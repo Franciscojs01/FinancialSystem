@@ -1,3 +1,3 @@
  💰 Financial System
 
-Um sistema financeiro desenvolvido em **Java + Spring Boot** para gerenciar **custos**, **despesas** e **investimentos** de usuários, utilizando **JPA/Hibernate** para persistência de dados e suporte a herança de entidades.
+ financial system developed in **Java + Spring Boot** to manage users' **costs**, **expenses** and **investments**, using **JPA/Hibernate** for data persistence and support for entity inheritance.
