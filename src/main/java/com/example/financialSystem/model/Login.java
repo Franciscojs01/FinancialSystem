@@ -16,7 +16,6 @@ public class Login implements UserDetails {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-
     @Getter
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")

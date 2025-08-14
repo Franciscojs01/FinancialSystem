@@ -12,6 +12,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private String name;
+    private String email;
     private LocalDate registerDate;
     private boolean userState;
 
@@ -21,7 +22,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Financial> financial;
 
-    public User(String name, LocalDate registerDate, boolean userState, Login login, List<Financial> financial) {
+    public User(String name, String email, LocalDate registerDate, boolean userState, Login login, List<Financial> financial) {
         this.name = name;
         this.registerDate = registerDate;
         this.userState = userState;
@@ -47,6 +48,14 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public LocalDate getRegisterDate() {
