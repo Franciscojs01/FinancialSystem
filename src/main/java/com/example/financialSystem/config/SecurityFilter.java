@@ -39,7 +39,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         String token = recoverToken(request);
         if (token != null) {
             String loginValidate = tokenService.validateToken(token);
-            Login login = loginRepository.findByUsername(loginValidate);
+            Login login = loginRepository.findByUsername(loginValidate).orElse(null);
 
             if (login != null) {
                 UsernamePasswordAuthenticationToken authentication =
