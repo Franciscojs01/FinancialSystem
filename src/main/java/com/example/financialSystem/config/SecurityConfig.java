@@ -27,9 +27,6 @@ public class SecurityConfig {
     @Autowired
     SecurityFilter securityFilter;
 
-    @Autowired
-    private @Lazy UserService userService;
-
     @Bean
     public SecurityFilterChain SecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
@@ -55,11 +52,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
+    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService) {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setPasswordEncoder(passwordEncoder());
 
-        authenticationProvider.setUserDetailsService(userService);
+        authenticationProvider.setUserDetailsService(userDetailsService);
 
         return authenticationProvider;
     }
