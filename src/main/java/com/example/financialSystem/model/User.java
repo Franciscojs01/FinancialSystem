@@ -16,6 +16,9 @@ public class User {
     private LocalDate registerDate;
     private boolean userState;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Login login;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Financial> financial;
 
@@ -68,6 +71,14 @@ public class User {
 
     public void setUserState(boolean userState) {
         this.userState = userState;
+    }
+
+    public Login getLogin() {
+        return login;
+    }
+
+    public void setLogin(Login login) {
+        this.login = login;
     }
 
     public List<Financial> getFinancial() {
