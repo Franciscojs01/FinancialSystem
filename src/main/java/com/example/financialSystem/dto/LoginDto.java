@@ -1,22 +1,22 @@
 package com.example.financialSystem.dto;
 
 public class LoginDto {
-    private int userId;
+    private int Id;
     private String userName;
-    private String password;
+    private String token;
 
-    public LoginDto(int userId, String userName, String password) {
-        this.userId = userId;
+    public LoginDto(int userId, String userName, String token) {
+        this.Id = userId;
         this.userName = userName;
-        this.password = password;
+        this.token = token;
     }
 
-    public int getUserId() {
-        return userId;
+    public int getId() {
+        return Id;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setId(int id) {
+        this.Id = id;
     }
 
     public String getUserName() {
@@ -27,11 +27,11 @@ public class LoginDto {
         this.userName = userName;
     }
 
-    public String getPassword() {
-        return password;
+    public String getToken() {
+        return token;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setToken(String token) {
+        this.token = token;
     }
 }

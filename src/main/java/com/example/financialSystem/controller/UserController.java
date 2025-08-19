@@ -21,10 +21,10 @@ public class UserController {
         return ResponseEntity.ok().body(userDto);
     }
 
-//    @PutMapping("/{id}")
-//    public ResponseEntity<UserDto> updateUser(@PathVariable int id, @RequestBody UserEditDto userEditDto) {
-//        UserDto userEdited = userService.editUser(id, userEditDto);
-//        return ResponseEntity.ok().body(userEdited);
-//    }
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDto> updateUser(@PathVariable int id, @RequestBody UserEditDto userEditDto) {
+        UserDto userEdited = userService.editUser(id, userEditDto);
+        return ResponseEntity.ok().body(userEdited);
+    }
 
 }

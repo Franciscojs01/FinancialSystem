@@ -41,7 +41,7 @@ public class TokenService {
                     .verify(token)
                     .getSubject();
         } catch (JWTVerificationException ex) {
-            return "";
+            return null;
         }
     }
 
@@ -50,6 +50,8 @@ public class TokenService {
     }
 
     private Instant getExpirationInstant() {
-        return LocalDateTime.now().plusSeconds(EXPIRATION_TIME).toInstant(TIMEZONE_OFFSET);
+        return LocalDateTime.now()
+                .plusHours(EXPIRATION_TIME)
+                .toInstant(TIMEZONE_OFFSET);
     }
 }

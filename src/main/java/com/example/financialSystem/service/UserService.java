@@ -55,7 +55,7 @@ public class UserService implements UserDetailsService {
         Login login = new Login(newUser,email, encondedPassword);
         newUser.setLogin(login);
 
-        User savedUser = userRepository.save(newUser);
+        userRepository.save(newUser);
 
         return new UserDto(newUser.getName(), newUser.getEmail());
 
@@ -70,9 +70,17 @@ public class UserService implements UserDetailsService {
 
         Login login = userExistent.getLogin();
 
+        if (login != null) {
+            if(userDto.getPassword() != null && !userDto.getPassword().isBlank()) {
+                login.setPassword(passwordEncoder.encode(userDto.getPassword()));
+            }
 
-        if (userDto.getPassword() != null && !userDto.getPassword().isBlank()) {
-            login.setPassword(passwordEncoder.encode(userDto.getPassword()));
+            if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
+                login.setUsername(userDto.getEmail());
+            }
+
+            login.setUser(userExistent);
+            userExistent.setLogin(login);
         }
 
         userRepository.save(userExistent);
