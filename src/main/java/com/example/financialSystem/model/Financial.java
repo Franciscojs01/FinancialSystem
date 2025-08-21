@@ -15,15 +15,17 @@ public abstract class Financial {
 
     private String type;
     private BigDecimal value;
+    private String baseCurrency;
     private LocalDate dateFinancial;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Financial(String type, BigDecimal value, LocalDate dateFinancial, User user) {
+    public Financial(String type, BigDecimal value, String baseCurrency, LocalDate dateFinancial, User user) {
         this.type = type;
         this.value = value;
+        this.baseCurrency = baseCurrency;
         this.dateFinancial = dateFinancial;
         this.user = user;
     }
@@ -32,20 +34,48 @@ public abstract class Financial {
 
     }
 
+    public int getId() {
+        return id;
+    }
+
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public void setType(String type) {
         this.type = type;
     }
 
+    public BigDecimal getValue() {
+        return value;
+    }
+
     public void setValue(BigDecimal value) {
         this.value = value;
     }
 
+    public String getBaseCurrency() {
+        return baseCurrency;
+    }
+
+    public void setBaseCurrency(String baseCurrency) {
+        this.baseCurrency = baseCurrency;
+    }
+
+    public LocalDate getDateFinancial() {
+        return dateFinancial;
+    }
+
     public void setDateFinancial(LocalDate dateFinancial) {
         this.dateFinancial = dateFinancial;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     public void setUser(User user) {

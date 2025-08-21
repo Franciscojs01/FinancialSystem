@@ -9,8 +9,8 @@ import java.time.LocalDate;
 public class Cost extends Financial {
     private String observation;
 
-    public Cost(String type, BigDecimal value, LocalDate dateFinancial, User user, String observation) {
-        super(type, value, dateFinancial, user);
+    public Cost(String type, BigDecimal value,String baseCurrency, LocalDate dateFinancial, User user, String observation) {
+        super(type, value, baseCurrency, dateFinancial, user);
         this.observation = observation;
     }
 

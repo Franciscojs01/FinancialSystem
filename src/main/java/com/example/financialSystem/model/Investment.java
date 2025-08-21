@@ -1,9 +1,9 @@
 package com.example.financialSystem.model;
 
 import jakarta.persistence.Entity;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 @Entity
 public class Investment extends Financial {
@@ -11,14 +11,22 @@ public class Investment extends Financial {
     private BigDecimal currentValue;
     private String brokerName;
 
-    public Investment(String type, BigDecimal value, LocalDate dateFinancial, User user, BigDecimal actionQuantity, BigDecimal currentValue, String brokerName) {
-        super(type, value, dateFinancial, user);
+    public Investment(String type, BigDecimal value, String baseCurrency, LocalDate dateFinancial, User user, BigDecimal actionQuantity, BigDecimal currentValue, String brokerName) {
+        super(type, value, baseCurrency, dateFinancial, user);
         this.actionQuantity = actionQuantity;
         this.currentValue = currentValue;
         this.brokerName = brokerName;
     }
 
     public Investment() {
+    }
+
+    public int getDaysInvested() {
+        if (this.getDateFinancial() == null) {
+            return 0;
+        }
+
+        return (int) ChronoUnit.DAYS.between(this.getDateFinancial(), LocalDate.now());
     }
 
     public BigDecimal getActionQuantity() {
@@ -44,4 +52,5 @@ public class Investment extends Financial {
     public void setBrokerName(String brokerName) {
         this.brokerName = brokerName;
     }
+
 }

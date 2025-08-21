@@ -6,18 +6,18 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-public class Expenses extends Financial {
+public class Expense extends Financial {
     private String paymentMethod;
     private boolean isFixed;
 
-    public Expenses(String type, BigDecimal value, LocalDate dateFinancial, User user, String paymentMethod, boolean isFixed) {
-        super(type, value, dateFinancial, user);
+    public Expense(String type, BigDecimal value, LocalDate dateFinancial,String baseCurrency, User user, String paymentMethod, boolean isFixed) {
+        super(type, value,baseCurrency, dateFinancial,user);
         this.paymentMethod = paymentMethod;
         this.isFixed = isFixed;
     }
 
 
-    public Expenses() {
+    public Expense() {
 
     }
 

@@ -33,6 +33,7 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return loginRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
     }
 
     public UserDto registerUser(UserRegisterDto userRegisterDto) {
