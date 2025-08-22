@@ -27,4 +27,17 @@ public class UserController {
         return ResponseEntity.ok().body(userEdited);
     }
 
+    @PutMapping("/{id}/deactivate")
+    public ResponseEntity<Void> deactivateUser(@PathVariable int id) {
+        userService.deactivateUser(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("{id}/active")
+    public ResponseEntity<Void> activateUser(@PathVariable int id) {
+        userService.activateUser(id);
+        return ResponseEntity.ok().build();
+    }
+
+
 }

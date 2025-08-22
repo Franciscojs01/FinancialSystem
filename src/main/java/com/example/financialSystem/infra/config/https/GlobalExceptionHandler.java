@@ -28,4 +28,19 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<String> handleIllegalStateException(IllegalStateException e, WebRequest webRequest) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGeneral(Exception ex) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR) // 500
+                .body("An unexpected error occurred: " + ex.getMessage());
+    }
+
 }

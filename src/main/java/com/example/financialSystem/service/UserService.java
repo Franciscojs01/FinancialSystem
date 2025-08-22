@@ -31,9 +31,14 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return loginRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        Login login = loginRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
+        if (!login.getUser().isUserState()) {
+            throw new UsernameNotFoundException("User is inactive");
+        }
+
+        return login;
     }
 
     public UserDto registerUser(UserRegisterDto userRegisterDto) {
@@ -87,6 +92,30 @@ public class UserService implements UserDetailsService {
         userRepository.save(userExistent);
 
         return new UserDto(userDto.getName(), userDto.getEmail());
+    }
+
+    public void deactivateUser(int id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if (!user.isUserState()) {
+            throw new IllegalStateException("User is in inactive");
+        }
+
+        user.setUserState(false);
+        userRepository.save(user);
+    }
+
+    public void activateUser(int id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if (user.isUserState()) {
+            throw new IllegalStateException("User is already active");
+        }
+
+        user.setUserState(true);
+        userRepository.save(user);
     }
 
 }
