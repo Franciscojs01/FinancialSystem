@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -92,6 +93,12 @@ public class UserService implements UserDetailsService {
         userRepository.save(userExistent);
 
         return new UserDto(userDto.getName(), userDto.getEmail());
+    }
+
+    public List<UserDto> listUser() {
+        return userRepository.findAll().stream()
+                .map(user -> new UserDto(user.getEmail(), user.getName()))
+                .toList();
     }
 
     public void deactivateUser(int id) {
