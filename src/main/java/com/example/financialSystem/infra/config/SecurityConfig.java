@@ -1,4 +1,4 @@
-package com.example.financialSystem.config;
+package com.example.financialSystem.infra.config;
 
 import com.example.financialSystem.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +25,6 @@ public class SecurityConfig {
     @Autowired
     SecurityFilter securityFilter;
 
-    @Autowired
-    private UserService userService;
-
     @Bean
     public SecurityFilterChain SecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
@@ -35,7 +32,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers(HttpMethod.POST,"/login","/user/register").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/auth/login","/user/register").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
@@ -53,7 +50,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
+    public AuthenticationProvider authenticationProvider(UserService userService) {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setPasswordEncoder(passwordEncoder());
 

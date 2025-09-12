@@ -1,5 +1,6 @@
 package com.example.financialSystem.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -22,12 +23,11 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Financial> financial;
 
-    public User(String name, String email, LocalDate registerDate, boolean userState, Login login, List<Financial> financial) {
+    public User(String name, String email, LocalDate registerDate, boolean userState) {
         this.name = name;
+        this.email = email;
         this.registerDate = registerDate;
         this.userState = userState;
-        this.login = login;
-        this.financial = financial;
     }
 
     public User() {
