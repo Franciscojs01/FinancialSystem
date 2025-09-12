@@ -1,25 +1,36 @@
 package com.example.financialSystem.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 @Entity
 public class Investment extends Financial {
-    private BigDecimal actionQuantity;
+    @Enumerated(EnumType.STRING)
+    private InvestmentType type;
+
+    private int actionQuantity;
     private BigDecimal currentValue;
     private String brokerName;
 
-    public Investment(String type, BigDecimal value, String baseCurrency, LocalDate dateFinancial, User user, BigDecimal actionQuantity, BigDecimal currentValue, String brokerName) {
-        super(type, value, baseCurrency, dateFinancial, user);
+    public Investment(InvestmentType type, BigDecimal value, String baseCurrency, LocalDate dateFinancial,
+                      User user, int actionQuantity, BigDecimal currentValue, String brokerName) {
+        super(value, baseCurrency, dateFinancial, user);
+        this.type = type;
         this.actionQuantity = actionQuantity;
         this.currentValue = currentValue;
         this.brokerName = brokerName;
     }
 
+
+
     public Investment() {
     }
+
 
     public int getDaysInvested() {
         if (this.getDateFinancial() == null) {
@@ -28,12 +39,19 @@ public class Investment extends Financial {
 
         return (int) ChronoUnit.DAYS.between(this.getDateFinancial(), LocalDate.now());
     }
+    public InvestmentType getType() {
+        return type;
+    }
 
-    public BigDecimal getActionQuantity() {
+    public void setType(InvestmentType type) {
+        this.type = type;
+    }
+
+    public int getActionQuantity() {
         return actionQuantity;
     }
 
-    public void setActionQuantity(BigDecimal actionQuantity) {
+    public void setActionQuantity(int actionQuantity) {
         this.actionQuantity = actionQuantity;
     }
 
@@ -52,5 +70,7 @@ public class Investment extends Financial {
     public void setBrokerName(String brokerName) {
         this.brokerName = brokerName;
     }
+
+
 
 }

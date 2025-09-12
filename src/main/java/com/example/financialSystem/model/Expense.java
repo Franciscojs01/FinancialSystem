@@ -10,8 +10,8 @@ public class Expense extends Financial {
     private String paymentMethod;
     private boolean isFixed;
 
-    public Expense(String type, BigDecimal value, LocalDate dateFinancial,String baseCurrency, User user, String paymentMethod, boolean isFixed) {
-        super(type, value,baseCurrency, dateFinancial,user);
+    public Expense(BigDecimal value, LocalDate dateFinancial,String baseCurrency, User user, String paymentMethod, boolean isFixed) {
+        super(value,baseCurrency, dateFinancial,user);
         this.paymentMethod = paymentMethod;
         this.isFixed = isFixed;
     }

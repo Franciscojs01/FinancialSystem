@@ -1,5 +1,7 @@
 package com.example.financialSystem.infra.config.https;
 
+import com.example.financialSystem.exceptions.InvestmentDuplicateException;
+import com.example.financialSystem.exceptions.InvestmentNotFoundException;
 import com.example.financialSystem.exceptions.UserDuplicateException;
 import com.example.financialSystem.exceptions.UserNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -42,5 +44,24 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR) // 500
                 .body("An unexpected error occurred: " + ex.getMessage());
     }
+
+    @ExceptionHandler(InvestmentNotFoundException.class)
+    public ResponseEntity<RestErrorMessage> handleInvestmentNotFoundException(InvestmentNotFoundException e, WebRequest webRequest) {
+        RestErrorMessage errorResponse = new RestErrorMessage(
+                HttpStatus.NOT_FOUND.value(), "Investment not found", e.getMessage()
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvestmentDuplicateException.class)
+    public ResponseEntity<RestErrorMessage> handleDuplicateException(InvestmentDuplicateException e, WebRequest webRequest) {
+        RestErrorMessage errorResponse = new RestErrorMessage(
+                HttpStatus.CONFLICT.value(), "Investment duplicate", e.getMessage()
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
 
 }

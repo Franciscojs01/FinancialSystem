@@ -1,59 +1,49 @@
 package com.example.financialSystem.service;
 
 import com.example.financialSystem.dto.InvestmentDto;
-import com.example.financialSystem.model.BenchMarkRate;
+
+import com.example.financialSystem.exceptions.InvestmentDuplicateException;
 import com.example.financialSystem.model.Investment;
-import com.example.financialSystem.model.Login;
+import com.example.financialSystem.model.InvestmentType;
+import java.util.Objects;
 import com.example.financialSystem.model.User;
 import com.example.financialSystem.repository.InvestmentRepository;
-import com.example.financialSystem.util.InterestCalculator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+import java.util.Optional;
+
 
 @Service
-public class InvestmentService extends UserLoggedService{
+public class InvestmentService extends UserLoggedService {
     @Autowired
     private InvestmentRepository investmentRepository;
 
-    public InvestmentDto createInvestment(InvestmentDto investmentDto) {
-        Login login = getLoggedUser();
-        User user = login.getUser();
+    public InvestmentDto createInvestment(Investment newInvestment) {
+        User user = getLoggedUser().getUser();
+        newInvestment.setUser(user);
 
+        Optional<Investment> existingInvestment = investmentRepository
+                .findByUserAndTypeAndBrokerName(user, newInvestment.getType(), newInvestment.getBrokerName());
 
-        BenchMarkRate rate = BenchMarkRate.valueOf(investmentDto.getBaseCurrency());
+        if (existingInvestment.isEmpty()) {
+            Investment savedInvestment = investmentRepository.save(newInvestment);
+            return new InvestmentDto(savedInvestment);
+        }
 
-        BigDecimal currentValue = InterestCalculator.calculate(
-                investmentDto.getValue(),
-                rate.getAnnualRate(),
-                investmentDto.getDaysInvested()
-        );
+        Investment foundInvestment = existingInvestment.get();
+        InvestmentType type = foundInvestment.getType();
 
-        Investment investment = new Investment(
-                investmentDto.getType(),
-                investmentDto.getValue(),
-                investmentDto.getBaseCurrency(),
-                investmentDto.getDateInvestment(),
-                user,
-                investmentDto.getActionQuantity(),
-                currentValue,
-                investmentDto.getBrokerName()
-        );
+        if (type.equals(InvestmentType.STOCK) ||  type.equals(InvestmentType.CRYPTO)) {
+            throw new InvestmentDuplicateException("You have already created investment");
+        }
 
-        investmentRepository.save(investment);
+        if (Objects.equals(foundInvestment.getDateFinancial(), newInvestment.getDateFinancial())) {
+            throw new InvestmentDuplicateException("You have already a investment with this date");
+        }
 
-        return new InvestmentDto(
-                investment.getType(),
-                investment.getValue(),
-                investment.getBaseCurrency(),
-                investment.getDateFinancial(),
-                investment.getActionQuantity(),
-                investment.getBrokerName(),
-                investment.getDaysInvested()
-        );
-
+        Investment savedInvestment = investmentRepository.save(newInvestment);
+        return new InvestmentDto(savedInvestment);
     }
-
 
 }

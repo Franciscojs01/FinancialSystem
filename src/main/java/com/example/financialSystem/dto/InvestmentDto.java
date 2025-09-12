@@ -1,81 +1,106 @@
 package com.example.financialSystem.dto;
 
+import com.example.financialSystem.model.Investment;
+import com.example.financialSystem.model.InvestmentType;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
 
 public class InvestmentDto {
-    private String type;
+    private InvestmentType type;
     private BigDecimal value;
     private String baseCurrency;
-    private LocalDate dateInvestment;
-    private BigDecimal actionQuantity;
+    private LocalDate dateFinancial;
+    private int actionQuantity;
+    private BigDecimal currentValue;
     private String brokerName;
     private int daysInvested;
 
-    public InvestmentDto(String type, BigDecimal value, String baseCurrency, LocalDate dateInvestment, BigDecimal actionQuantity, String brokerName, int daysInvested) {
-        this.type = type;
-        this.value = value;
-        this.baseCurrency = baseCurrency;
-        this.dateInvestment = dateInvestment;
-        this.actionQuantity = actionQuantity;
-        this.brokerName = brokerName;
-        this.daysInvested = daysInvested;
+    public InvestmentDto() {
+
     }
 
-    public String getType() {
+    public InvestmentDto(Investment entityInvestment) {
+        this.type = entityInvestment.getType();
+        this.value = entityInvestment.getValue();
+        this.baseCurrency = entityInvestment.getBaseCurrency();
+        this.dateFinancial = entityInvestment.getDateFinancial();
+        this.actionQuantity = entityInvestment.getActionQuantity();
+        this.currentValue = entityInvestment.getCurrentValue();
+        this.brokerName = entityInvestment.getBrokerName();
+
+        if (entityInvestment.getDateFinancial() != null) {
+            this.daysInvested = (int) ChronoUnit.DAYS.between(dateFinancial, LocalDate.now());
+        } else {
+            this.daysInvested = 0;
+        }
+    }
+
+    public InvestmentType getType() {
         return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public BigDecimal getValue() {
         return value;
     }
 
-    public void setValue(BigDecimal value) {
-        this.value = value;
-    }
-
     public String getBaseCurrency() {
         return baseCurrency;
     }
 
-    public void setBaseCurrency(String baseCurrency) {
-        this.baseCurrency = baseCurrency;
+    public LocalDate getDateFinancial() {
+        return dateFinancial;
     }
 
-    public LocalDate getDateInvestment() {
-        return dateInvestment;
-    }
-
-    public void setDateInvestment(LocalDate dateInvestment) {
-        this.dateInvestment = dateInvestment;
-    }
-
-    public BigDecimal getActionQuantity() {
+    public int getActionQuantity() {
         return actionQuantity;
     }
 
-    public void setActionQuantity(BigDecimal actionQuantity) {
-        this.actionQuantity = actionQuantity;
+    public BigDecimal getCurrentValue() {
+        return currentValue;
     }
 
     public String getBrokerName() {
         return brokerName;
     }
 
-    public void setBrokerName(String brokerName) {
-        this.brokerName = brokerName;
-    }
-
     public int getDaysInvested() {
         return daysInvested;
+    }
+
+    public void setType(InvestmentType type) {
+        this.type = type;
+    }
+
+    public void setValue(BigDecimal value) {
+        this.value = value;
+    }
+
+    public void setBaseCurrency(String baseCurrency) {
+        this.baseCurrency = baseCurrency;
+    }
+
+    public void setDateFinancial(LocalDate dateFinancial) {
+        this.dateFinancial = dateFinancial;
+    }
+
+    public void setActionQuantity(int actionQuantity) {
+        this.actionQuantity = actionQuantity;
+    }
+
+    public void setCurrentValue(BigDecimal currentValue) {
+        this.currentValue = currentValue;
+    }
+
+    public void setBrokerName(String brokerName) {
+        this.brokerName = brokerName;
     }
 
     public void setDaysInvested(int daysInvested) {
         this.daysInvested = daysInvested;
     }
+
 }

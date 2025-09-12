@@ -1,19 +1,18 @@
 package com.example.financialSystem.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Inheritance(strategy=InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Financial {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    private String type;
     private BigDecimal value;
     private String baseCurrency;
     private LocalDate dateFinancial;
@@ -22,8 +21,7 @@ public abstract class Financial {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Financial(String type, BigDecimal value, String baseCurrency, LocalDate dateFinancial, User user) {
-        this.type = type;
+    public Financial(BigDecimal value, String baseCurrency, LocalDate dateFinancial, User user) {
         this.value = value;
         this.baseCurrency = baseCurrency;
         this.dateFinancial = dateFinancial;
@@ -34,20 +32,13 @@ public abstract class Financial {
 
     }
 
+
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public BigDecimal getValue() {
