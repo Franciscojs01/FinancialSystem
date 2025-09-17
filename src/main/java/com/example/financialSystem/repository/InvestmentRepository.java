@@ -9,4 +9,5 @@ import java.util.Optional;
 
 public interface InvestmentRepository extends JpaRepository<Investment, Long> {
     Optional<Investment> findByUserAndTypeAndBrokerName(User user, InvestmentType type, String brokerName);
+    Optional<Investment> findById(int id);
 }
