@@ -25,4 +25,9 @@ public class InvestmentController {
         InvestmentDto modifiedInvestment = investmentService.editInvestment(id, investment);
         return ResponseEntity.ok().body(modifiedInvestment);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<InvestmentDto> getInvestment(@PathVariable int id) {
+        return ResponseEntity.ok().body(investmentService.getInvestmentById(id));
+    }
 }

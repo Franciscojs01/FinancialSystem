@@ -86,4 +86,10 @@ public class InvestmentService extends UserLoggedService {
         return false;
     }
 
+    public InvestmentDto getInvestmentById(int id) {
+        Investment investment = investmentRepository.findById(id).orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
+
+        return new InvestmentDto(investment);
+    }
+
 }

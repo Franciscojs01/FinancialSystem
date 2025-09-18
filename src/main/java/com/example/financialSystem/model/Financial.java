@@ -1,5 +1,6 @@
 package com.example.financialSystem.model;
 
+
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;

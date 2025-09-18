@@ -71,6 +71,4 @@ public class Investment extends Financial {
         this.brokerName = brokerName;
     }
 
-
-
 }
