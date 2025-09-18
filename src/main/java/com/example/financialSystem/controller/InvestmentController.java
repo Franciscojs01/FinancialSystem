@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/investments")
 public class InvestmentController {
@@ -29,5 +31,17 @@ public class InvestmentController {
     @GetMapping("/{id}")
     public ResponseEntity<InvestmentDto> getInvestment(@PathVariable int id) {
         return ResponseEntity.ok().body(investmentService.getInvestmentById(id));
+    }
+
+    @GetMapping("/{id}/simulate")
+    public ResponseEntity<InvestmentDto> simulateInvestment(@PathVariable int id, @RequestParam int days) {
+        InvestmentDto simulated = investmentService.simulateInvestment(id, days);
+        return ResponseEntity.ok().body(simulated);
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<Investment>> getInvestments() {
+        List<Investment> investments = investmentService.listInvestments();
+        return ResponseEntity.ok(investments);
     }
 }

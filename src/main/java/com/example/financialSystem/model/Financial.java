@@ -1,6 +1,7 @@
 package com.example.financialSystem.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -19,6 +20,7 @@ public abstract class Financial {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
     public Financial(BigDecimal value, String baseCurrency, LocalDate dateFinancial, User user) {

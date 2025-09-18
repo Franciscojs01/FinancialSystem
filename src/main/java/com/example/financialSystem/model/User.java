@@ -21,6 +21,7 @@ public class User {
     private Login login;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Financial> financial;
 
     public User(String name, String email, LocalDate registerDate, boolean userState) {

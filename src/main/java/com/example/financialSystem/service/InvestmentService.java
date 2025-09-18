@@ -4,14 +4,16 @@ import com.example.financialSystem.dto.InvestmentDto;
 
 import com.example.financialSystem.exceptions.InvestmentDuplicateException;
 import com.example.financialSystem.exceptions.InvestmentNotFoundException;
-import com.example.financialSystem.model.Investment;
-import com.example.financialSystem.model.InvestmentType;
+import com.example.financialSystem.model.*;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 
-import com.example.financialSystem.model.User;
 import com.example.financialSystem.repository.InvestmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -50,8 +52,15 @@ public class InvestmentService extends UserLoggedService {
     }
 
     public InvestmentDto editInvestment(int id, InvestmentDto editInvestmentDto) {
+
         Investment existingInvestment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
+
+        Login loggedInUser = getLoggedUser();
+
+        if (existingInvestment.getUser().getId() != loggedInUser.getId()) {
+            throw new AccessDeniedException("You are not authorized to edit this investment");
+        }
 
         unchanged(existingInvestment, editInvestmentDto);
 
@@ -91,5 +100,32 @@ public class InvestmentService extends UserLoggedService {
 
         return new InvestmentDto(investment);
     }
+
+    public InvestmentDto simulateInvestment(int id, int days) {
+        Investment investment = investmentRepository.findById(id)
+                .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
+
+        BigDecimal initialValue = investment.getValue();
+
+        BenchMarkRate rate = BenchMarkRate.valueOf(investment.getBaseCurrency());
+        double annualRate = rate.getAnnualRate();
+
+        double dailyRate = Math.pow(1 + annualRate, 1.0 / 365) - 1;
+
+        double futureValue = Math.round(initialValue.doubleValue() * Math.pow(1 + dailyRate, days));
+
+        InvestmentDto investmentDto = new InvestmentDto(investment);
+        investmentDto.setCurrentValue(BigDecimal.valueOf(futureValue));
+
+        return investmentDto;
+    }
+
+    public List<Investment> listInvestments() {
+        Login loggedInUser = getLoggedUser();
+        User user = loggedInUser.getUser();
+
+        return investmentRepository.findByUser(user);
+    }
+
 
 }
