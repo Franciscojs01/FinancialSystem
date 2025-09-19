@@ -44,4 +44,10 @@ public class InvestmentController {
         List<Investment> investments = investmentService.listInvestments();
         return ResponseEntity.ok(investments);
     }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteInvestment(@PathVariable int id) {
+        investmentService.deleteInvestment(id);
+        return ResponseEntity.ok("Investment success deleted! ");
+    }
 }

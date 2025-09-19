@@ -127,5 +127,17 @@ public class InvestmentService extends UserLoggedService {
         return investmentRepository.findByUser(user);
     }
 
+    public void deleteInvestment(long id) {
+        Investment investment = investmentRepository.findById(id)
+                .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
+
+        Login loggedInUser = getLoggedUser();
+
+        if (loggedInUser.getUser().getId() != investment.getUser().getId()) {
+            throw new AccessDeniedException("You are not authorized to delete this investment");
+        }
+        investmentRepository.deleteById(id);
+    }
+
 
 }
