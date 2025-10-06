@@ -1,4 +1,4 @@
-package com.example.financialSystem.model;
+package com.example.financialSystem.model.enums;
 
 public enum ExpensesType {
     FOOD("Food", "Expenses related to food and drinks"),

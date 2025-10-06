@@ -1,4 +1,4 @@
-package com.example.financialSystem.infra.config.https;
+package com.example.financialSystem.config;
 
 public class RestErrorMessage {
     private int statusCode;

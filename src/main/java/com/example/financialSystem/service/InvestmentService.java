@@ -8,12 +8,12 @@ import com.example.financialSystem.model.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Objects;
 
+import com.example.financialSystem.model.enums.InvestmentType;
 import com.example.financialSystem.repository.InvestmentRepository;
+import com.example.financialSystem.util.BenchMarkRate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -43,9 +43,9 @@ public class InvestmentService extends UserLoggedService {
             throw new InvestmentDuplicateException("You have already created investment");
         }
 
-        if (Objects.equals(foundInvestment.getDateFinancial(), newInvestment.getDateFinancial())) {
-            throw new InvestmentDuplicateException("You have already a investment with this date");
-        }
+//        if (Objects.equals(foundInvestment.getDateFinancial(), newInvestment.getDateFinancial())) {
+//            throw new InvestmentDuplicateException("You have already a investment with this date");
+//        }
 
         Investment savedInvestment = investmentRepository.save(newInvestment);
         return new InvestmentDto(savedInvestment);

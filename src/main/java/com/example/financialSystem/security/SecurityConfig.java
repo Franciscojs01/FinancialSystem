@@ -1,4 +1,4 @@
-package com.example.financialSystem.infra.config;
+package com.example.financialSystem.security;
 
 import com.example.financialSystem.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

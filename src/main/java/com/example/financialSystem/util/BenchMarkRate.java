@@ -1,4 +1,4 @@
-package com.example.financialSystem.model;
+package com.example.financialSystem.util;
 
 public enum BenchMarkRate {
     BRL("CDI", 0.1365),

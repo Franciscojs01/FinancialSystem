@@ -1,7 +1,7 @@
 package com.example.financialSystem.dto;
 
 import com.example.financialSystem.model.Investment;
-import com.example.financialSystem.model.InvestmentType;
+import com.example.financialSystem.model.enums.InvestmentType;
 
 
 import java.math.BigDecimal;

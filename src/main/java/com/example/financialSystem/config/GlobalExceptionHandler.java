@@ -1,4 +1,4 @@
-package com.example.financialSystem.infra.config.https;
+package com.example.financialSystem.config;
 
 import com.example.financialSystem.exceptions.InvestmentDuplicateException;
 import com.example.financialSystem.exceptions.InvestmentNotFoundException;

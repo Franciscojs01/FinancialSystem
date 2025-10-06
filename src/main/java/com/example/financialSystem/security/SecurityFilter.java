@@ -1,4 +1,4 @@
-package com.example.financialSystem.infra.config;
+package com.example.financialSystem.security;
 
 import com.example.financialSystem.repository.LoginRepository;
 import com.example.financialSystem.service.TokenService;

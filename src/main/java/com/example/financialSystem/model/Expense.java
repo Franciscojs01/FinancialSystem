@@ -1,5 +1,6 @@
 package com.example.financialSystem.model;
 
+import com.example.financialSystem.model.enums.ExpensesType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

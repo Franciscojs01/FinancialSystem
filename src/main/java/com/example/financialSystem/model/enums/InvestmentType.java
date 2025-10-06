@@ -1,4 +1,4 @@
-package com.example.financialSystem.model;
+package com.example.financialSystem.model.enums;
 
 public enum InvestmentType {
     STOCK(null),

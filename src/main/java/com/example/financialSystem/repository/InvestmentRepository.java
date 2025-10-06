@@ -1,7 +1,7 @@
 package com.example.financialSystem.repository;
 
 import com.example.financialSystem.model.Investment;
-import com.example.financialSystem.model.InvestmentType;
+import com.example.financialSystem.model.enums.InvestmentType;
 import com.example.financialSystem.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
