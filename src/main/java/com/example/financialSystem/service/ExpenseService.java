@@ -1,6 +1,7 @@
 package com.example.financialSystem.service;
 
 import com.example.financialSystem.dto.ExpenseDto;
+import com.example.financialSystem.exceptions.ExpenseDuplicateExcepetion;
 import com.example.financialSystem.model.Expense;
 import com.example.financialSystem.model.User;
 import com.example.financialSystem.repository.ExpenseRepository;
@@ -14,27 +15,24 @@ public class ExpenseService extends UserLoggedService {
     @Autowired
     private ExpenseRepository expenseRepository;
 
-    public ExpenseDto createExpense(Expense newExpense) {
+    public ExpenseDto createExpense(Expense expense) {
         User user = getLoggedUser().getUser();
-        newExpense.setUser(user);
+        expense.setUser(user);
 
-        Optional<Expense> existingExpense = expenseRepository
-                .findByUserAndDateFinancialAndValueAndPaymentMethod(
-                        user,
-                        newExpense.getDateFinancial(),
-                        newExpense.getValue(),
-                        newExpense.getPaymentMethod()
-                );
-
-        if (existingExpense.isEmpty()) {
-            Expense savedExpense = expenseRepository.save(newExpense);
-            return new ExpenseDto(savedExpense);
+        if (expense.getPaymentMethod() == null) {
+            throw new IllegalArgumentException("payment method are required");
         }
 
+        Optional<Expense> existingExpense = expenseRepository.findById((expense.getId()));
 
-        return ;
+        if(existingExpense.isPresent() && existingExpense.get().getUser().equals(user)) {
+            throw new ExpenseDuplicateExcepetion("Expense already exists");
+        }
+
+        expenseRepository.save(expense);
+
+        return new ExpenseDto(expense);
     }
-
 
 
 }

@@ -25,19 +25,23 @@ public class InvestmentService extends UserLoggedService {
     @Autowired
     private InvestmentRepository investmentRepository;
 
-    public InvestmentDto createInvestment(Investment newInvestment) {
+    public InvestmentDto createInvestment(Investment investment) {
         User user = getLoggedUser().getUser();
-        newInvestment.setUser(user);
+        investment.setUser(user);
+
+        if (investment.getBrokerName() == null || investment.getCurrentValue() == null || investment.getActionQuantity() <= 0) {
+            throw new IllegalArgumentException("broker name, current value and action quantity are required");
+        }
 
         investmentRepository
-                .findByUserAndTypeAndBrokerName(user, newInvestment.getType(), newInvestment.getBrokerName())
+                .findByUserAndTypeAndBrokerName(user, investment.getType(), investment.getBrokerName())
                 .ifPresent(existing -> {
                     if (existing.getType().equals(InvestmentType.STOCK) || existing.getType().equals(InvestmentType.CRYPTO)) {
                         throw new InvestmentDuplicateException("You have already created investment");
                     }
                 });
 
-        Investment savedInvestment = investmentRepository.save(newInvestment);
+        Investment savedInvestment = investmentRepository.save(investment);
         return new InvestmentDto(savedInvestment);
     }
 

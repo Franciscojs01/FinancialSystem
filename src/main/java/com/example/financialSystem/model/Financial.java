@@ -3,6 +3,7 @@ package com.example.financialSystem.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,8 +15,13 @@ public abstract class Financial {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
+    @NotNull(message = "Value is required")
     private BigDecimal value;
+
+    @NotNull(message = "Base currency is required")
     private String baseCurrency;
+
+    @NotNull(message = "Date is required")
     private LocalDate dateFinancial;
 
     @ManyToOne

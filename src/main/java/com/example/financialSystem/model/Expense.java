@@ -1,6 +1,6 @@
 package com.example.financialSystem.model;
 
-import com.example.financialSystem.model.enums.ExpensesType;
+import com.example.financialSystem.model.enums.ExpenseType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -11,12 +11,12 @@ import java.time.LocalDate;
 @Entity
 public class Expense extends Financial {
     @Enumerated(EnumType.STRING)
-    private ExpensesType type;
+    private ExpenseType type;
 
     private String paymentMethod;
     private boolean isFixed;
 
-    public Expense(ExpensesType type, BigDecimal value, LocalDate dateFinancial,String baseCurrency, User user, String paymentMethod, boolean isFixed) {
+    public Expense(ExpenseType type, BigDecimal value, LocalDate dateFinancial, String baseCurrency, User user, String paymentMethod, boolean isFixed) {
         super(value,baseCurrency, dateFinancial,user);
         this.type = type;
         this.paymentMethod = paymentMethod;
@@ -27,11 +27,11 @@ public class Expense extends Financial {
 
     }
 
-    public ExpensesType getType() {
+    public ExpenseType getType() {
         return type;
     }
 
-    public void setType(ExpensesType type) {
+    public void setType(ExpenseType type) {
         this.type = type;
     }
 
