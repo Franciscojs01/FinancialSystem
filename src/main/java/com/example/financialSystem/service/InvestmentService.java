@@ -12,6 +12,7 @@ import java.util.List;
 import com.example.financialSystem.model.enums.InvestmentType;
 import com.example.financialSystem.repository.InvestmentRepository;
 import com.example.financialSystem.util.BenchMarkRate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -28,24 +29,13 @@ public class InvestmentService extends UserLoggedService {
         User user = getLoggedUser().getUser();
         newInvestment.setUser(user);
 
-        Optional<Investment> existingInvestment = investmentRepository
-                .findByUserAndTypeAndBrokerName(user, newInvestment.getType(), newInvestment.getBrokerName());
-
-        if (existingInvestment.isEmpty()) {
-            Investment savedInvestment = investmentRepository.save(newInvestment);
-            return new InvestmentDto(savedInvestment);
-        }
-
-        Investment foundInvestment = existingInvestment.get();
-        InvestmentType type = foundInvestment.getType();
-
-        if (type.equals(InvestmentType.STOCK) || type.equals(InvestmentType.CRYPTO)) {
-            throw new InvestmentDuplicateException("You have already created investment");
-        }
-
-//        if (Objects.equals(foundInvestment.getDateFinancial(), newInvestment.getDateFinancial())) {
-//            throw new InvestmentDuplicateException("You have already a investment with this date");
-//        }
+        investmentRepository
+                .findByUserAndTypeAndBrokerName(user, newInvestment.getType(), newInvestment.getBrokerName())
+                .ifPresent(existing -> {
+                    if (existing.getType().equals(InvestmentType.STOCK) || existing.getType().equals(InvestmentType.CRYPTO)) {
+                        throw new InvestmentDuplicateException("You have already created investment");
+                    }
+                });
 
         Investment savedInvestment = investmentRepository.save(newInvestment);
         return new InvestmentDto(savedInvestment);
