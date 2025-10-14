@@ -1,6 +1,7 @@
 package com.example.financialSystem.model;
 
 import com.example.financialSystem.model.enums.ExpenseType;
+import com.example.financialSystem.util.BenchMarkRate;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -16,7 +17,7 @@ public class Expense extends Financial {
     private String paymentMethod;
     private boolean isFixed;
 
-    public Expense(ExpenseType type, BigDecimal value, LocalDate dateFinancial, String baseCurrency, User user, String paymentMethod, boolean isFixed) {
+    public Expense(ExpenseType type, BigDecimal value, LocalDate dateFinancial, BenchMarkRate baseCurrency, User user, String paymentMethod, boolean isFixed) {
         super(value,baseCurrency, dateFinancial,user);
         this.type = type;
         this.paymentMethod = paymentMethod;

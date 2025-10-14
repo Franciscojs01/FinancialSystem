@@ -1,13 +1,14 @@
 package com.example.financialSystem.model;
 
 import com.example.financialSystem.model.enums.InvestmentType;
+import com.example.financialSystem.util.BenchMarkRate;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 @Entity
 public class Investment extends Financial {
@@ -15,31 +16,24 @@ public class Investment extends Financial {
     private InvestmentType type;
 
     private int actionQuantity;
+
+    @JsonIgnore
     private BigDecimal currentValue;
+
     private String brokerName;
 
-    public Investment(InvestmentType type, BigDecimal value, String baseCurrency, LocalDate dateFinancial,
+    public Investment(InvestmentType type, BigDecimal value, BenchMarkRate baseCurrency, LocalDate dateFinancial,
                       User user, int actionQuantity, BigDecimal currentValue, String brokerName) {
         super(value, baseCurrency, dateFinancial, user);
         this.type = type;
         this.actionQuantity = actionQuantity;
-        this.currentValue = currentValue;
+        this.currentValue = value;
         this.brokerName = brokerName;
     }
-
-
 
     public Investment() {
     }
 
-
-    public int getDaysInvested() {
-        if (this.getDateFinancial() == null) {
-            return 0;
-        }
-
-        return (int) ChronoUnit.DAYS.between(this.getDateFinancial(), LocalDate.now());
-    }
     public InvestmentType getType() {
         return type;
     }

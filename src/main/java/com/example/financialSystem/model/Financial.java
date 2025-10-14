@@ -1,6 +1,7 @@
 package com.example.financialSystem.model;
 
 
+import com.example.financialSystem.util.BenchMarkRate;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -18,8 +19,8 @@ public abstract class Financial {
     @NotNull(message = "Value is required")
     private BigDecimal value;
 
-    @NotNull(message = "Base currency is required")
-    private String baseCurrency;
+    @Enumerated(EnumType.STRING)
+    private BenchMarkRate baseCurrency;
 
     @NotNull(message = "Date is required")
     private LocalDate dateFinancial;
@@ -29,7 +30,7 @@ public abstract class Financial {
     @JsonBackReference
     private User user;
 
-    public Financial(BigDecimal value, String baseCurrency, LocalDate dateFinancial, User user) {
+    public Financial(BigDecimal value, BenchMarkRate baseCurrency, LocalDate dateFinancial, User user) {
         this.value = value;
         this.baseCurrency = baseCurrency;
         this.dateFinancial = dateFinancial;
@@ -57,11 +58,11 @@ public abstract class Financial {
         this.value = value;
     }
 
-    public String getBaseCurrency() {
+    public BenchMarkRate getBaseCurrency() {
         return baseCurrency;
     }
 
-    public void setBaseCurrency(String baseCurrency) {
+    public void setBaseCurrency(BenchMarkRate baseCurrency) {
         this.baseCurrency = baseCurrency;
     }
 
