@@ -2,6 +2,7 @@ package com.example.financialSystem.dto;
 
 import com.example.financialSystem.model.Expense;
 import com.example.financialSystem.model.enums.ExpenseType;
+import com.example.financialSystem.util.BenchMarkRate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -9,7 +10,7 @@ import java.time.LocalDate;
 public class ExpenseDto {
     private ExpenseType expenseType;
     private BigDecimal value;
-    private String baseCurrency;
+    private BenchMarkRate baseCurrency;
     private LocalDate expenseDate;
     private String paymentMethod;
     private boolean isFixed;
@@ -43,11 +44,11 @@ public class ExpenseDto {
         this.value = value;
     }
 
-    public String getBaseCurrency() {
+    public BenchMarkRate getBaseCurrency() {
         return baseCurrency;
     }
 
-    public void setBaseCurrency(String baseCurrency) {
+    public void setBaseCurrency(BenchMarkRate baseCurrency) {
         this.baseCurrency = baseCurrency;
     }
 

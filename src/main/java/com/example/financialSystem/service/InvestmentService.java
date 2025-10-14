@@ -7,6 +7,7 @@ import com.example.financialSystem.exceptions.InvestmentNotFoundException;
 import com.example.financialSystem.model.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import com.example.financialSystem.model.enums.InvestmentType;
@@ -14,6 +15,7 @@ import com.example.financialSystem.repository.InvestmentRepository;
 import com.example.financialSystem.util.BenchMarkRate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +31,7 @@ public class InvestmentService extends UserLoggedService {
         User user = getLoggedUser().getUser();
         investment.setUser(user);
 
-        if (investment.getBrokerName() == null || investment.getCurrentValue() == null || investment.getActionQuantity() <= 0) {
+        if (investment.getBrokerName() == null || investment.getActionQuantity() <= 0) {
             throw new IllegalArgumentException("broker name, current value and action quantity are required");
         }
 
@@ -40,6 +42,9 @@ public class InvestmentService extends UserLoggedService {
                         throw new InvestmentDuplicateException("You have already created investment");
                     }
                 });
+
+        BigDecimal currentValue = calculateCurrentValue(investment);
+        investment.setCurrentValue(currentValue);
 
         Investment savedInvestment = investmentRepository.save(investment);
         return new InvestmentDto(savedInvestment);
@@ -63,11 +68,11 @@ public class InvestmentService extends UserLoggedService {
         existingInvestment.setBaseCurrency(editInvestmentDto.getBaseCurrency());
         existingInvestment.setDateFinancial(editInvestmentDto.getDateFinancial());
         existingInvestment.setActionQuantity(editInvestmentDto.getActionQuantity());
-        existingInvestment.setCurrentValue(editInvestmentDto.getCurrentValue());
         existingInvestment.setBrokerName(editInvestmentDto.getBrokerName());
 
-        Investment updatedInvestment = investmentRepository.save(existingInvestment);
+        existingInvestment.setCurrentValue(calculateCurrentValue(existingInvestment));
 
+        Investment updatedInvestment = investmentRepository.save(existingInvestment);
         return new InvestmentDto(updatedInvestment);
     }
 
@@ -82,8 +87,7 @@ public class InvestmentService extends UserLoggedService {
                         existingInvestment.getBrokerName().equals(editInvestmentDto.getBrokerName());
 
         if (unchanged) {
-            throw new InvestmentDuplicateException("You didn't change anything in this investment");
-
+            throw new IllegalArgumentException("You didn't change anything in this investment");
         }
 
         return false;
@@ -97,22 +101,25 @@ public class InvestmentService extends UserLoggedService {
 
     public InvestmentDto simulateInvestment(int id, int days) {
         Investment investment = investmentRepository.findById(id)
-                .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
+                .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + " not found"));
 
         BigDecimal initialValue = investment.getValue();
+        InvestmentType type = investment.getType();
+        BenchMarkRate baseCurrency = investment.getBaseCurrency();
 
-        BenchMarkRate rate = BenchMarkRate.valueOf(investment.getBaseCurrency());
-        double annualRate = rate.getAnnualRate();
+        double rate = (type.getRate() != null) ? type.getRate() : baseCurrency.getAnnualRate();
 
-        double dailyRate = Math.pow(1 + annualRate, 1.0 / 365) - 1;
+        double dailyRate = Math.pow(1 + rate, 1.0 / 365) - 1;
 
-        double futureValue = Math.round(initialValue.doubleValue() * Math.pow(1 + dailyRate, days));
+        BigDecimal growthFactor = BigDecimal.valueOf(Math.pow(1 + dailyRate, days));
+        BigDecimal futureValue = initialValue.multiply(growthFactor).setScale(2, java.math.RoundingMode.HALF_UP);
 
         InvestmentDto investmentDto = new InvestmentDto(investment);
-        investmentDto.setCurrentValue(BigDecimal.valueOf(futureValue));
+        investmentDto.setCurrentValue(futureValue);
 
         return investmentDto;
     }
+
 
     public List<Investment> listInvestments() {
         Login loggedInUser = getLoggedUser();
@@ -132,6 +139,44 @@ public class InvestmentService extends UserLoggedService {
         }
         investmentRepository.deleteById(id);
     }
+
+    private BigDecimal calculateCurrentValue(Investment investment) {
+        BigDecimal initialValue = investment.getValue();
+        InvestmentType type = investment.getType();
+        BenchMarkRate baseCurrency = investment.getBaseCurrency();
+
+        double rate = 0.0;
+
+        if (type.getRate() != null) {
+            rate = type.getRate();
+        } else {
+            rate = baseCurrency.getAnnualRate();
+        }
+
+        double dailyRate = Math.pow(1 + rate, 1.0 / 365) - 1;
+
+        long days = java.time.temporal.ChronoUnit.DAYS.between(
+                investment.getDateFinancial(),
+                java.time.LocalDate.now()
+        );
+
+        if (days < 0) days = 0;
+
+        BigDecimal growthFactor = BigDecimal.valueOf(Math.pow(1 + dailyRate, days));
+        BigDecimal futureValue = initialValue.multiply(growthFactor);
+
+        return futureValue.setScale(2, java.math.BigDecimal.ROUND_HALF_UP);
+    }
+
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void updateAllInvestmentsDaily() {
+        List<Investment> investments = investmentRepository.findAll();
+        for (Investment inv : investments) {
+            inv.setCurrentValue(calculateCurrentValue(inv));
+        }
+        investmentRepository.saveAll(investments);
+    }
+
 
 
 }
