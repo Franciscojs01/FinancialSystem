@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/investments")
-public class InvestmentController {
+public class InvestmentController{
     @Autowired
     InvestmentService investmentService;
 

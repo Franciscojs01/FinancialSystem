@@ -24,8 +24,6 @@ public class Login implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    private boolean enabled;
-
     public Login(User user, String username, String password) {
         this.user = user;
         this.username = username;
@@ -86,6 +84,6 @@ public class Login implements UserDetails {
     }
     @Override
     public boolean isEnabled() {
-        return enabled && user.isUserState();
+        return user.isUserState();
     }
 }

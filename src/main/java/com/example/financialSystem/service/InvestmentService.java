@@ -1,25 +1,21 @@
 package com.example.financialSystem.service;
 
 import com.example.financialSystem.dto.InvestmentDto;
-
 import com.example.financialSystem.exceptions.InvestmentDuplicateException;
 import com.example.financialSystem.exceptions.InvestmentNotFoundException;
-import com.example.financialSystem.model.*;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.List;
-
+import com.example.financialSystem.model.Investment;
+import com.example.financialSystem.model.Login;
+import com.example.financialSystem.model.User;
 import com.example.financialSystem.model.enums.InvestmentType;
 import com.example.financialSystem.repository.InvestmentRepository;
 import com.example.financialSystem.util.BenchMarkRate;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.math.BigDecimal;
+import java.util.List;
 
 
 @Service
