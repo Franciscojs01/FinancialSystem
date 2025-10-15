@@ -2,6 +2,8 @@ package com.example.financialSystem.controller;
 
 
 import com.example.financialSystem.dto.InvestmentDto;
+import com.example.financialSystem.dto.InvestmentRequestDto;
+import com.example.financialSystem.mapper.InvestmentMapper;
 import com.example.financialSystem.model.Investment;
 import com.example.financialSystem.service.InvestmentService;
 import jakarta.validation.Valid;
@@ -17,8 +19,12 @@ public class InvestmentController{
     @Autowired
     InvestmentService investmentService;
 
+    @Autowired
+    InvestmentMapper investmentMapper;
+
     @PostMapping("/create")
-    public ResponseEntity<InvestmentDto> create(@Valid @RequestBody Investment investment) {
+    public ResponseEntity<InvestmentDto> create(@Valid @RequestBody InvestmentRequestDto investmentDto) {
+        Investment investment = investmentMapper.toEntity(investmentDto);
         InvestmentDto investmentCreated = investmentService.createInvestment(investment);
         return ResponseEntity.ok().body(investmentCreated);
     }

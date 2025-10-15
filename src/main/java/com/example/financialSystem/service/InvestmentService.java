@@ -31,6 +31,10 @@ public class InvestmentService extends UserLoggedService {
             throw new IllegalArgumentException("broker name, current value and action quantity are required");
         }
 
+        if (investment.getDateFinancial().isAfter(java.time.LocalDate.now())) {
+            throw new IllegalArgumentException("You cannot register an investment in the future");
+        }
+
         investmentRepository
                 .findByUserAndTypeAndBrokerName(user, investment.getType(), investment.getBrokerName())
                 .ifPresent(existing -> {
