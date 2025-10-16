@@ -1,6 +1,7 @@
 package com.example.financialSystem.service;
 
 import com.example.financialSystem.dto.InvestmentDto;
+import com.example.financialSystem.dto.InvestmentRequestDto;
 import com.example.financialSystem.exceptions.InvestmentDuplicateException;
 import com.example.financialSystem.exceptions.InvestmentNotFoundException;
 import com.example.financialSystem.model.Investment;
@@ -50,7 +51,7 @@ public class InvestmentService extends UserLoggedService {
         return new InvestmentDto(savedInvestment);
     }
 
-    public InvestmentDto editInvestment(int id, InvestmentDto editInvestmentDto) {
+    public InvestmentDto editInvestment(int id, InvestmentRequestDto investmentRequestDto) {
 
         Investment existingInvestment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
@@ -61,30 +62,28 @@ public class InvestmentService extends UserLoggedService {
             throw new AccessDeniedException("You are not authorized to edit this investment");
         }
 
-        unchanged(existingInvestment, editInvestmentDto);
+        unchanged(existingInvestment, investmentRequestDto);
 
-        existingInvestment.setType(editInvestmentDto.getType());
-        existingInvestment.setValue(editInvestmentDto.getValue());
-        existingInvestment.setBaseCurrency(editInvestmentDto.getBaseCurrency());
-        existingInvestment.setDateFinancial(editInvestmentDto.getDateFinancial());
-        existingInvestment.setActionQuantity(editInvestmentDto.getActionQuantity());
-        existingInvestment.setBrokerName(editInvestmentDto.getBrokerName());
-
+        existingInvestment.setType(investmentRequestDto.type());
+        existingInvestment.setValue(investmentRequestDto.value());
+        existingInvestment.setBaseCurrency(investmentRequestDto.baseCurrency());
+        existingInvestment.setDateFinancial(investmentRequestDto.dateFinancial());
+        existingInvestment.setActionQuantity(investmentRequestDto.actionQuantity());
+        existingInvestment.setBrokerName(investmentRequestDto.brokerName());
         existingInvestment.setCurrentValue(calculateCurrentValue(existingInvestment));
 
         Investment updatedInvestment = investmentRepository.save(existingInvestment);
         return new InvestmentDto(updatedInvestment);
     }
 
-    public Boolean unchanged(Investment existingInvestment, InvestmentDto editInvestmentDto) {
+    public Boolean unchanged(Investment existingInvestment, InvestmentRequestDto investmentRequestDto) {
         boolean unchanged =
-                existingInvestment.getType().equals(editInvestmentDto.getType()) &&
-                        existingInvestment.getValue().compareTo(editInvestmentDto.getValue()) == 0 &&
-                        existingInvestment.getBaseCurrency().equals(editInvestmentDto.getBaseCurrency()) &&
-                        existingInvestment.getDateFinancial().equals(editInvestmentDto.getDateFinancial()) &&
-                        existingInvestment.getActionQuantity() == editInvestmentDto.getActionQuantity() &&
-                        existingInvestment.getCurrentValue().compareTo(editInvestmentDto.getCurrentValue()) == 0 &&
-                        existingInvestment.getBrokerName().equals(editInvestmentDto.getBrokerName());
+                existingInvestment.getType().equals(investmentRequestDto.type()) &&
+                        existingInvestment.getValue().compareTo(investmentRequestDto.value()) == 0 &&
+                        existingInvestment.getBaseCurrency().equals(investmentRequestDto.baseCurrency()) &&
+                        existingInvestment.getDateFinancial().equals(investmentRequestDto.dateFinancial()) &&
+                        existingInvestment.getActionQuantity() == investmentRequestDto.actionQuantity() &&
+                        existingInvestment.getBrokerName().equals(investmentRequestDto.brokerName());
 
         if (unchanged) {
             throw new IllegalArgumentException("You didn't change anything in this investment");
@@ -112,7 +111,7 @@ public class InvestmentService extends UserLoggedService {
         double dailyRate = Math.pow(1 + rate, 1.0 / 365) - 1;
 
         BigDecimal growthFactor = BigDecimal.valueOf(Math.pow(1 + dailyRate, days));
-        BigDecimal futureValue = initialValue.multiply(growthFactor).setScale(2, java.math.RoundingMode.HALF_UP);
+        BigDecimal futureValue = initialValue.multiply(growthFactor).setScale(4, java.math.RoundingMode.HALF_UP);
 
         InvestmentDto investmentDto = new InvestmentDto(investment);
         investmentDto.setCurrentValue(futureValue);
@@ -145,7 +144,7 @@ public class InvestmentService extends UserLoggedService {
         InvestmentType type = investment.getType();
         BenchMarkRate baseCurrency = investment.getBaseCurrency();
 
-        double rate = 0.0;
+        double rate;
 
         if (type.getRate() != null) {
             rate = type.getRate();
@@ -165,7 +164,7 @@ public class InvestmentService extends UserLoggedService {
         BigDecimal growthFactor = BigDecimal.valueOf(Math.pow(1 + dailyRate, days));
         BigDecimal futureValue = initialValue.multiply(growthFactor);
 
-        return futureValue.setScale(2, java.math.BigDecimal.ROUND_HALF_UP);
+        return futureValue.setScale(4, java.math.BigDecimal.ROUND_HALF_UP);
     }
 
     @Scheduled(cron = "0 0 0 * * ?")

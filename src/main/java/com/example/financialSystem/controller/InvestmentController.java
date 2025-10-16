@@ -30,8 +30,8 @@ public class InvestmentController{
     }
 
     @PutMapping("/edit/{id}")
-    public ResponseEntity<InvestmentDto> edit(@PathVariable int id, @RequestBody InvestmentDto investment) {
-        InvestmentDto modifiedInvestment = investmentService.editInvestment(id, investment);
+    public ResponseEntity<InvestmentDto> edit(@PathVariable int id, @RequestBody InvestmentRequestDto investmentRequestDto) {
+        InvestmentDto modifiedInvestment = investmentService.editInvestment(id, investmentRequestDto);
         return ResponseEntity.ok().body(modifiedInvestment);
     }
 
@@ -47,8 +47,9 @@ public class InvestmentController{
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<Investment>> getInvestments() {
-        List<Investment> investments = investmentService.listInvestments();
+    public ResponseEntity<List<InvestmentDto>> getInvestments() {
+        List<InvestmentDto> investments = investmentMapper.toDtoList(investmentService.listInvestments());
+
         return ResponseEntity.ok(investments);
     }
 
