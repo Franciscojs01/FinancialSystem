@@ -58,4 +58,6 @@ public class InvestmentController{
         investmentService.deleteInvestment(id);
         return ResponseEntity.ok("Investment success deleted! ");
     }
+
+
 }

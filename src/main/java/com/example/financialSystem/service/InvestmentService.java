@@ -116,6 +116,8 @@ public class InvestmentService extends UserLoggedService {
         InvestmentDto investmentDto = new InvestmentDto(investment);
         investmentDto.setCurrentValue(futureValue);
 
+        investmentDto.setDaysInvested(days);
+
         return investmentDto;
     }
 
@@ -170,7 +172,9 @@ public class InvestmentService extends UserLoggedService {
     @Scheduled(cron = "0 0 0 * * ?")
     public void updateAllInvestmentsDaily() {
         List<Investment> investments = investmentRepository.findAll();
+
         for (Investment inv : investments) {
+            inv.setDaysInvested(inv.getDaysInvested() + 1);
             inv.setCurrentValue(calculateCurrentValue(inv));
         }
         investmentRepository.saveAll(investments);

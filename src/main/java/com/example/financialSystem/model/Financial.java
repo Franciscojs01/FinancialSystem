@@ -14,6 +14,7 @@ import java.time.LocalDate;
 public abstract class Financial {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "financial_id")
     private int id;
 
     @NotNull(message = "Value is required")

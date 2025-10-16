@@ -22,13 +22,16 @@ public class Investment extends Financial {
 
     private String brokerName;
 
+    private int daysInvested;
+
     public Investment(InvestmentType type, BigDecimal value, BenchMarkRate baseCurrency, LocalDate dateFinancial,
-                      User user, int actionQuantity, BigDecimal currentValue, String brokerName) {
+                      User user, int actionQuantity, BigDecimal currentValue, String brokerName, int daysInvested) {
         super(value, baseCurrency, dateFinancial, user);
         this.type = type;
         this.actionQuantity = actionQuantity;
         this.currentValue = value;
         this.brokerName = brokerName;
+        this.daysInvested = daysInvested;
     }
 
     public Investment() {
@@ -66,4 +69,12 @@ public class Investment extends Financial {
         this.brokerName = brokerName;
     }
 
+    public int getDaysInvested() {
+        return daysInvested;
+    }
+
+    public void setDaysInvested(int daysInvested) {
+        this.daysInvested = daysInvested;
+    }
+    
 }

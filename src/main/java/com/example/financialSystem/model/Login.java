@@ -12,6 +12,7 @@ public class Login implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "login_id")
     private int id;
 
     @OneToOne
