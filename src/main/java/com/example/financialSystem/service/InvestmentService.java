@@ -93,14 +93,26 @@ public class InvestmentService extends UserLoggedService {
     }
 
     public InvestmentDto getInvestmentById(int id) {
+        Login loggedInUser = getLoggedUser();
+
         Investment investment = investmentRepository.findById(id).orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
+
+        if (investment.getUser().getId() != loggedInUser.getId()) {
+            throw new AccessDeniedException("You are not authorized to edit this investment");
+        }
 
         return new InvestmentDto(investment);
     }
 
     public InvestmentDto simulateInvestment(int id, int days) {
+        Login loggedInUser = getLoggedUser();
+
         Investment investment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + " not found"));
+
+        if (investment.getUser().getId() != loggedInUser.getId()) {
+            throw new AccessDeniedException("You are not authorized to edit this investment");
+        }
 
         BigDecimal initialValue = investment.getValue();
         InvestmentType type = investment.getType();
