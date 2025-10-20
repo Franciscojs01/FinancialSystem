@@ -33,7 +33,7 @@ public class InvestmentService extends UserLoggedService {
         }
 
         if (investment.getDateFinancial().isAfter(java.time.LocalDate.now())) {
-            throw new IllegalArgumentException("You cannot register an investment in the future");
+            throw new IllegalArgumentException("You cannot create an investment with an invalid date");
         }
 
         investmentRepository

@@ -19,13 +19,20 @@ public class ExpenseService extends UserLoggedService {
         User user = getLoggedUser().getUser();
         expense.setUser(user);
 
-        if (expense.getPaymentMethod() == null) {
-            throw new IllegalArgumentException("payment method are required");
+        if (expense.getDateFinancial().isAfter(java.time.LocalDate.now())) {
+            throw new IllegalArgumentException("You cannot create an expense with an invalid date");
         }
 
-        Optional<Expense> existingExpense = expenseRepository.findById((expense.getId()));
+        Optional<Expense> existingExpense = expenseRepository
+                .findByUserAndTypeAndDateFinancialAndValueAndPaymentMethod(
+                        user,
+                        expense.getType(),
+                        expense.getDateFinancial(),
+                        expense.getValue(),
+                        expense.getPaymentMethod()
+                );
 
-        if(existingExpense.isPresent() && existingExpense.get().getUser().equals(user)) {
+        if (existingExpense.isPresent()) {
             throw new ExpenseDuplicateExcepetion("Expense already exists");
         }
 

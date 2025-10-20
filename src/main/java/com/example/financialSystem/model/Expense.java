@@ -5,6 +5,7 @@ import com.example.financialSystem.util.BenchMarkRate;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,7 +15,10 @@ public class Expense extends Financial {
     @Enumerated(EnumType.STRING)
     private ExpenseType type;
 
+    @NotNull(message = "paymentMethod are required")
     private String paymentMethod;
+
+    @NotNull(message = "this value is required")
     private boolean isFixed;
 
     public Expense(ExpenseType type, BigDecimal value, LocalDate dateFinancial, BenchMarkRate baseCurrency, User user, String paymentMethod, boolean isFixed) {
