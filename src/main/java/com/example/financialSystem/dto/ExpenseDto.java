@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class ExpenseDto {
+    private int idExpense;
     private ExpenseType expenseType;
     private BigDecimal value;
     private BenchMarkRate baseCurrency;
@@ -20,12 +21,21 @@ public class ExpenseDto {
     }
 
     public ExpenseDto(Expense entityExpense) {
+        this.idExpense = entityExpense.getId();
         this.expenseType = entityExpense.getType();
         this.value = entityExpense.getValue();
         this.baseCurrency = entityExpense.getBaseCurrency();
         this.expenseDate = entityExpense.getDateFinancial();
         this.paymentMethod = entityExpense.getPaymentMethod();
         this.isFixed = entityExpense.isFixed();
+    }
+
+    public int getIdExpense() {
+        return idExpense;
+    }
+
+    public void setIdExpense(int idExpense) {
+        this.idExpense = idExpense;
     }
 
     public ExpenseType getExpenseType() {

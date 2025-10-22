@@ -10,6 +10,7 @@ import java.time.temporal.ChronoUnit;
 
 
 public class InvestmentDto {
+    private int idInvestment;
     private InvestmentType type;
     private BigDecimal value;
     private BenchMarkRate baseCurrency;
@@ -24,6 +25,7 @@ public class InvestmentDto {
     }
 
     public InvestmentDto(Investment entityInvestment) {
+        this.idInvestment = entityInvestment.getId();
         this.type = entityInvestment.getType();
         this.value = entityInvestment.getValue();
         this.baseCurrency = entityInvestment.getBaseCurrency();
@@ -37,6 +39,14 @@ public class InvestmentDto {
         } else {
             this.daysInvested = 0;
         }
+    }
+
+    public int getIdInvestment() {
+        return idInvestment;
+    }
+
+    public void setIdInvestment(int idInvestment) {
+        this.idInvestment = idInvestment;
     }
 
     public InvestmentType getType() {

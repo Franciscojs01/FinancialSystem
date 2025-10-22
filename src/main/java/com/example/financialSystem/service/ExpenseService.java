@@ -37,7 +37,6 @@ public class ExpenseService extends UserLoggedService {
         }
 
         expenseRepository.save(expense);
-
         return new ExpenseDto(expense);
     }
 
