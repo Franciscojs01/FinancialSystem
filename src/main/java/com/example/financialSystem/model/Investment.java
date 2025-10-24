@@ -25,7 +25,7 @@ public class Investment extends Financial {
     private int daysInvested;
 
     public Investment(InvestmentType type, BigDecimal value, BenchMarkRate baseCurrency, LocalDate dateFinancial,
-                      User user, int actionQuantity, BigDecimal currentValue, String brokerName, int daysInvested) {
+                      User user, int actionQuantity, String brokerName, int daysInvested) {
         super(value, baseCurrency, dateFinancial, user);
         this.type = type;
         this.actionQuantity = actionQuantity;

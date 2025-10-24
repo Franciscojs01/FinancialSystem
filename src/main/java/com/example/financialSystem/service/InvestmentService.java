@@ -16,6 +16,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -28,13 +29,9 @@ public class InvestmentService extends UserLoggedService {
         User user = getLoggedUser().getUser();
         investment.setUser(user);
 
-        if (investment.getBrokerName() == null || investment.getActionQuantity() <= 0) {
-            throw new IllegalArgumentException("broker name, current value and action quantity are required");
-        }
+        validateInvestmentFields(investment);
 
-        if (investment.getDateFinancial().isAfter(java.time.LocalDate.now())) {
-            throw new IllegalArgumentException("You cannot create an investment with an invalid date");
-        }
+        validateInvestmentDate(investment);
 
         investmentRepository
                 .findByUserAndTypeAndBrokerName(user, investment.getType(), investment.getBrokerName())
@@ -44,25 +41,19 @@ public class InvestmentService extends UserLoggedService {
                     }
                 });
 
-        BigDecimal currentValue = calculateCurrentValue(investment);
-        investment.setCurrentValue(currentValue);
+        investment.setCurrentValue(calculateCurrentValue(investment));
 
         Investment savedInvestment = investmentRepository.save(investment);
         return new InvestmentDto(savedInvestment);
     }
 
     public InvestmentDto editInvestment(int id, InvestmentRequestDto investmentRequestDto) {
-
         Investment existingInvestment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
 
-        Login loggedInUser = getLoggedUser();
+        validateOnwership(existingInvestment);
 
-        if (existingInvestment.getUser().getId() != loggedInUser.getId()) {
-            throw new AccessDeniedException("You are not authorized to edit this investment");
-        }
-
-        unchanged(existingInvestment, investmentRequestDto);
+        ensureChanged(existingInvestment, investmentRequestDto);
 
         existingInvestment.setType(investmentRequestDto.type());
         existingInvestment.setValue(investmentRequestDto.value());
@@ -76,43 +67,21 @@ public class InvestmentService extends UserLoggedService {
         return new InvestmentDto(updatedInvestment);
     }
 
-    public Boolean unchanged(Investment existingInvestment, InvestmentRequestDto investmentRequestDto) {
-        boolean unchanged =
-                existingInvestment.getType().equals(investmentRequestDto.type()) &&
-                        existingInvestment.getValue().compareTo(investmentRequestDto.value()) == 0 &&
-                        existingInvestment.getBaseCurrency().equals(investmentRequestDto.baseCurrency()) &&
-                        existingInvestment.getDateFinancial().equals(investmentRequestDto.dateFinancial()) &&
-                        existingInvestment.getActionQuantity() == investmentRequestDto.actionQuantity() &&
-                        existingInvestment.getBrokerName().equals(investmentRequestDto.brokerName());
-
-        if (unchanged) {
-            throw new IllegalArgumentException("You didn't change anything in this investment");
-        }
-
-        return false;
-    }
 
     public InvestmentDto getInvestmentById(int id) {
-        Login loggedInUser = getLoggedUser();
+        Investment investment = investmentRepository.findById(id)
+                .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
 
-        Investment investment = investmentRepository.findById(id).orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
-
-        if (investment.getUser().getId() != loggedInUser.getId()) {
-            throw new AccessDeniedException("You are not authorized to edit this investment");
-        }
+        validateOnwership(investment);
 
         return new InvestmentDto(investment);
     }
 
     public InvestmentDto simulateInvestment(int id, int days) {
-        Login loggedInUser = getLoggedUser();
-
         Investment investment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + " not found"));
 
-        if (investment.getUser().getId() != loggedInUser.getId()) {
-            throw new AccessDeniedException("You are not authorized to edit this investment");
-        }
+        validateOnwership(investment);
 
         BigDecimal initialValue = investment.getValue();
         InvestmentType type = investment.getType();
@@ -135,21 +104,15 @@ public class InvestmentService extends UserLoggedService {
 
 
     public List<Investment> listInvestments() {
-        Login loggedInUser = getLoggedUser();
-        User user = loggedInUser.getUser();
-
-        return investmentRepository.findByUser(user);
+        return investmentRepository.findByUser(getLoggedUser().getUser());
     }
 
     public void deleteInvestment(long id) {
         Investment investment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
 
-        Login loggedInUser = getLoggedUser();
+        validateOnwership(investment);
 
-        if (loggedInUser.getUser().getId() != investment.getUser().getId()) {
-            throw new AccessDeniedException("You are not authorized to delete this investment");
-        }
         investmentRepository.deleteById(id);
     }
 
@@ -192,6 +155,44 @@ public class InvestmentService extends UserLoggedService {
         investmentRepository.saveAll(investments);
     }
 
+    private void validateInvestmentFields(Investment investment) {
+        if (investment.getBrokerName() == null || investment.getBrokerName().isBlank()) {
+            throw new IllegalArgumentException("broker name is required");
+        }
+
+        if (investment.getActionQuantity() <= 0) {
+            throw new IllegalArgumentException("Action quantity must be greater than zero");
+        }
+    }
+
+    private void validateInvestmentDate(Investment investment) {
+        if (investment.getDateFinancial().isAfter(LocalDate.now()))
+            throw new IllegalArgumentException("Investment date cannot be in the future");
+    }
+
+    private void validateOnwership(Investment investment) {
+        Login loggedInUser = getLoggedUser();
+
+        if (investment.getUser().getId() != loggedInUser.getId()) {
+            throw new AccessDeniedException("You are not authorized to edit this investment");
+        }
+    }
+
+    public Boolean ensureChanged(Investment existingInvestment, InvestmentRequestDto investmentRequestDto) {
+        boolean unchanged =
+                existingInvestment.getType().equals(investmentRequestDto.type()) &&
+                        existingInvestment.getValue().compareTo(investmentRequestDto.value()) == 0 &&
+                        existingInvestment.getBaseCurrency().equals(investmentRequestDto.baseCurrency()) &&
+                        existingInvestment.getDateFinancial().equals(investmentRequestDto.dateFinancial()) &&
+                        existingInvestment.getActionQuantity() == investmentRequestDto.actionQuantity() &&
+                        existingInvestment.getBrokerName().equals(investmentRequestDto.brokerName());
+
+        if (unchanged) {
+            throw new IllegalArgumentException("You didn't change anything in this investment");
+        }
+
+        return false;
+    }
 
 
 }
