@@ -2,6 +2,8 @@ package com.example.financialSystem.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -12,8 +14,15 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
+
+    @NotBlank(message = "Name cannot be blank")
+    @Column(nullable = false)
     private String name;
+
+    @NotBlank(message = "Email cannot be blank")
+    @Column(nullable = false)
     private String email;
+
     private LocalDate registerDate;
     private boolean userState;
 
