@@ -9,6 +9,7 @@ import com.example.financialSystem.model.User;
 import com.example.financialSystem.repository.LoginRepository;
 import com.example.financialSystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,7 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class UserService implements UserDetailsService {
+public class UserService extends UserLoggedService implements UserDetailsService {
     @Autowired
     private LoginRepository loginRepository;
 
@@ -69,25 +70,26 @@ public class UserService implements UserDetailsService {
     }
 
     public UserDto editUser(int id, UserEditDto userDto) {
+        Login authenticatedLogin = getLoggedUser();
+        if (authenticatedLogin.getUser().getId() != id) {
+            throw new AccessDeniedException("You can only edit your own account");
+        }
+
+
         User userExistent = userRepository.findById(id)
                         .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        userExistent.setName(userDto.getName());
-        userExistent.setEmail(userDto.getEmail());
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
+            userExistent.setName(userDto.getName());
+        }
 
-        Login login = userExistent.getLogin();
+        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
+            userExistent.setEmail(userDto.getEmail());
+            userExistent.getLogin().setUsername(userDto.getEmail());
+        }
 
-        if (login != null) {
-            if(userDto.getPassword() != null && !userDto.getPassword().isBlank()) {
-                login.setPassword(passwordEncoder.encode(userDto.getPassword()));
-            }
-
-            if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
-                login.setUsername(userDto.getEmail());
-            }
-
-            login.setUser(userExistent);
-            userExistent.setLogin(login);
+        if (userDto.getPassword() != null && !userDto.getPassword().isBlank()) {
+            userExistent.getLogin().setPassword(passwordEncoder.encode(userDto.getPassword()));
         }
 
         userRepository.save(userExistent);
