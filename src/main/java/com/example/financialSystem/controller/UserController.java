@@ -5,6 +5,7 @@ import com.example.financialSystem.dto.UserEditDto;
 import com.example.financialSystem.dto.UserRegisterDto;
 import com.example.financialSystem.model.User;
 import com.example.financialSystem.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserDto> registerUser(@RequestBody UserRegisterDto userRegisterDto) {
+    public ResponseEntity<UserDto> registerUser(@Valid @RequestBody UserRegisterDto userRegisterDto) {
         UserDto userDto = userService.registerUser(userRegisterDto);
         return ResponseEntity.ok().body(userDto);
     }

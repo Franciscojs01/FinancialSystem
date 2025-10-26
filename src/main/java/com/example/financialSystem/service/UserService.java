@@ -52,14 +52,14 @@ public class UserService implements UserDetailsService {
 
         User newUser = new User(
                 userRegisterDto.getName(),
-                userRegisterDto.getEmail(),
+                email,
                 LocalDate.now(),
                 true
         );
 
         String encondedPassword = passwordEncoder.encode(userRegisterDto.getPassword());
 
-        Login login = new Login(newUser,email, encondedPassword);
+        Login login = new Login(newUser, email, encondedPassword);
         newUser.setLogin(login);
 
         userRepository.save(newUser);
