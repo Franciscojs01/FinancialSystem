@@ -1,9 +1,7 @@
 package com.example.financialSystem.controller;
 
 import com.example.financialSystem.dto.UserDto;
-import com.example.financialSystem.dto.UserEditDto;
-import com.example.financialSystem.dto.UserRegisterDto;
-import com.example.financialSystem.model.User;
+import com.example.financialSystem.dto.UserResponseDto;
 import com.example.financialSystem.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +24,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable int id, @RequestBody UserEditDto userEditDto) {
+    public ResponseEntity<UserDto> updateUser(@PathVariable int id, @RequestBody UserResponseDto userEditDto) {
         UserDto userEdited = userService.editUser(id, userEditDto);
         return ResponseEntity.ok().body(userEdited);
     }

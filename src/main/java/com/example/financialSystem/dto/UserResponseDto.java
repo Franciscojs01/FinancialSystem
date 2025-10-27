@@ -1,12 +1,12 @@
 package com.example.financialSystem.dto;
 
-public class UserEditDto {
+public class UserResponseDto {
 
     private String name;
     private String email;
     private String password;
 
-    public UserEditDto( String name, String email, String password) {
+    public UserResponseDto(String name, String email, String password) {
         this.name = name;
         this.email = email;
         this.password = password;

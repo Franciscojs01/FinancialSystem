@@ -47,20 +47,20 @@ public class InvestmentService extends UserLoggedService {
         return new InvestmentDto(savedInvestment);
     }
 
-    public InvestmentDto editInvestment(int id, InvestmentRequestDto investmentRequestDto) {
+    public InvestmentDto editInvestment(int id, Investment updateData) {
         Investment existingInvestment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
 
         validateOnwership(existingInvestment);
 
-        ensureChanged(existingInvestment, investmentRequestDto);
+        ensureChanged(existingInvestment, updateData);
 
-        existingInvestment.setType(investmentRequestDto.type());
-        existingInvestment.setValue(investmentRequestDto.value());
-        existingInvestment.setBaseCurrency(investmentRequestDto.baseCurrency());
-        existingInvestment.setDateFinancial(investmentRequestDto.dateFinancial());
-        existingInvestment.setActionQuantity(investmentRequestDto.actionQuantity());
-        existingInvestment.setBrokerName(investmentRequestDto.brokerName());
+        existingInvestment.setType(updateData.getType());
+        existingInvestment.setValue(updateData.getValue());
+        existingInvestment.setBaseCurrency(updateData.getBaseCurrency());
+        existingInvestment.setDateFinancial(updateData.getDateFinancial());
+        existingInvestment.setActionQuantity(updateData.getActionQuantity());
+        existingInvestment.setBrokerName(updateData.getBrokerName());
         existingInvestment.setCurrentValue(calculateCurrentValue(existingInvestment));
 
         Investment updatedInvestment = investmentRepository.save(existingInvestment);
@@ -178,14 +178,14 @@ public class InvestmentService extends UserLoggedService {
         }
     }
 
-    public Boolean ensureChanged(Investment existingInvestment, InvestmentRequestDto investmentRequestDto) {
+    public Boolean ensureChanged(Investment existingInvestment, Investment updateData) {
         boolean unchanged =
-                existingInvestment.getType().equals(investmentRequestDto.type()) &&
-                        existingInvestment.getValue().compareTo(investmentRequestDto.value()) == 0 &&
-                        existingInvestment.getBaseCurrency().equals(investmentRequestDto.baseCurrency()) &&
-                        existingInvestment.getDateFinancial().equals(investmentRequestDto.dateFinancial()) &&
-                        existingInvestment.getActionQuantity() == investmentRequestDto.actionQuantity() &&
-                        existingInvestment.getBrokerName().equals(investmentRequestDto.brokerName());
+                existingInvestment.getType().equals(updateData.getType()) &&
+                        existingInvestment.getValue().compareTo(updateData.getValue()) == 0 &&
+                        existingInvestment.getBaseCurrency().equals(updateData.getBaseCurrency()) &&
+                        existingInvestment.getDateFinancial().equals(updateData.getDateFinancial()) &&
+                        existingInvestment.getActionQuantity() == updateData.getActionQuantity() &&
+                        existingInvestment.getBrokerName().equals(updateData.getBrokerName());
 
         if (unchanged) {
             throw new IllegalArgumentException("You didn't change anything in this investment");

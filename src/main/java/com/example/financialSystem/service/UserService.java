@@ -1,8 +1,7 @@
 package com.example.financialSystem.service;
 
 import com.example.financialSystem.dto.UserDto;
-import com.example.financialSystem.dto.UserEditDto;
-import com.example.financialSystem.dto.UserRegisterDto;
+import com.example.financialSystem.dto.UserResponseDto;
 import com.example.financialSystem.exceptions.UserDuplicateException;
 import com.example.financialSystem.model.Login;
 import com.example.financialSystem.model.User;
@@ -17,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -43,7 +41,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
         return login;
     }
 
-    public UserDto registerUser(UserRegisterDto userRegisterDto) {
+    public UserDto registerUser(UserResponseDto userRegisterDto) {
         String email = userRegisterDto.getEmail();
 
         loginRepository.findByUsername(email)
@@ -69,12 +67,11 @@ public class UserService extends UserLoggedService implements UserDetailsService
 
     }
 
-    public UserDto editUser(int id, UserEditDto userDto) {
+    public UserDto editUser(int id, UserResponseDto userDto) {
         Login authenticatedLogin = getLoggedUser();
         if (authenticatedLogin.getUser().getId() != id) {
             throw new AccessDeniedException("You can only edit your own account");
         }
-
 
         User userExistent = userRepository.findById(id)
                         .orElseThrow(() -> new UsernameNotFoundException("User not found"));
