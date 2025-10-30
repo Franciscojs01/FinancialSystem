@@ -1,7 +1,10 @@
 package com.example.financialSystem.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import com.example.financialSystem.util.BenchMarkRate;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -11,17 +14,24 @@ import java.time.LocalDate;
 public abstract class Financial {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "financial_id")
     private int id;
 
+    @NotNull(message = "Value is required")
     private BigDecimal value;
-    private String baseCurrency;
+
+    @Enumerated(EnumType.STRING)
+    private BenchMarkRate baseCurrency;
+
+    @NotNull(message = "Date is required")
     private LocalDate dateFinancial;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
-    public Financial(BigDecimal value, String baseCurrency, LocalDate dateFinancial, User user) {
+    public Financial(BigDecimal value, BenchMarkRate baseCurrency, LocalDate dateFinancial, User user) {
         this.value = value;
         this.baseCurrency = baseCurrency;
         this.dateFinancial = dateFinancial;
@@ -49,11 +59,11 @@ public abstract class Financial {
         this.value = value;
     }
 
-    public String getBaseCurrency() {
+    public BenchMarkRate getBaseCurrency() {
         return baseCurrency;
     }
 
-    public void setBaseCurrency(String baseCurrency) {
+    public void setBaseCurrency(BenchMarkRate baseCurrency) {
         this.baseCurrency = baseCurrency;
     }
 

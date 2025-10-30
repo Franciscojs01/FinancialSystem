@@ -12,6 +12,7 @@ public class Login implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "login_id")
     private int id;
 
     @OneToOne
@@ -84,6 +85,6 @@ public class Login implements UserDetails {
     }
     @Override
     public boolean isEnabled() {
-        return true;
+        return user.isUserState();
     }
 }

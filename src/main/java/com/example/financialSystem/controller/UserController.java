@@ -1,10 +1,9 @@
 package com.example.financialSystem.controller;
 
-import com.example.financialSystem.dto.UserDto;
-import com.example.financialSystem.dto.UserEditDto;
-import com.example.financialSystem.dto.UserRegisterDto;
-import com.example.financialSystem.model.User;
+import com.example.financialSystem.dto.UserResponse;
+import com.example.financialSystem.dto.UserRequest;
 import com.example.financialSystem.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,20 +18,20 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserDto> registerUser(@RequestBody UserRegisterDto userRegisterDto) {
-        UserDto userDto = userService.registerUser(userRegisterDto);
+    public ResponseEntity<UserResponse> registerUser(@Valid @RequestBody UserRequest userData) {
+        UserResponse userDto = userService.registerUser(userData);
         return ResponseEntity.ok().body(userDto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable int id, @RequestBody UserEditDto userEditDto) {
-        UserDto userEdited = userService.editUser(id, userEditDto);
+    public ResponseEntity<UserResponse> updateUser(@PathVariable int id, @RequestBody UserRequest userEditDto) {
+        UserResponse userEdited = userService.editUser(id, userEditDto);
         return ResponseEntity.ok().body(userEdited);
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        List<UserDto> users = userService.listUser();
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
+        List<UserResponse> users = userService.listUser();
 
         return ResponseEntity.ok().body(users);
     }

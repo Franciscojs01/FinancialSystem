@@ -1,4 +1,4 @@
-package com.example.financialSystem.infra.config.https;
+package com.example.financialSystem.config;
 
 import com.example.financialSystem.exceptions.InvestmentDuplicateException;
 import com.example.financialSystem.exceptions.InvestmentNotFoundException;
@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGeneral(Exception ex) {
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR) // 500
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("An unexpected error occurred: " + ex.getMessage());
     }
 

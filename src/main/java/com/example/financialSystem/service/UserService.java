@@ -1,14 +1,14 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.dto.UserDto;
-import com.example.financialSystem.dto.UserEditDto;
-import com.example.financialSystem.dto.UserRegisterDto;
+import com.example.financialSystem.dto.UserResponse;
+import com.example.financialSystem.dto.UserRequest;
 import com.example.financialSystem.exceptions.UserDuplicateException;
 import com.example.financialSystem.model.Login;
 import com.example.financialSystem.model.User;
 import com.example.financialSystem.repository.LoginRepository;
 import com.example.financialSystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,11 +16,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class UserService implements UserDetailsService {
+public class UserService extends UserLoggedService implements UserDetailsService {
     @Autowired
     private LoginRepository loginRepository;
 
@@ -42,7 +41,7 @@ public class UserService implements UserDetailsService {
         return login;
     }
 
-    public UserDto registerUser(UserRegisterDto userRegisterDto) {
+    public UserResponse registerUser(UserRequest userRegisterDto) {
         String email = userRegisterDto.getEmail();
 
         loginRepository.findByUsername(email)
@@ -52,52 +51,52 @@ public class UserService implements UserDetailsService {
 
         User newUser = new User(
                 userRegisterDto.getName(),
-                userRegisterDto.getEmail(),
+                email,
                 LocalDate.now(),
                 true
         );
 
         String encondedPassword = passwordEncoder.encode(userRegisterDto.getPassword());
 
-        Login login = new Login(newUser,email, encondedPassword);
+        Login login = new Login(newUser, email, encondedPassword);
         newUser.setLogin(login);
 
         userRepository.save(newUser);
 
-        return new UserDto(newUser.getName(), newUser.getEmail());
+        return new UserResponse(newUser.getName(), newUser.getEmail());
 
     }
 
-    public UserDto editUser(int id, UserEditDto userDto) {
+    public UserResponse editUser(int id, UserRequest userDto) {
+        Login authenticatedLogin = getLoggedUser();
+        if (authenticatedLogin.getUser().getId() != id) {
+            throw new AccessDeniedException("You can only edit your own account");
+        }
+
         User userExistent = userRepository.findById(id)
                         .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        userExistent.setName(userDto.getName());
-        userExistent.setEmail(userDto.getEmail());
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
+            userExistent.setName(userDto.getName());
+        }
 
-        Login login = userExistent.getLogin();
+        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
+            userExistent.setEmail(userDto.getEmail());
+            userExistent.getLogin().setUsername(userDto.getEmail());
+        }
 
-        if (login != null) {
-            if(userDto.getPassword() != null && !userDto.getPassword().isBlank()) {
-                login.setPassword(passwordEncoder.encode(userDto.getPassword()));
-            }
-
-            if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
-                login.setUsername(userDto.getEmail());
-            }
-
-            login.setUser(userExistent);
-            userExistent.setLogin(login);
+        if (userDto.getPassword() != null && !userDto.getPassword().isBlank()) {
+            userExistent.getLogin().setPassword(passwordEncoder.encode(userDto.getPassword()));
         }
 
         userRepository.save(userExistent);
 
-        return new UserDto(userDto.getName(), userDto.getEmail());
+        return new UserResponse(userDto.getName(), userDto.getEmail());
     }
 
-    public List<UserDto> listUser() {
+    public List<UserResponse> listUser() {
         return userRepository.findAll().stream()
-                .map(user -> new UserDto(user.getEmail(), user.getName()))
+                .map(user -> new UserResponse(user.getEmail(), user.getName()))
                 .toList();
     }
 

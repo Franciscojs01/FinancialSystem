@@ -5,6 +5,7 @@ import com.example.financialSystem.repository.LoginRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 
 public abstract class UserLoggedService {
@@ -15,6 +16,6 @@ public abstract class UserLoggedService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
         return loginRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User Not Found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
     }
 }

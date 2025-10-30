@@ -1,29 +1,31 @@
 package com.example.financialSystem.dto;
 
 import com.example.financialSystem.model.Investment;
-import com.example.financialSystem.model.InvestmentType;
-
+import com.example.financialSystem.model.enums.InvestmentType;
+import com.example.financialSystem.util.BenchMarkRate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 
-public class InvestmentDto {
+public class InvestmentResponse {
+    private int idInvestment;
     private InvestmentType type;
     private BigDecimal value;
-    private String baseCurrency;
+    private BenchMarkRate baseCurrency;
     private LocalDate dateFinancial;
     private int actionQuantity;
     private BigDecimal currentValue;
     private String brokerName;
     private int daysInvested;
 
-    public InvestmentDto() {
+    public InvestmentResponse() {
 
     }
 
-    public InvestmentDto(Investment entityInvestment) {
+    public InvestmentResponse(Investment entityInvestment) {
+        this.idInvestment = entityInvestment.getId();
         this.type = entityInvestment.getType();
         this.value = entityInvestment.getValue();
         this.baseCurrency = entityInvestment.getBaseCurrency();
@@ -39,6 +41,14 @@ public class InvestmentDto {
         }
     }
 
+    public int getIdInvestment() {
+        return idInvestment;
+    }
+
+    public void setIdInvestment(int idInvestment) {
+        this.idInvestment = idInvestment;
+    }
+
     public InvestmentType getType() {
         return type;
     }
@@ -47,7 +57,7 @@ public class InvestmentDto {
         return value;
     }
 
-    public String getBaseCurrency() {
+    public BenchMarkRate getBaseCurrency() {
         return baseCurrency;
     }
 
@@ -57,10 +67,6 @@ public class InvestmentDto {
 
     public int getActionQuantity() {
         return actionQuantity;
-    }
-
-    public BigDecimal getCurrentValue() {
-        return currentValue;
     }
 
     public String getBrokerName() {
@@ -79,7 +85,7 @@ public class InvestmentDto {
         this.value = value;
     }
 
-    public void setBaseCurrency(String baseCurrency) {
+    public void setBaseCurrency(BenchMarkRate baseCurrency) {
         this.baseCurrency = baseCurrency;
     }
 
@@ -91,10 +97,6 @@ public class InvestmentDto {
         this.actionQuantity = actionQuantity;
     }
 
-    public void setCurrentValue(BigDecimal currentValue) {
-        this.currentValue = currentValue;
-    }
-
     public void setBrokerName(String brokerName) {
         this.brokerName = brokerName;
     }
@@ -103,4 +105,11 @@ public class InvestmentDto {
         this.daysInvested = daysInvested;
     }
 
+    public BigDecimal getCurrentValue() {
+        return currentValue;
+    }
+
+    public void setCurrentValue(BigDecimal currentValue) {
+        this.currentValue = currentValue;
+    }
 }

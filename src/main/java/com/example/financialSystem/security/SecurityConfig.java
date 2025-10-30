@@ -1,4 +1,4 @@
-package com.example.financialSystem.infra.config;
+package com.example.financialSystem.security;
 
 import com.example.financialSystem.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +33,11 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers(HttpMethod.POST,"/auth/login","/user/register").permitAll()
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
