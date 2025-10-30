@@ -1,9 +1,9 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.dto.InvestmentDto;
-import com.example.financialSystem.dto.InvestmentRequestDto;
+import com.example.financialSystem.dto.InvestmentResponse;
 import com.example.financialSystem.exceptions.InvestmentDuplicateException;
 import com.example.financialSystem.exceptions.InvestmentNotFoundException;
+import com.example.financialSystem.exceptions.NoChangeDetectedException;
 import com.example.financialSystem.model.Investment;
 import com.example.financialSystem.model.Login;
 import com.example.financialSystem.model.User;
@@ -25,7 +25,7 @@ public class InvestmentService extends UserLoggedService {
     @Autowired
     private InvestmentRepository investmentRepository;
 
-    public InvestmentDto createInvestment(Investment investment) {
+    public InvestmentResponse createInvestment(Investment investment) {
         User user = getLoggedUser().getUser();
         investment.setUser(user);
 
@@ -35,8 +35,9 @@ public class InvestmentService extends UserLoggedService {
 
         investmentRepository
                 .findByUserAndTypeAndBrokerName(user, investment.getType(), investment.getBrokerName())
-                .ifPresent(existing -> {
-                    if (existing.getType().equals(InvestmentType.STOCK) || existing.getType().equals(InvestmentType.CRYPTO)) {
+                .ifPresent(existingInvestment -> {
+                    if (existingInvestment.getType().equals(InvestmentType.STOCK) ||
+                            existingInvestment.getType().equals(InvestmentType.CRYPTO)) {
                         throw new InvestmentDuplicateException("You have already created investment");
                     }
                 });
@@ -44,44 +45,44 @@ public class InvestmentService extends UserLoggedService {
         investment.setCurrentValue(calculateCurrentValue(investment));
 
         Investment savedInvestment = investmentRepository.save(investment);
-        return new InvestmentDto(savedInvestment);
+        return new InvestmentResponse(savedInvestment);
     }
 
-    public InvestmentDto editInvestment(int id, Investment updateData) {
+    public InvestmentResponse editInvestment(int id, Investment updatedInvestment) {
         Investment existingInvestment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
 
-        validateOnwership(existingInvestment);
+        validateOnwerShip(existingInvestment);
 
-        ensureChanged(existingInvestment, updateData);
+        ensureChanged(existingInvestment, updatedInvestment);
 
-        existingInvestment.setType(updateData.getType());
-        existingInvestment.setValue(updateData.getValue());
-        existingInvestment.setBaseCurrency(updateData.getBaseCurrency());
-        existingInvestment.setDateFinancial(updateData.getDateFinancial());
-        existingInvestment.setActionQuantity(updateData.getActionQuantity());
-        existingInvestment.setBrokerName(updateData.getBrokerName());
+        existingInvestment.setType(updatedInvestment.getType());
+        existingInvestment.setValue(updatedInvestment.getValue());
+        existingInvestment.setBaseCurrency(updatedInvestment.getBaseCurrency());
+        existingInvestment.setDateFinancial(updatedInvestment.getDateFinancial());
+        existingInvestment.setActionQuantity(updatedInvestment.getActionQuantity());
+        existingInvestment.setBrokerName(updatedInvestment.getBrokerName());
         existingInvestment.setCurrentValue(calculateCurrentValue(existingInvestment));
 
-        Investment updatedInvestment = investmentRepository.save(existingInvestment);
-        return new InvestmentDto(updatedInvestment);
+        Investment updatedData = investmentRepository.save(existingInvestment);
+        return new InvestmentResponse(updatedData);
     }
 
 
-    public InvestmentDto getInvestmentById(int id) {
+    public InvestmentResponse getInvestmentById(int id) {
         Investment investment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
 
-        validateOnwership(investment);
+        validateOnwerShip(investment);
 
-        return new InvestmentDto(investment);
+        return new InvestmentResponse(investment);
     }
 
-    public InvestmentDto simulateInvestment(int id, int days) {
+    public InvestmentResponse simulateInvestment(int id, int days) {
         Investment investment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + " not found"));
 
-        validateOnwership(investment);
+        validateOnwerShip(investment);
 
         BigDecimal initialValue = investment.getValue();
         InvestmentType type = investment.getType();
@@ -94,7 +95,7 @@ public class InvestmentService extends UserLoggedService {
         BigDecimal growthFactor = BigDecimal.valueOf(Math.pow(1 + dailyRate, days));
         BigDecimal futureValue = initialValue.multiply(growthFactor).setScale(4, java.math.RoundingMode.HALF_UP);
 
-        InvestmentDto investmentDto = new InvestmentDto(investment);
+        InvestmentResponse investmentDto = new InvestmentResponse(investment);
         investmentDto.setCurrentValue(futureValue);
 
         investmentDto.setDaysInvested(days);
@@ -111,7 +112,7 @@ public class InvestmentService extends UserLoggedService {
         Investment investment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
 
-        validateOnwership(investment);
+        validateOnwerShip(investment);
 
         investmentRepository.deleteById(id);
     }
@@ -170,28 +171,27 @@ public class InvestmentService extends UserLoggedService {
             throw new IllegalArgumentException("Investment date cannot be in the future");
     }
 
-    private void validateOnwership(Investment investment) {
+    private void validateOnwerShip(Investment investment) {
         Login loggedInUser = getLoggedUser();
 
         if (investment.getUser().getId() != loggedInUser.getId()) {
-            throw new AccessDeniedException("You are not authorized to edit this investment");
+            throw new AccessDeniedException("You are not authorized to view this investment");
         }
     }
 
-    public Boolean ensureChanged(Investment existingInvestment, Investment updateData) {
+    public void ensureChanged(Investment existingInvestment, Investment updatedInvestment) {
         boolean unchanged =
-                existingInvestment.getType().equals(updateData.getType()) &&
-                        existingInvestment.getValue().compareTo(updateData.getValue()) == 0 &&
-                        existingInvestment.getBaseCurrency().equals(updateData.getBaseCurrency()) &&
-                        existingInvestment.getDateFinancial().equals(updateData.getDateFinancial()) &&
-                        existingInvestment.getActionQuantity() == updateData.getActionQuantity() &&
-                        existingInvestment.getBrokerName().equals(updateData.getBrokerName());
+                existingInvestment.getType().equals(updatedInvestment.getType()) &&
+                        existingInvestment.getValue().compareTo(updatedInvestment.getValue()) == 0 &&
+                        existingInvestment.getBaseCurrency().equals(updatedInvestment.getBaseCurrency()) &&
+                        existingInvestment.getDateFinancial().equals(updatedInvestment.getDateFinancial()) &&
+                        existingInvestment.getActionQuantity() == updatedInvestment.getActionQuantity() &&
+                        existingInvestment.getBrokerName().equals(updatedInvestment.getBrokerName());
 
         if (unchanged) {
-            throw new IllegalArgumentException("You didn't change anything in this investment");
+            throw new NoChangeDetectedException("No changes in this investment");
         }
 
-        return false;
     }
 
 

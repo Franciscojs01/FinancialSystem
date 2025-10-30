@@ -1,7 +1,7 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.dto.UserDto;
-import com.example.financialSystem.dto.UserResponseDto;
+import com.example.financialSystem.dto.UserResponse;
+import com.example.financialSystem.dto.UserRequest;
 import com.example.financialSystem.exceptions.UserDuplicateException;
 import com.example.financialSystem.model.Login;
 import com.example.financialSystem.model.User;
@@ -41,7 +41,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
         return login;
     }
 
-    public UserDto registerUser(UserResponseDto userRegisterDto) {
+    public UserResponse registerUser(UserRequest userRegisterDto) {
         String email = userRegisterDto.getEmail();
 
         loginRepository.findByUsername(email)
@@ -63,11 +63,11 @@ public class UserService extends UserLoggedService implements UserDetailsService
 
         userRepository.save(newUser);
 
-        return new UserDto(newUser.getName(), newUser.getEmail());
+        return new UserResponse(newUser.getName(), newUser.getEmail());
 
     }
 
-    public UserDto editUser(int id, UserResponseDto userDto) {
+    public UserResponse editUser(int id, UserRequest userDto) {
         Login authenticatedLogin = getLoggedUser();
         if (authenticatedLogin.getUser().getId() != id) {
             throw new AccessDeniedException("You can only edit your own account");
@@ -91,12 +91,12 @@ public class UserService extends UserLoggedService implements UserDetailsService
 
         userRepository.save(userExistent);
 
-        return new UserDto(userDto.getName(), userDto.getEmail());
+        return new UserResponse(userDto.getName(), userDto.getEmail());
     }
 
-    public List<UserDto> listUser() {
+    public List<UserResponse> listUser() {
         return userRepository.findAll().stream()
-                .map(user -> new UserDto(user.getEmail(), user.getName()))
+                .map(user -> new UserResponse(user.getEmail(), user.getName()))
                 .toList();
     }
 

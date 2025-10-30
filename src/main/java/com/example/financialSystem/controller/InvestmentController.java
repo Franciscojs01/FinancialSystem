@@ -1,8 +1,8 @@
 package com.example.financialSystem.controller;
 
 
-import com.example.financialSystem.dto.InvestmentDto;
-import com.example.financialSystem.dto.InvestmentRequestDto;
+import com.example.financialSystem.dto.InvestmentResponse;
+import com.example.financialSystem.dto.InvestmentRequest;
 import com.example.financialSystem.mapper.InvestmentMapper;
 import com.example.financialSystem.model.Investment;
 import com.example.financialSystem.service.InvestmentService;
@@ -23,35 +23,35 @@ public class InvestmentController{
     InvestmentMapper investmentMapper;
 
     @PostMapping("/create")
-    public ResponseEntity<InvestmentDto> create(@Valid @RequestBody InvestmentRequestDto investmentDto) {
-        Investment investment = investmentMapper.toEntity(investmentDto);
-        InvestmentDto investmentCreated = investmentService.createInvestment(investment);
-        return ResponseEntity.ok().body(investmentCreated);
+    public ResponseEntity<InvestmentResponse> create(@Valid @RequestBody InvestmentRequest investmentRequest) {
+        Investment investment = investmentMapper.toEntity(investmentRequest);
+        InvestmentResponse createdInvestment = investmentService.createInvestment(investment);
+        return ResponseEntity.ok().body(createdInvestment);
     }
 
     @PutMapping("/edit/{id}")
-    public ResponseEntity<InvestmentDto> edit(@PathVariable int id, @Valid @RequestBody InvestmentRequestDto investmentDto) {
-        Investment updateData = investmentMapper.toEntity(investmentDto);
+    public ResponseEntity<InvestmentResponse> edit(@PathVariable int id, @Valid @RequestBody InvestmentRequest investmentDto) {
+        Investment investment = investmentMapper.toEntity(investmentDto);
 
-        InvestmentDto investmentUpdated = investmentService.editInvestment(id, updateData);
+        InvestmentResponse updatedInvestment = investmentService.editInvestment(id, investment);
 
-        return ResponseEntity.ok().body(investmentUpdated);
+        return ResponseEntity.ok().body(updatedInvestment);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<InvestmentDto> getInvestment(@PathVariable int id) {
+    public ResponseEntity<InvestmentResponse> getInvestment(@PathVariable int id) {
         return ResponseEntity.ok().body(investmentService.getInvestmentById(id));
     }
 
     @GetMapping("/{id}/simulate")
-    public ResponseEntity<InvestmentDto> simulateInvestment(@PathVariable int id, @RequestParam int days) {
-        InvestmentDto simulated = investmentService.simulateInvestment(id, days);
+    public ResponseEntity<InvestmentResponse> simulateInvestment(@PathVariable int id, @RequestParam int days) {
+        InvestmentResponse simulated = investmentService.simulateInvestment(id, days);
         return ResponseEntity.ok().body(simulated);
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<InvestmentDto>> getInvestments() {
-        List<InvestmentDto> investments = investmentMapper.toDtoList(investmentService.listInvestments());
+    public ResponseEntity<List<InvestmentResponse>> getInvestments() {
+        List<InvestmentResponse> investments = investmentMapper.toDtoList(investmentService.listInvestments());
 
         return ResponseEntity.ok(investments);
     }

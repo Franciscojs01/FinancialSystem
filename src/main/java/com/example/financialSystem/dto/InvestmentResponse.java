@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 
-public class InvestmentDto {
+public class InvestmentResponse {
     private int idInvestment;
     private InvestmentType type;
     private BigDecimal value;
@@ -20,11 +20,11 @@ public class InvestmentDto {
     private String brokerName;
     private int daysInvested;
 
-    public InvestmentDto() {
+    public InvestmentResponse() {
 
     }
 
-    public InvestmentDto(Investment entityInvestment) {
+    public InvestmentResponse(Investment entityInvestment) {
         this.idInvestment = entityInvestment.getId();
         this.type = entityInvestment.getType();
         this.value = entityInvestment.getValue();

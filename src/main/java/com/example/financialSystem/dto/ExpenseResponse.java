@@ -7,7 +7,7 @@ import com.example.financialSystem.util.BenchMarkRate;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class ExpenseDto {
+public class ExpenseResponse {
     private int idExpense;
     private ExpenseType expenseType;
     private BigDecimal value;
@@ -16,11 +16,11 @@ public class ExpenseDto {
     private String paymentMethod;
     private boolean isFixed;
 
-    public ExpenseDto() {
+    public ExpenseResponse() {
 
     }
 
-    public ExpenseDto(Expense entityExpense) {
+    public ExpenseResponse(Expense entityExpense) {
         this.idExpense = entityExpense.getId();
         this.expenseType = entityExpense.getType();
         this.value = entityExpense.getValue();
