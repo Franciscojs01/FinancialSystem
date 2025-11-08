@@ -1,0 +1,1189 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Financial System API",
+    "description": "API documentation for the financial system",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "bearer": []
+    }
+  ],
+  "paths": {
+    "/user/{id}": {
+      "put": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/{id}/deactivate": {
+      "put": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "deactivateUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/user/{id}/active": {
+      "put": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "activateUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/investments/edit/{id}": {
+      "put": {
+        "tags": [
+          "investment-controller"
+        ],
+        "operationId": "edit",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "investmentType": {
+                    "type": "string",
+                    "enum": [
+                      "STOCK",
+                      "FUND",
+                      "CRYPTO",
+                      "FIXED_INCOME",
+                      "TREASURY"
+                    ]
+                  },
+                  "value": {
+                    "type": "number"
+                  },
+                  "baseCurrency": {
+                    "type": "string",
+                    "enum": [
+                      "BRL",
+                      "USD",
+                      "EUR"
+                    ]
+                  },
+                  "dateFinancial": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "actionQuantity": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "brokerName": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "idInvestment": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "STOCK",
+                        "FUND",
+                        "CRYPTO",
+                        "FIXED_INCOME",
+                        "TREASURY"
+                      ]
+                    },
+                    "value": {
+                      "type": "number"
+                    },
+                    "baseCurrency": {
+                      "type": "string",
+                      "enum": [
+                        "BRL",
+                        "USD",
+                        "EUR"
+                      ]
+                    },
+                    "dateFinancial": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "actionQuantity": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "currentValue": {
+                      "type": "number"
+                    },
+                    "brokerName": {
+                      "type": "string"
+                    },
+                    "daysInvested": {
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/expense/edit/{id}": {
+      "put": {
+        "tags": [
+          "expense-controller"
+        ],
+        "operationId": "editExpense",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expenseType": {
+                    "type": "string",
+                    "enum": [
+                      "FOOD",
+                      "TRANSPORT",
+                      "HOUSING",
+                      "HEALTH",
+                      "LEISURE",
+                      "OTHER"
+                    ]
+                  },
+                  "value": {
+                    "type": "number"
+                  },
+                  "dateFinancial": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "baseCurrency": {
+                    "type": "string",
+                    "enum": [
+                      "BRL",
+                      "USD",
+                      "EUR"
+                    ]
+                  },
+                  "paymentMethod": {
+                    "type": "string"
+                  },
+                  "isFixed": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "idExpense": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "expenseType": {
+                      "type": "string",
+                      "enum": [
+                        "FOOD",
+                        "TRANSPORT",
+                        "HOUSING",
+                        "HEALTH",
+                        "LEISURE",
+                        "OTHER"
+                      ]
+                    },
+                    "value": {
+                      "type": "number"
+                    },
+                    "baseCurrency": {
+                      "type": "string",
+                      "enum": [
+                        "BRL",
+                        "USD",
+                        "EUR"
+                      ]
+                    },
+                    "expenseDate": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "paymentMethod": {
+                      "type": "string"
+                    },
+                    "fixed": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/register": {
+      "post": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "registerUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/investments/create": {
+      "post": {
+        "tags": [
+          "investment-controller"
+        ],
+        "operationId": "create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "investmentType": {
+                    "type": "string",
+                    "enum": [
+                      "STOCK",
+                      "FUND",
+                      "CRYPTO",
+                      "FIXED_INCOME",
+                      "TREASURY"
+                    ]
+                  },
+                  "value": {
+                    "type": "number"
+                  },
+                  "baseCurrency": {
+                    "type": "string",
+                    "enum": [
+                      "BRL",
+                      "USD",
+                      "EUR"
+                    ]
+                  },
+                  "dateFinancial": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "actionQuantity": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "brokerName": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "idInvestment": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "STOCK",
+                        "FUND",
+                        "CRYPTO",
+                        "FIXED_INCOME",
+                        "TREASURY"
+                      ]
+                    },
+                    "value": {
+                      "type": "number"
+                    },
+                    "baseCurrency": {
+                      "type": "string",
+                      "enum": [
+                        "BRL",
+                        "USD",
+                        "EUR"
+                      ]
+                    },
+                    "dateFinancial": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "actionQuantity": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "currentValue": {
+                      "type": "number"
+                    },
+                    "brokerName": {
+                      "type": "string"
+                    },
+                    "daysInvested": {
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/expense/create": {
+      "post": {
+        "tags": [
+          "expense-controller"
+        ],
+        "operationId": "createExpense",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expenseType": {
+                    "type": "string",
+                    "enum": [
+                      "FOOD",
+                      "TRANSPORT",
+                      "HOUSING",
+                      "HEALTH",
+                      "LEISURE",
+                      "OTHER"
+                    ]
+                  },
+                  "value": {
+                    "type": "number"
+                  },
+                  "dateFinancial": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "baseCurrency": {
+                    "type": "string",
+                    "enum": [
+                      "BRL",
+                      "USD",
+                      "EUR"
+                    ]
+                  },
+                  "paymentMethod": {
+                    "type": "string"
+                  },
+                  "isFixed": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "idExpense": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "expenseType": {
+                      "type": "string",
+                      "enum": [
+                        "FOOD",
+                        "TRANSPORT",
+                        "HOUSING",
+                        "HEALTH",
+                        "LEISURE",
+                        "OTHER"
+                      ]
+                    },
+                    "value": {
+                      "type": "number"
+                    },
+                    "baseCurrency": {
+                      "type": "string",
+                      "enum": [
+                        "BRL",
+                        "USD",
+                        "EUR"
+                      ]
+                    },
+                    "expenseDate": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "paymentMethod": {
+                      "type": "string"
+                    },
+                    "fixed": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "login-controller"
+        ],
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "userName": {
+                      "type": "string"
+                    },
+                    "token": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/list": {
+      "get": {
+        "tags": [
+          "user-controller"
+        ],
+        "operationId": "getAllUsers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "email": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/investments/{id}": {
+      "get": {
+        "tags": [
+          "investment-controller"
+        ],
+        "operationId": "getInvestment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "idInvestment": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "STOCK",
+                        "FUND",
+                        "CRYPTO",
+                        "FIXED_INCOME",
+                        "TREASURY"
+                      ]
+                    },
+                    "value": {
+                      "type": "number"
+                    },
+                    "baseCurrency": {
+                      "type": "string",
+                      "enum": [
+                        "BRL",
+                        "USD",
+                        "EUR"
+                      ]
+                    },
+                    "dateFinancial": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "actionQuantity": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "currentValue": {
+                      "type": "number"
+                    },
+                    "brokerName": {
+                      "type": "string"
+                    },
+                    "daysInvested": {
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/investments/{id}/simulate": {
+      "get": {
+        "tags": [
+          "investment-controller"
+        ],
+        "operationId": "simulateInvestment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "idInvestment": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "STOCK",
+                        "FUND",
+                        "CRYPTO",
+                        "FIXED_INCOME",
+                        "TREASURY"
+                      ]
+                    },
+                    "value": {
+                      "type": "number"
+                    },
+                    "baseCurrency": {
+                      "type": "string",
+                      "enum": [
+                        "BRL",
+                        "USD",
+                        "EUR"
+                      ]
+                    },
+                    "dateFinancial": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "actionQuantity": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "currentValue": {
+                      "type": "number"
+                    },
+                    "brokerName": {
+                      "type": "string"
+                    },
+                    "daysInvested": {
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/investments/list": {
+      "get": {
+        "tags": [
+          "investment-controller"
+        ],
+        "operationId": "getInvestments",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "idInvestment": {
+                        "type": "integer",
+                        "format": "int32"
+                      },
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "STOCK",
+                          "FUND",
+                          "CRYPTO",
+                          "FIXED_INCOME",
+                          "TREASURY"
+                        ]
+                      },
+                      "value": {
+                        "type": "number"
+                      },
+                      "baseCurrency": {
+                        "type": "string",
+                        "enum": [
+                          "BRL",
+                          "USD",
+                          "EUR"
+                        ]
+                      },
+                      "dateFinancial": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "actionQuantity": {
+                        "type": "integer",
+                        "format": "int32"
+                      },
+                      "currentValue": {
+                        "type": "number"
+                      },
+                      "brokerName": {
+                        "type": "string"
+                      },
+                      "daysInvested": {
+                        "type": "integer",
+                        "format": "int32"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/investments/delete/{id}": {
+      "delete": {
+        "tags": [
+          "investment-controller"
+        ],
+        "operationId": "deleteInvestment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "InvestmentRequest": {
+        "type": "object",
+        "properties": {
+          "investmentType": {
+            "type": "string",
+            "enum": [
+              "STOCK",
+              "FUND",
+              "CRYPTO",
+              "FIXED_INCOME",
+              "TREASURY"
+            ]
+          },
+          "value": {
+            "type": "number"
+          },
+          "baseCurrency": {
+            "type": "string",
+            "enum": [
+              "BRL",
+              "USD",
+              "EUR"
+            ]
+          },
+          "dateFinancial": {
+            "type": "string",
+            "format": "date"
+          },
+          "actionQuantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "brokerName": {
+            "type": "string"
+          }
+        }
+      },
+      "InvestmentResponse": {
+        "type": "object",
+        "properties": {
+          "idInvestment": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "STOCK",
+              "FUND",
+              "CRYPTO",
+              "FIXED_INCOME",
+              "TREASURY"
+            ]
+          },
+          "value": {
+            "type": "number"
+          },
+          "baseCurrency": {
+            "type": "string",
+            "enum": [
+              "BRL",
+              "USD",
+              "EUR"
+            ]
+          },
+          "dateFinancial": {
+            "type": "string",
+            "format": "date"
+          },
+          "actionQuantity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "currentValue": {
+            "type": "number"
+          },
+          "brokerName": {
+            "type": "string"
+          },
+          "daysInvested": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ExpenseRequest": {
+        "type": "object",
+        "properties": {
+          "expenseType": {
+            "type": "string",
+            "enum": [
+              "FOOD",
+              "TRANSPORT",
+              "HOUSING",
+              "HEALTH",
+              "LEISURE",
+              "OTHER"
+            ]
+          },
+          "value": {
+            "type": "number"
+          },
+          "dateFinancial": {
+            "type": "string",
+            "format": "date"
+          },
+          "baseCurrency": {
+            "type": "string",
+            "enum": [
+              "BRL",
+              "USD",
+              "EUR"
+            ]
+          },
+          "paymentMethod": {
+            "type": "string"
+          },
+          "isFixed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ExpenseResponse": {
+        "type": "object",
+        "properties": {
+          "idExpense": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "expenseType": {
+            "type": "string",
+            "enum": [
+              "FOOD",
+              "TRANSPORT",
+              "HOUSING",
+              "HEALTH",
+              "LEISURE",
+              "OTHER"
+            ]
+          },
+          "value": {
+            "type": "number"
+          },
+          "baseCurrency": {
+            "type": "string",
+            "enum": [
+              "BRL",
+              "USD",
+              "EUR"
+            ]
+          },
+          "expenseDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "paymentMethod": {
+            "type": "string"
+          },
+          "fixed": {
+            "type": "boolean"
+          }
+        }
+      },
+      "LoginDataDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "userName": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "name": "bearer",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

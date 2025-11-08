@@ -23,9 +23,7 @@ public class ExpenseService extends UserLoggedService {
         User user = getLoggedUser().getUser();
         expense.setUser(user);
 
-        if (expense.getDateFinancial().isAfter(java.time.LocalDate.now())) {
-            throw new IllegalArgumentException("You cannot create an expense with an invalid date");
-        }
+        validateExpenseDate(expense);
 
         Optional<Expense> existingExpense = expenseRepository
                 .findByUserAndTypeAndDateFinancialAndValueAndPaymentMethod(
@@ -49,6 +47,7 @@ public class ExpenseService extends UserLoggedService {
                 .orElseThrow(() -> new ExpenseNotFoundException("Expense with id: " + id + " not found"));
 
         validateOnwerShip(existingExpense);
+
         ensureChanged(existingExpense, updatedExpense);
 
         existingExpense.setType(updatedExpense.getType());
@@ -58,7 +57,7 @@ public class ExpenseService extends UserLoggedService {
         existingExpense.setPaymentMethod(updatedExpense.getPaymentMethod());
         existingExpense.setFixed(updatedExpense.isFixed());
 
-        expenseRepository.save(updatedExpense);
+        updatedExpense = expenseRepository.save(existingExpense);
 
         return new ExpenseResponse(updatedExpense);
     }
@@ -95,5 +94,11 @@ public class ExpenseService extends UserLoggedService {
         }
     }
 
+    private void validateExpenseDate(Expense expense) {
+        if (expense.getDateFinancial().isAfter(java.time.LocalDate.now())) {
+            throw new IllegalArgumentException("You cannot create an expense with an invalid date");
+        }
+
+    }
 
 }

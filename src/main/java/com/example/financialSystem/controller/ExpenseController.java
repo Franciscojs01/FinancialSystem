@@ -31,7 +31,12 @@ public class ExpenseController {
     public ResponseEntity<ExpenseResponse> editExpense(@PathVariable int id, @Valid @RequestBody ExpenseRequest expensedto) {
         Expense expense = expenseMapper.toEntity(expensedto);
         ExpenseResponse updatedExpense = expenseService.editExpense(id, expense);
-
         return ResponseEntity.ok().body(updatedExpense);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ExpenseResponse> getExpense(@PathVariable int id) {
+        return ResponseEntity.ok().body(expenseService.getExpenseById(id));
+    }
+
 }

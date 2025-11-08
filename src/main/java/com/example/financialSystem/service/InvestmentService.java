@@ -53,7 +53,6 @@ public class InvestmentService extends UserLoggedService {
                 .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
 
         validateOnwerShip(existingInvestment);
-
         ensureChanged(existingInvestment, updatedInvestment);
 
         existingInvestment.setType(updatedInvestment.getType());
