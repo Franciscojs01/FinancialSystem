@@ -1,5 +1,6 @@
 package com.example.financialSystem.service;
 
+import com.example.financialSystem.dto.ExpensePatchRequest;
 import com.example.financialSystem.dto.ExpenseResponse;
 import com.example.financialSystem.exceptions.ExpenseDuplicateExcepetion;
 import com.example.financialSystem.exceptions.ExpenseNotFoundException;
@@ -10,6 +11,7 @@ import com.example.financialSystem.model.User;
 import com.example.financialSystem.repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -49,6 +51,8 @@ public class ExpenseService extends UserLoggedService {
 
         validateOnwerShip(existingExpense);
 
+        validateExpenseDate(updatedExpense);
+
         ensureChanged(existingExpense, updatedExpense);
 
         existingExpense.setType(updatedExpense.getType());
@@ -65,6 +69,42 @@ public class ExpenseService extends UserLoggedService {
 
     public List<Expense> listExpense() {
         return expenseRepository.findByUser(getLoggedUser().getUser());
+    }
+
+    public ExpenseResponse patchExpense(int id, ExpensePatchRequest patchRequest) {
+        Expense existingExpense = expenseRepository.findById(id)
+                .orElseThrow(() -> new ExpenseNotFoundException("Expense with id: " + id + " not found"));
+
+        validateOnwerShip(existingExpense);
+
+        validateExpenseDate(existingExpense);
+
+        if (patchRequest.getValue() != null) {
+            existingExpense.setValue(patchRequest.getValue());
+        }
+
+        if (patchRequest.getDateFinancial() != null) {
+            existingExpense.setDateFinancial(patchRequest.getDateFinancial());
+        }
+
+        if (patchRequest.getPaymentMethod() != null) {
+            existingExpense.setPaymentMethod(patchRequest.getPaymentMethod());
+        }
+
+        if (patchRequest.getIsFixed() != null) {
+            existingExpense.setFixed(patchRequest.getIsFixed());
+        }
+
+        if (patchRequest.getBaseCurrency() != null)
+            existingExpense.setBaseCurrency(patchRequest.getBaseCurrency());
+
+        if (patchRequest.getExpenseType() != null) {
+            existingExpense.setType(patchRequest.getExpenseType());
+        }
+
+        expenseRepository.save(existingExpense);
+
+        return new ExpenseResponse(existingExpense);
     }
 
     public ExpenseResponse getExpenseById(int id) {
