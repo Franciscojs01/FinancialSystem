@@ -1,8 +1,12 @@
 package com.example.financialSystem.mapper;
 
 import com.example.financialSystem.dto.ExpenseRequest;
+import com.example.financialSystem.dto.ExpenseResponse;
 import com.example.financialSystem.model.Expense;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 @Component
 public class ExpenseMapper {
@@ -16,6 +20,12 @@ public class ExpenseMapper {
         expense.setFixed(dto.isFixed());
 
         return expense;
+    }
+
+    public List<ExpenseResponse> toDtoList(List<Expense> expenses) {
+        return expenses.stream()
+                .map(ExpenseResponse::new)
+                .toList();
     }
 
 }

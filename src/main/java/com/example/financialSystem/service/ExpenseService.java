@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -60,6 +61,10 @@ public class ExpenseService extends UserLoggedService {
         updatedExpense = expenseRepository.save(existingExpense);
 
         return new ExpenseResponse(updatedExpense);
+    }
+
+    public List<Expense> listExpense() {
+        return expenseRepository.findByUser(getLoggedUser().getUser());
     }
 
     public ExpenseResponse getExpenseById(int id) {

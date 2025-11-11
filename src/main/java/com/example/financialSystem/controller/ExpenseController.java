@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/expense")
 public class ExpenseController {
@@ -37,6 +39,12 @@ public class ExpenseController {
     @GetMapping("/{id}")
     public ResponseEntity<ExpenseResponse> getExpense(@PathVariable int id) {
         return ResponseEntity.ok().body(expenseService.getExpenseById(id));
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<ExpenseResponse>> getAllExpense() {
+        List<ExpenseResponse> expenses = expenseMapper.toDtoList(expenseService.listExpense());
+        return ResponseEntity.ok(expenses);
     }
 
 }

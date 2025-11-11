@@ -52,7 +52,6 @@ public class InvestmentController{
     @GetMapping("/list")
     public ResponseEntity<List<InvestmentResponse>> getInvestments() {
         List<InvestmentResponse> investments = investmentMapper.toDtoList(investmentService.listInvestments());
-
         return ResponseEntity.ok(investments);
     }
 
