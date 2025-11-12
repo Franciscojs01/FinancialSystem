@@ -1,9 +1,11 @@
 package com.example.financialSystem.controller;
 
 
+import com.example.financialSystem.dto.InvestmentPatchRequest;
 import com.example.financialSystem.dto.InvestmentResponse;
 import com.example.financialSystem.dto.InvestmentRequest;
 import com.example.financialSystem.mapper.InvestmentMapper;
+import com.example.financialSystem.model.Expense;
 import com.example.financialSystem.model.Investment;
 import com.example.financialSystem.service.InvestmentService;
 import jakarta.validation.Valid;
@@ -53,6 +55,12 @@ public class InvestmentController{
     public ResponseEntity<List<InvestmentResponse>> getInvestments() {
         List<InvestmentResponse> investments = investmentMapper.toDtoList(investmentService.listInvestments());
         return ResponseEntity.ok(investments);
+    }
+
+    @PatchMapping("/patch/{id}")
+    public ResponseEntity<InvestmentResponse> patchInvestment(@PathVariable int id, @RequestBody InvestmentPatchRequest patchRequest) {
+        InvestmentResponse updateInvestment =  investmentService.patchInvestment(id, patchRequest);
+        return  ResponseEntity.ok().body(updateInvestment);
     }
 
     @DeleteMapping("/delete/{id}")

@@ -9,6 +9,7 @@ import com.example.financialSystem.model.Expense;
 import com.example.financialSystem.model.Login;
 import com.example.financialSystem.model.User;
 import com.example.financialSystem.repository.ExpenseRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.parameters.P;
@@ -114,6 +115,16 @@ public class ExpenseService extends UserLoggedService {
         validateOnwerShip(expense);
 
         return new ExpenseResponse(expense);
+    }
+
+    @Transactional
+    public void deleteExpense(int id) {
+        Expense expense = expenseRepository.findById(id)
+                        .orElseThrow(() -> new ExpenseNotFoundException("Expense with " + id + " not found"));
+
+        validateOnwerShip(expense);
+
+        expenseRepository.deleteById(id);
     }
 
     public void ensureChanged(Expense existingExpense, Expense updatedExpense) {

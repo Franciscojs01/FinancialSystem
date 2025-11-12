@@ -18,4 +18,6 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     Optional<Expense> findByUserAndTypeAndDateFinancialAndValueAndPaymentMethod(User user, ExpenseType type, LocalDate dateFinancial, BigDecimal value, String paymentMethod);
 
     List<Expense> findByUser(User user);
+
+    void deleteById(int id);
 }

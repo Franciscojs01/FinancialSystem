@@ -1,6 +1,7 @@
 package com.example.financialSystem.controller;
 
 
+import com.example.financialSystem.dto.ExpensePatchRequest;
 import com.example.financialSystem.dto.ExpenseResponse;
 import com.example.financialSystem.dto.ExpenseRequest;
 import com.example.financialSystem.mapper.ExpenseMapper;
@@ -44,7 +45,19 @@ public class ExpenseController {
     @GetMapping("/list")
     public ResponseEntity<List<ExpenseResponse>> getAllExpense() {
         List<ExpenseResponse> expenses = expenseMapper.toDtoList(expenseService.listExpense());
-        return ResponseEntity.ok(expenses);
+        return ResponseEntity.ok().body(expenses);
+    }
+
+    @PatchMapping("/patch/{id}")
+    public ResponseEntity<ExpenseResponse> patchExpense(@PathVariable int id, @Valid @RequestBody ExpensePatchRequest patchRequest) {
+        ExpenseResponse updatedExpense = expenseService.patchExpense(id, patchRequest);
+        return ResponseEntity.ok().body(updatedExpense);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteExpense(@PathVariable int id) {
+        expenseService.deleteExpense(id);
+        return ResponseEntity.ok("Expense success deleted ");
     }
 
 }

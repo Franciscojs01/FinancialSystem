@@ -1,5 +1,6 @@
 package com.example.financialSystem.service;
 
+import com.example.financialSystem.dto.InvestmentPatchRequest;
 import com.example.financialSystem.dto.InvestmentResponse;
 import com.example.financialSystem.exceptions.InvestmentDuplicateException;
 import com.example.financialSystem.exceptions.InvestmentNotFoundException;
@@ -10,6 +11,7 @@ import com.example.financialSystem.model.User;
 import com.example.financialSystem.model.enums.InvestmentType;
 import com.example.financialSystem.repository.InvestmentRepository;
 import com.example.financialSystem.util.BenchMarkRate;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
@@ -107,7 +109,46 @@ public class InvestmentService extends UserLoggedService {
         return investmentRepository.findByUser(getLoggedUser().getUser());
     }
 
-    public void deleteInvestment(long id) {
+    public InvestmentResponse patchInvestment(int id, InvestmentPatchRequest patchRequest) {
+        Investment existingInvestment = investmentRepository.findById(id)
+                .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
+
+        validateOnwerShip(existingInvestment);
+        validateInvestmentDate(existingInvestment);
+
+        if (patchRequest.getInvestmentType() != null) {
+            existingInvestment.setType(patchRequest.getInvestmentType());
+        }
+
+        if (patchRequest.getValue() != null) {
+            existingInvestment.setValue(patchRequest.getValue());
+        }
+
+        if (patchRequest.getBaseCurrency() != null) {
+            existingInvestment.setBaseCurrency(patchRequest.getBaseCurrency());
+        }
+
+        if (patchRequest.getDateFinancial() != null) {
+            existingInvestment.setDateFinancial(patchRequest.getDateFinancial());
+        }
+
+        if (patchRequest.getActionQuantity() != null) {
+            existingInvestment.setActionQuantity(patchRequest.getActionQuantity());
+        }
+
+        if (patchRequest.getBrokerName() != null) {
+            existingInvestment.setBrokerName(patchRequest.getBrokerName());
+        }
+
+        existingInvestment.setCurrentValue(calculateCurrentValue(existingInvestment));
+
+        investmentRepository.save(existingInvestment);
+
+        return new InvestmentResponse(existingInvestment);
+    }
+
+    @Transactional
+    public void deleteInvestment(int id) {
         Investment investment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
 
