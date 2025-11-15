@@ -1,9 +1,6 @@
-package com.example.financialSystem.config;
+package com.example.financialSystem.handler;
 
-import com.example.financialSystem.exceptions.InvestmentDuplicateException;
-import com.example.financialSystem.exceptions.InvestmentNotFoundException;
-import com.example.financialSystem.exceptions.UserDuplicateException;
-import com.example.financialSystem.exceptions.UserNotFoundException;
+import com.example.financialSystem.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -14,8 +11,8 @@ import org.springframework.web.context.request.WebRequest;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<RestErrorMessage> handleUserNotFoundException(UserNotFoundException e, WebRequest webRequest) {
-        RestErrorMessage errorResponse = new RestErrorMessage(
+    public ResponseEntity<BadRequestExceptionDetails> handleUserNotFoundException(UserNotFoundException e, WebRequest webRequest) {
+        BadRequestExceptionDetails errorResponse = new BadRequestExceptionDetails(
                 HttpStatus.NOT_FOUND.value(), "User not found", e.getMessage()
         );
 
@@ -23,8 +20,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UserDuplicateException.class)
-    public ResponseEntity<RestErrorMessage> handleUserDuplicateException(UserDuplicateException e, WebRequest webRequest) {
-        RestErrorMessage errorResponse = new RestErrorMessage(
+    public ResponseEntity<BadRequestExceptionDetails> handleUserDuplicateException(UserDuplicateException e, WebRequest webRequest) {
+        BadRequestExceptionDetails errorResponse = new BadRequestExceptionDetails(
                 HttpStatus.CONFLICT.value(), "User duplicate", e.getMessage()
         );
 
@@ -46,8 +43,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvestmentNotFoundException.class)
-    public ResponseEntity<RestErrorMessage> handleInvestmentNotFoundException(InvestmentNotFoundException e, WebRequest webRequest) {
-        RestErrorMessage errorResponse = new RestErrorMessage(
+    public ResponseEntity<BadRequestExceptionDetails> handleInvestmentNotFoundException(InvestmentNotFoundException e, WebRequest webRequest) {
+        BadRequestExceptionDetails errorResponse = new BadRequestExceptionDetails(
                 HttpStatus.NOT_FOUND.value(), "Investment not found", e.getMessage()
         );
 
@@ -55,8 +52,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InvestmentDuplicateException.class)
-    public ResponseEntity<RestErrorMessage> handleDuplicateException(InvestmentDuplicateException e, WebRequest webRequest) {
-        RestErrorMessage errorResponse = new RestErrorMessage(
+    public ResponseEntity<BadRequestExceptionDetails> handleDuplicateException(InvestmentDuplicateException e, WebRequest webRequest) {
+        BadRequestExceptionDetails errorResponse = new BadRequestExceptionDetails(
                 HttpStatus.CONFLICT.value(), "Investment duplicate", e.getMessage()
         );
 

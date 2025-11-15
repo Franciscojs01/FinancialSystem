@@ -1,7 +1,7 @@
 package com.example.financialSystem.mapper;
 
-import com.example.financialSystem.dto.InvestmentResponse;
-import com.example.financialSystem.dto.InvestmentRequest;
+import com.example.financialSystem.dto.responses.InvestmentResponse;
+import com.example.financialSystem.dto.requests.InvestmentRequest;
 import com.example.financialSystem.model.Investment;
 import org.springframework.stereotype.Component;
 

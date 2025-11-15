@@ -1,7 +1,7 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.dto.InvestmentPatchRequest;
-import com.example.financialSystem.dto.InvestmentResponse;
+import com.example.financialSystem.dto.requests.InvestmentPatchRequest;
+import com.example.financialSystem.dto.responses.InvestmentResponse;
 import com.example.financialSystem.exceptions.InvestmentDuplicateException;
 import com.example.financialSystem.exceptions.InvestmentNotFoundException;
 import com.example.financialSystem.exceptions.NoChangeDetectedException;

@@ -1,4 +1,4 @@
-package com.example.financialSystem.dto;
+package com.example.financialSystem.dto.responses;
 
 public class UserResponse {
     private String name;

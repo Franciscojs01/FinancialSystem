@@ -1,11 +1,11 @@
-package com.example.financialSystem.dto;
+package com.example.financialSystem.dto.responses;
 
-public class LoginDto {
+public class LoginResponse {
     private int Id;
     private String userName;
     private String token;
 
-    public LoginDto(int userId, String userName, String token) {
+    public LoginResponse(int userId, String userName, String token) {
         this.Id = userId;
         this.userName = userName;
         this.token = token;

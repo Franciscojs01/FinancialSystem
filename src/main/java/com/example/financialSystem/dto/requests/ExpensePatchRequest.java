@@ -1,6 +1,6 @@
-package com.example.financialSystem.dto;
+package com.example.financialSystem.dto.requests;
 
-import com.example.financialSystem.model.enums.InvestmentType;
+import com.example.financialSystem.model.enums.ExpenseType;
 import com.example.financialSystem.util.BenchMarkRate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,12 +14,11 @@ import java.time.LocalDate;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class InvestmentPatchRequest {
-    private InvestmentType investmentType;
+public class ExpensePatchRequest {
+    private ExpenseType expenseType;
     private BigDecimal value;
-    private BenchMarkRate baseCurrency;
     private LocalDate dateFinancial;
-    private Integer actionQuantity;
-    String brokerName;
-
+    private BenchMarkRate baseCurrency;
+    private String paymentMethod;
+    private Boolean isFixed;
 }

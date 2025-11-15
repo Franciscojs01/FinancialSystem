@@ -1,7 +1,7 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.dto.UserResponse;
-import com.example.financialSystem.dto.UserRequest;
+import com.example.financialSystem.dto.responses.UserResponse;
+import com.example.financialSystem.dto.requests.UserRequest;
 import com.example.financialSystem.exceptions.UserDuplicateException;
 import com.example.financialSystem.model.Login;
 import com.example.financialSystem.model.User;
