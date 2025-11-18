@@ -1,27 +1,24 @@
 package com.example.financialSystem.model;
 
-import com.example.financialSystem.util.BenchMarkRate;
+import com.example.financialSystem.model.enums.CostType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class Cost extends Financial {
     private String observation;
 
-    public Cost(BigDecimal value, BenchMarkRate baseCurrency, LocalDate dateFinancial, User user, String observation) {
-        super(value, baseCurrency, dateFinancial, user);
-        this.observation = observation;
-    }
+    @Enumerated(EnumType.STRING)
+    private CostType type;
 
-    public Cost() {}
-
-    public String getObservation() {
-        return observation;
-    }
-
-    public void setObservation(String observation) {
-        this.observation = observation;
-    }
 }

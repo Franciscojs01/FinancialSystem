@@ -214,7 +214,7 @@ public class InvestmentService extends UserLoggedService {
     private void validateOnwerShip(Investment investment) {
         Login loggedInUser = getLoggedUser();
 
-        if (investment.getUser().getId() != loggedInUser.getId()) {
+        if (investment.getUser().getId() != loggedInUser.getUser().getId()) {
             throw new AccessDeniedException("You are not authorized to view this investment");
         }
     }
