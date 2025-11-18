@@ -10,8 +10,10 @@ import java.time.LocalDate;
 public record CostRequest(
         @NotNull(message = "type is required")
         CostType costType,
+
         @NotNull(message = "observations is required")
         String observation,
+
         BigDecimal value,
         LocalDate dateFinancial,
         BenchMarkRate baseCurrency

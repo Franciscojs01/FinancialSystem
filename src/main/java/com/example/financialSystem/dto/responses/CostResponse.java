@@ -13,6 +13,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class CostResponse {
     private int idCost;
@@ -22,6 +23,12 @@ public class CostResponse {
     private BenchMarkRate baseCurrency;
     private LocalDate dateFinancial;
 
-    public CostResponse(Cost cost) {
+    public CostResponse(Cost entityCost) {
+        this.idCost = entityCost.getId();
+        this.costType = entityCost.getType();
+        this.observation = entityCost.getObservation();
+        this.value = entityCost.getValue();
+        this.baseCurrency = entityCost.getBaseCurrency();
+        this.dateFinancial = entityCost.getDateFinancial();
     }
 }

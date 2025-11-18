@@ -4,7 +4,9 @@ package com.example.financialSystem.model;
 import com.example.financialSystem.util.BenchMarkRate;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,6 +20,7 @@ public abstract class Financial {
     private int id;
 
     @NotNull(message = "Value is required")
+    @DecimalMin(value = "0.01", message = "Value must be greater than 0")
     private BigDecimal value;
 
     @Enumerated(EnumType.STRING)
