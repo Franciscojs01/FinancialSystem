@@ -64,6 +64,15 @@ public class CostService extends UserLoggedService {
         return new CostResponse(cost);
     }
 
+    public CostResponse getCostById(int id) {
+        Cost cost = costRepository.findById(id)
+                .orElseThrow(() -> new CostNotFoundException("Cost with " + id + " not found"));
+
+        validateOwerShip(cost);
+
+        return new CostResponse(cost);
+    }
+
 
     public void validateCostDate(LocalDate date) {
         if (date.isAfter(LocalDate.now())) throw new IllegalArgumentException("Cost date cannot be in the future");

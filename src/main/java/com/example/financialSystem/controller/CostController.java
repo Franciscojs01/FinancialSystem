@@ -19,10 +19,17 @@ public class CostController {
         return ResponseEntity.ok().body(costService.createCost(costRequest));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CostResponse> getCost(@PathVariable int id) {
+        return ResponseEntity.ok().body(costService.getCostById(id));
+    }
+
     @PutMapping("/edit/{id}")
     public ResponseEntity<CostResponse> editCost(@PathVariable int id, @Valid @RequestBody CostRequest costRequest) {
         return ResponseEntity.ok().body(costService.updateCost(id, costRequest));
     }
+
+
 
 
 }
