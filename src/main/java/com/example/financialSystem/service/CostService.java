@@ -1,5 +1,6 @@
 package com.example.financialSystem.service;
 
+import com.example.financialSystem.dto.requests.CostPatchRequest;
 import com.example.financialSystem.dto.requests.CostRequest;
 import com.example.financialSystem.dto.responses.CostResponse;
 import com.example.financialSystem.exceptions.CostDuplicateException;
@@ -10,11 +11,14 @@ import com.example.financialSystem.model.Cost;
 import com.example.financialSystem.model.Login;
 import com.example.financialSystem.model.User;
 import com.example.financialSystem.repository.CostRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class CostService extends UserLoggedService {
@@ -47,7 +51,6 @@ public class CostService extends UserLoggedService {
         Cost cost = costRepository.findById(id)
                 .orElseThrow(() -> new CostNotFoundException("Cost with " + id + " not found"));
 
-
         costMapper.toEntity(request);
 
         validateOwerShip(cost);
@@ -73,6 +76,43 @@ public class CostService extends UserLoggedService {
         return new CostResponse(cost);
     }
 
+    public CostResponse patchCost(int id, CostPatchRequest request) {
+        Cost existingCost = costRepository.findById(id)
+                .orElseThrow(() -> new CostNotFoundException("Cost with " + id + " not found"));
+
+        costMapper.toPatchEntity(request);
+
+        validateOwerShip(existingCost);
+
+        if (request.getCostType() != null) existingCost.setType(request.getCostType());
+
+        if (request.getObservation() != null) existingCost.setObservation(request.getObservation());
+
+        if (request.getValue() != null) existingCost.setValue(request.getValue());
+
+        if (request.getDateFinancial() != null) existingCost.setDateFinancial(request.getDateFinancial());
+
+        if (request.getBaseCurrency() != null) existingCost.setBaseCurrency(request.getBaseCurrency());
+
+        validateCostDate(existingCost.getDateFinancial());
+
+        costRepository.save(existingCost);
+        return new CostResponse(existingCost);
+    }
+
+    public List<Cost> listCosts() {
+        return costRepository.findByUser(getLoggedUser().getUser());
+    }
+
+    @Transactional
+    public void deleteCost(int id) {
+        Cost cost = costRepository.findById(id)
+                .orElseThrow(() -> new CostNotFoundException("Cost with " + id + "not found"));
+
+        validateOwerShip(cost);
+
+        costRepository.deleteById(id);
+    }
 
     public void validateCostDate(LocalDate date) {
         if (date.isAfter(LocalDate.now())) throw new IllegalArgumentException("Cost date cannot be in the future");

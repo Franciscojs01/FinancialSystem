@@ -1,5 +1,6 @@
 package com.example.financialSystem.mapper;
 
+import com.example.financialSystem.dto.requests.CostPatchRequest;
 import com.example.financialSystem.dto.requests.CostRequest;
 import com.example.financialSystem.dto.responses.CostResponse;
 import com.example.financialSystem.model.Cost;
@@ -18,6 +19,16 @@ public class CostMapper {
         cost.setBaseCurrency(costRequest.baseCurrency());
 
         return cost;
+    }
+
+    public void toPatchEntity(CostPatchRequest patchRequest) {
+        Cost cost = new Cost();
+        cost.setType(patchRequest.getCostType());
+        cost.setObservation(patchRequest.getObservation());
+        cost.setValue(patchRequest.getValue());
+        cost.setDateFinancial(patchRequest.getDateFinancial());
+        cost.setBaseCurrency(patchRequest.getBaseCurrency());
+
     }
 
     public List<CostResponse> toDtoList(List<Cost> costs) {
