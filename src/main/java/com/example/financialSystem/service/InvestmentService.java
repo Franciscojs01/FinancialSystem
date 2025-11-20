@@ -2,9 +2,9 @@ package com.example.financialSystem.service;
 
 import com.example.financialSystem.dto.requests.InvestmentPatchRequest;
 import com.example.financialSystem.dto.responses.InvestmentResponse;
-import com.example.financialSystem.exceptions.InvestmentDuplicateException;
-import com.example.financialSystem.exceptions.InvestmentNotFoundException;
-import com.example.financialSystem.exceptions.NoChangeDetectedException;
+import com.example.financialSystem.exception.InvestmentDuplicateException;
+import com.example.financialSystem.exception.InvestmentNotFoundException;
+import com.example.financialSystem.exception.NoChangeDetectedException;
 import com.example.financialSystem.model.Investment;
 import com.example.financialSystem.model.Login;
 import com.example.financialSystem.model.User;
@@ -52,7 +52,7 @@ public class InvestmentService extends UserLoggedService {
 
     public InvestmentResponse editInvestment(int id, Investment updatedInvestment) {
         Investment existingInvestment = investmentRepository.findById(id)
-                .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
+                .orElseThrow(() -> new InvestmentNotFoundException(id));
 
         validateOnwerShip(existingInvestment);
         ensureChanged(existingInvestment, updatedInvestment);
@@ -72,7 +72,7 @@ public class InvestmentService extends UserLoggedService {
 
     public InvestmentResponse getInvestmentById(int id) {
         Investment investment = investmentRepository.findById(id)
-                .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
+                .orElseThrow(() -> new InvestmentNotFoundException(id));
 
         validateOnwerShip(investment);
 
@@ -81,7 +81,7 @@ public class InvestmentService extends UserLoggedService {
 
     public InvestmentResponse simulateInvestment(int id, int days) {
         Investment investment = investmentRepository.findById(id)
-                .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + " not found"));
+                .orElseThrow(() -> new InvestmentNotFoundException(id));
 
         validateOnwerShip(investment);
 
@@ -111,7 +111,7 @@ public class InvestmentService extends UserLoggedService {
 
     public InvestmentResponse patchInvestment(int id, InvestmentPatchRequest patchRequest) {
         Investment existingInvestment = investmentRepository.findById(id)
-                .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
+                .orElseThrow(() -> new InvestmentNotFoundException(id));
 
         validateOnwerShip(existingInvestment);
         validateInvestmentDate(existingInvestment);
@@ -150,7 +150,7 @@ public class InvestmentService extends UserLoggedService {
     @Transactional
     public void deleteInvestment(int id) {
         Investment investment = investmentRepository.findById(id)
-                .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
+                .orElseThrow(() -> new InvestmentNotFoundException(id));
 
         validateOnwerShip(investment);
 

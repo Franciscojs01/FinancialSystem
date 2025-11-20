@@ -1,64 +1,94 @@
 package com.example.financialSystem.handler;
 
-import com.example.financialSystem.exceptions.*;
+import com.example.financialSystem.exception.AlreadyExistsException;
+import com.example.financialSystem.exception.ExceptionDetails;
+import com.example.financialSystem.exception.FinancialException;
+import com.example.financialSystem.exception.ValidationExceptionDetails;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<BadRequestExceptionDetails> handleUserNotFoundException(UserNotFoundException e, WebRequest webRequest) {
-        BadRequestExceptionDetails errorResponse = new BadRequestExceptionDetails(
-                HttpStatus.NOT_FOUND.value(), "User not found", e.getMessage()
-        );
+    @ExceptionHandler(FinancialException.class)
+    public ResponseEntity<ExceptionDetails> handleFinancialExceptions(FinancialException ex) {
+        ExceptionDetails body = ExceptionDetails.builder()
+                .timestamp(LocalDateTime.now())
+                .statusCode(HttpStatus.NOT_FOUND.value())
+                .title("Resource Not Found")
+                .details(ex.getMessage())
+                .developerMessage(ex.getClass().getName())
+                .build();
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(UserDuplicateException.class)
-    public ResponseEntity<BadRequestExceptionDetails> handleUserDuplicateException(UserDuplicateException e, WebRequest webRequest) {
-        BadRequestExceptionDetails errorResponse = new BadRequestExceptionDetails(
-                HttpStatus.CONFLICT.value(), "User duplicate", e.getMessage()
-        );
+    @ExceptionHandler(AlreadyExistsException.class)
+    public ResponseEntity<ExceptionDetails> handleAlreadyExists(AlreadyExistsException ex) {
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+        ExceptionDetails body = ExceptionDetails.builder()
+                .timestamp(LocalDateTime.now())
+                .statusCode(HttpStatus.CONFLICT.value()) // 409 CONFLICT
+                .title("Resource Already Exists")
+                .details(ex.getMessage())
+                .developerMessage(ex.getClass().getName())
+                .build();
+
+        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<String> handleIllegalStateException(IllegalStateException e, WebRequest webRequest) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(e.getMessage());
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            HttpHeaders headers,
+            HttpStatusCode status,
+            WebRequest request) {
+
+        String fields = ex.getBindingResult().getFieldErrors()
+                .stream().map(fe -> fe.getField()).collect(Collectors.joining(", "));
+
+        String fieldsMessage = ex.getBindingResult().getFieldErrors()
+                .stream().map(fe -> fe.getDefaultMessage()).collect(Collectors.joining(", "));
+
+        ValidationExceptionDetails body = ValidationExceptionDetails.builder()
+                .timestamp(LocalDateTime.now())
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .title("Invalid Request Fields")
+                .details("Some fields are invalid")
+                .fields(fields)
+                .fieldsMessage(fieldsMessage)
+                .developerMessage(ex.getClass().getName())
+                .build();
+
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGeneral(Exception ex) {
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("An unexpected error occurred: " + ex.getMessage());
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(
+            Exception ex,
+            Object body,
+            HttpHeaders headers,
+            HttpStatusCode status,
+            WebRequest request) {
+
+        ExceptionDetails details = ExceptionDetails.builder()
+                .timestamp(LocalDateTime.now())
+                .statusCode(status.value())
+                .title("Internal Error")
+                .details(ex.getMessage())
+                .developerMessage(ex.getClass().getName())
+                .build();
+
+        return new ResponseEntity<>(details, headers, status);
     }
-
-    @ExceptionHandler(InvestmentNotFoundException.class)
-    public ResponseEntity<BadRequestExceptionDetails> handleInvestmentNotFoundException(InvestmentNotFoundException e, WebRequest webRequest) {
-        BadRequestExceptionDetails errorResponse = new BadRequestExceptionDetails(
-                HttpStatus.NOT_FOUND.value(), "Investment not found", e.getMessage()
-        );
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-    }
-
-    @ExceptionHandler(InvestmentDuplicateException.class)
-    public ResponseEntity<BadRequestExceptionDetails> handleDuplicateException(InvestmentDuplicateException e, WebRequest webRequest) {
-        BadRequestExceptionDetails errorResponse = new BadRequestExceptionDetails(
-                HttpStatus.CONFLICT.value(), "Investment duplicate", e.getMessage()
-        );
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
-    }
-
-
 }

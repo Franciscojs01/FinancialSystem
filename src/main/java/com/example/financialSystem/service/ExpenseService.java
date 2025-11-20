@@ -2,9 +2,9 @@ package com.example.financialSystem.service;
 
 import com.example.financialSystem.dto.requests.ExpensePatchRequest;
 import com.example.financialSystem.dto.responses.ExpenseResponse;
-import com.example.financialSystem.exceptions.ExpenseDuplicateExcepetion;
-import com.example.financialSystem.exceptions.ExpenseNotFoundException;
-import com.example.financialSystem.exceptions.NoChangeDetectedException;
+import com.example.financialSystem.exception.ExpenseDuplicateException;
+import com.example.financialSystem.exception.ExpenseNotFoundException;
+import com.example.financialSystem.exception.NoChangeDetectedException;
 import com.example.financialSystem.model.Expense;
 import com.example.financialSystem.model.Login;
 import com.example.financialSystem.model.User;
@@ -38,7 +38,7 @@ public class ExpenseService extends UserLoggedService {
                 );
 
         if (existingExpense.isPresent()) {
-            throw new ExpenseDuplicateExcepetion("Expense already exists");
+            throw new ExpenseDuplicateException("Expense already exists");
         }
 
         expenseRepository.save(expense);
@@ -47,7 +47,7 @@ public class ExpenseService extends UserLoggedService {
 
     public ExpenseResponse editExpense(int id, Expense updatedExpense) {
         Expense existingExpense = expenseRepository.findById(id)
-                .orElseThrow(() -> new ExpenseNotFoundException("Expense with id: " + id + " not found"));
+                .orElseThrow(() -> new ExpenseNotFoundException(id));
 
         validateOnwerShip(existingExpense);
 
@@ -73,7 +73,7 @@ public class ExpenseService extends UserLoggedService {
 
     public ExpenseResponse patchExpense(int id, ExpensePatchRequest patchRequest) {
         Expense existingExpense = expenseRepository.findById(id)
-                .orElseThrow(() -> new ExpenseNotFoundException("Expense with id: " + id + " not found"));
+                .orElseThrow(() -> new ExpenseNotFoundException(id));
 
         validateOnwerShip(existingExpense);
 
@@ -109,7 +109,7 @@ public class ExpenseService extends UserLoggedService {
 
     public ExpenseResponse getExpenseById(int id) {
         Expense expense = expenseRepository.findById(id)
-                .orElseThrow(() -> new ExpenseNotFoundException("Investment with Id " + id + "Not found"));
+                .orElseThrow(() -> new ExpenseNotFoundException(id));
 
         validateOnwerShip(expense);
 
@@ -119,7 +119,7 @@ public class ExpenseService extends UserLoggedService {
     @Transactional
     public void deleteExpense(int id) {
         Expense expense = expenseRepository.findById(id)
-                        .orElseThrow(() -> new ExpenseNotFoundException("Expense with " + id + " not found"));
+                        .orElseThrow(() -> new ExpenseNotFoundException(id));
 
         validateOnwerShip(expense);
 

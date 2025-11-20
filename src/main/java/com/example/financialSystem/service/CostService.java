@@ -3,9 +3,9 @@ package com.example.financialSystem.service;
 import com.example.financialSystem.dto.requests.CostPatchRequest;
 import com.example.financialSystem.dto.requests.CostRequest;
 import com.example.financialSystem.dto.responses.CostResponse;
-import com.example.financialSystem.exceptions.CostDuplicateException;
-import com.example.financialSystem.exceptions.CostNotFoundException;
-import com.example.financialSystem.exceptions.NoChangeDetectedException;
+import com.example.financialSystem.exception.CostDuplicateException;
+import com.example.financialSystem.exception.CostNotFoundException;
+import com.example.financialSystem.exception.NoChangeDetectedException;
 import com.example.financialSystem.mapper.CostMapper;
 import com.example.financialSystem.model.Cost;
 import com.example.financialSystem.model.Login;
@@ -17,7 +17,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -49,7 +48,7 @@ public class CostService extends UserLoggedService {
 
     public CostResponse updateCost(int id, CostRequest request) {
         Cost cost = costRepository.findById(id)
-                .orElseThrow(() -> new CostNotFoundException("Cost with " + id + " not found"));
+                .orElseThrow(() -> new CostNotFoundException(id));
 
         costMapper.toEntity(request);
 
@@ -69,7 +68,7 @@ public class CostService extends UserLoggedService {
 
     public CostResponse getCostById(int id) {
         Cost cost = costRepository.findById(id)
-                .orElseThrow(() -> new CostNotFoundException("Cost with " + id + " not found"));
+                .orElseThrow(() -> new CostNotFoundException(id));
 
         validateOwerShip(cost);
 
@@ -78,7 +77,7 @@ public class CostService extends UserLoggedService {
 
     public CostResponse patchCost(int id, CostPatchRequest request) {
         Cost existingCost = costRepository.findById(id)
-                .orElseThrow(() -> new CostNotFoundException("Cost with " + id + " not found"));
+                .orElseThrow(() -> new CostNotFoundException(id));
 
         costMapper.toPatchEntity(request);
 
@@ -107,7 +106,7 @@ public class CostService extends UserLoggedService {
     @Transactional
     public void deleteCost(int id) {
         Cost cost = costRepository.findById(id)
-                .orElseThrow(() -> new CostNotFoundException("Cost with " + id + "not found"));
+                .orElseThrow(() -> new CostNotFoundException(id));
 
         validateOwerShip(cost);
 

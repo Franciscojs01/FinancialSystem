@@ -2,7 +2,8 @@ package com.example.financialSystem.service;
 
 import com.example.financialSystem.dto.responses.UserResponse;
 import com.example.financialSystem.dto.requests.UserRequest;
-import com.example.financialSystem.exceptions.UserDuplicateException;
+import com.example.financialSystem.exception.UserDuplicateException;
+import com.example.financialSystem.exception.UserNotFoundException;
 import com.example.financialSystem.model.Login;
 import com.example.financialSystem.model.User;
 import com.example.financialSystem.repository.LoginRepository;
@@ -30,7 +31,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
     private UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws UserNotFoundException {
         Login login = loginRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
@@ -46,7 +47,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
 
         loginRepository.findByUsername(email)
                 .ifPresent(userRegistered -> {
-                    throw new UserDuplicateException("User with: " + email + " already exists");
+                    throw new UserDuplicateException("email", email);
                 });
 
         User newUser = new User(
@@ -74,7 +75,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
         }
 
         User userExistent = userRepository.findById(id)
-                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                        .orElseThrow(() -> new UserNotFoundException(id));
 
         if (userDto.getName() != null && !userDto.getName().isBlank()) {
             userExistent.setName(userDto.getName());
@@ -102,7 +103,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
 
     public void deactivateUser(int id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(id));
 
         if (!user.isUserState()) {
             throw new IllegalStateException("User is in inactive");
@@ -114,7 +115,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
 
     public void activateUser(int id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(id));
 
         if (user.isUserState()) {
             throw new IllegalStateException("User is already active");
