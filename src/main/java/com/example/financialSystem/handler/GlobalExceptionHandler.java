@@ -38,7 +38,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ExceptionDetails body = ExceptionDetails.builder()
                 .timestamp(LocalDateTime.now())
-                .statusCode(HttpStatus.CONFLICT.value()) // 409 CONFLICT
+                .statusCode(HttpStatus.CONFLICT.value())
                 .title("Resource Already Exists")
                 .details(ex.getMessage())
                 .developerMessage(ex.getClass().getName())

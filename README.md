@@ -41,6 +41,7 @@ Permite o registro e categorização de gastos para controle financeiro:
 * **`POST /expense/create`**: Registra novas despesas, incluindo tipo, valor, data, método de pagamento e flag para despesas fixas (`isFixed`).
 * **`PUT /expense/edit/{id}`**: Atualiza os detalhes de uma despesa existente.
 
+
 ## 🤝 Contato
 
 * **Desenvolvedor:** Francisco José da Silva Mendes
