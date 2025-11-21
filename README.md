@@ -40,6 +40,16 @@ Permite o registro e categorização de gastos para controle financeiro:
 * **Tipos de Despesa:** `FOOD`, `TRANSPORT`, `HOUSING`, `HEALTH`, `LEISURE`, `OTHER`.
 * **`POST /expense/create`**: Registra novas despesas, incluindo tipo, valor, data, método de pagamento e flag para despesas fixas (`isFixed`).
 * **`PUT /expense/edit/{id}`**: Atualiza os detalhes de uma despesa existente.
+* **`GET /expense/list `**: Listar despesas
+* **`GET /expense/{id}`**: Buscar despesa por ID
+* **`DELETE /expense/delete/{id}`**: Deletar despesa
+
+## 💸 Módulo de Custos (Cost)
+* **`POST /cost/create`**: – Criar cost
+* **`GET /cost/list`**: – Listar costs
+* **`GET /cost/{id}`**: – Buscar cost por ID
+* **`PUT /cost/edit/{id}`**: – Atualizar cost
+* **`DELETE /cost/delete/{id}`**: – Deletar cost
 
 
 ## 🤝 Contato
