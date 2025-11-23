@@ -38,4 +38,11 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Financial> financial;
+
+    public User(String name, String email, LocalDate date, boolean state) {
+        this.name = name;
+        this.email = email;
+        this.registerDate = date;
+        this.userState = state;
+    }
 }
