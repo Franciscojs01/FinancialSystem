@@ -1,4 +1,4 @@
-package com.example.financialSystem.dto;
+package com.example.financialSystem.dto.responses;
 
 import com.example.financialSystem.model.Investment;
 import com.example.financialSystem.model.enums.InvestmentType;

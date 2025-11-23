@@ -1,17 +1,20 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.dto.ExpenseResponse;
-import com.example.financialSystem.exceptions.ExpenseDuplicateExcepetion;
-import com.example.financialSystem.exceptions.ExpenseNotFoundException;
-import com.example.financialSystem.exceptions.NoChangeDetectedException;
+import com.example.financialSystem.dto.requests.ExpensePatchRequest;
+import com.example.financialSystem.dto.responses.ExpenseResponse;
+import com.example.financialSystem.exception.ExpenseDuplicateException;
+import com.example.financialSystem.exception.ExpenseNotFoundException;
+import com.example.financialSystem.exception.NoChangeDetectedException;
 import com.example.financialSystem.model.Expense;
 import com.example.financialSystem.model.Login;
 import com.example.financialSystem.model.User;
 import com.example.financialSystem.repository.ExpenseRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,7 +38,7 @@ public class ExpenseService extends UserLoggedService {
                 );
 
         if (existingExpense.isPresent()) {
-            throw new ExpenseDuplicateExcepetion("Expense already exists");
+            throw new ExpenseDuplicateException("Expense already exists");
         }
 
         expenseRepository.save(expense);
@@ -44,9 +47,11 @@ public class ExpenseService extends UserLoggedService {
 
     public ExpenseResponse editExpense(int id, Expense updatedExpense) {
         Expense existingExpense = expenseRepository.findById(id)
-                .orElseThrow(() -> new ExpenseNotFoundException("Expense with id: " + id + " not found"));
+                .orElseThrow(() -> new ExpenseNotFoundException(id));
 
         validateOnwerShip(existingExpense);
+
+        validateExpenseDate(updatedExpense);
 
         ensureChanged(existingExpense, updatedExpense);
 
@@ -62,13 +67,63 @@ public class ExpenseService extends UserLoggedService {
         return new ExpenseResponse(updatedExpense);
     }
 
+    public List<Expense> listExpense() {
+        return expenseRepository.findByUser(getLoggedUser().getUser());
+    }
+
+    public ExpenseResponse patchExpense(int id, ExpensePatchRequest patchRequest) {
+        Expense existingExpense = expenseRepository.findById(id)
+                .orElseThrow(() -> new ExpenseNotFoundException(id));
+
+        validateOnwerShip(existingExpense);
+
+        validateExpenseDate(existingExpense);
+
+        if (patchRequest.getValue() != null) {
+            existingExpense.setValue(patchRequest.getValue());
+        }
+
+        if (patchRequest.getDateFinancial() != null) {
+            existingExpense.setDateFinancial(patchRequest.getDateFinancial());
+        }
+
+        if (patchRequest.getPaymentMethod() != null) {
+            existingExpense.setPaymentMethod(patchRequest.getPaymentMethod());
+        }
+
+        if (patchRequest.getIsFixed() != null) {
+            existingExpense.setFixed(patchRequest.getIsFixed());
+        }
+
+        if (patchRequest.getBaseCurrency() != null)
+            existingExpense.setBaseCurrency(patchRequest.getBaseCurrency());
+
+        if (patchRequest.getExpenseType() != null) {
+            existingExpense.setType(patchRequest.getExpenseType());
+        }
+
+        expenseRepository.save(existingExpense);
+
+        return new ExpenseResponse(existingExpense);
+    }
+
     public ExpenseResponse getExpenseById(int id) {
         Expense expense = expenseRepository.findById(id)
-                .orElseThrow(() -> new ExpenseNotFoundException("Investment with Id " + id + "Not found"));
+                .orElseThrow(() -> new ExpenseNotFoundException(id));
 
         validateOnwerShip(expense);
 
         return new ExpenseResponse(expense);
+    }
+
+    @Transactional
+    public void deleteExpense(int id) {
+        Expense expense = expenseRepository.findById(id)
+                        .orElseThrow(() -> new ExpenseNotFoundException(id));
+
+        validateOnwerShip(expense);
+
+        expenseRepository.deleteById(id);
     }
 
     public void ensureChanged(Expense existingExpense, Expense updatedExpense) {

@@ -1,9 +1,8 @@
 package com.example.financialSystem.controller;
 
-import com.example.financialSystem.dto.LoginDataDto;
-import com.example.financialSystem.dto.LoginDto;
+import com.example.financialSystem.dto.requests.LoginRequest;
+import com.example.financialSystem.dto.responses.LoginResponse;
 import com.example.financialSystem.model.Login;
-import com.example.financialSystem.model.User;
 import com.example.financialSystem.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,14 +25,14 @@ public class LoginController {
     private TokenService tokenService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginDto> login(@RequestBody LoginDataDto loginDataDto) {
-        Authentication userTokenAuthenticate = new UsernamePasswordAuthenticationToken(loginDataDto.username(), loginDataDto.password());
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+        Authentication userTokenAuthenticate = new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password());
         Authentication authentication = authenticationManager.authenticate(userTokenAuthenticate);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         Login login = (Login) authentication.getPrincipal();
 
         var token = tokenService.generateToken(login);
 
-        return ResponseEntity.ok(new LoginDto(login.getId(), login.getUsername(), token));
+        return ResponseEntity.ok(new LoginResponse(login.getId(), login.getUsername(), token));
     }
 }

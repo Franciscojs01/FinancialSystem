@@ -1,4 +1,4 @@
-package com.example.financialSystem.dto;
+package com.example.financialSystem.dto.requests;
 
 import com.example.financialSystem.model.enums.InvestmentType;
 import com.example.financialSystem.util.BenchMarkRate;

@@ -1,8 +1,9 @@
 package com.example.financialSystem.controller;
 
 
-import com.example.financialSystem.dto.InvestmentResponse;
-import com.example.financialSystem.dto.InvestmentRequest;
+import com.example.financialSystem.dto.requests.InvestmentPatchRequest;
+import com.example.financialSystem.dto.responses.InvestmentResponse;
+import com.example.financialSystem.dto.requests.InvestmentRequest;
 import com.example.financialSystem.mapper.InvestmentMapper;
 import com.example.financialSystem.model.Investment;
 import com.example.financialSystem.service.InvestmentService;
@@ -30,8 +31,8 @@ public class InvestmentController{
     }
 
     @PutMapping("/edit/{id}")
-    public ResponseEntity<InvestmentResponse> edit(@PathVariable int id, @Valid @RequestBody InvestmentRequest investmentDto) {
-        Investment investment = investmentMapper.toEntity(investmentDto);
+    public ResponseEntity<InvestmentResponse> edit(@PathVariable int id, @Valid @RequestBody InvestmentRequest investmentRequest) {
+        Investment investment = investmentMapper.toEntity(investmentRequest);
 
         InvestmentResponse updatedInvestment = investmentService.editInvestment(id, investment);
 
@@ -52,8 +53,13 @@ public class InvestmentController{
     @GetMapping("/list")
     public ResponseEntity<List<InvestmentResponse>> getInvestments() {
         List<InvestmentResponse> investments = investmentMapper.toDtoList(investmentService.listInvestments());
-
         return ResponseEntity.ok(investments);
+    }
+
+    @PatchMapping("/patch/{id}")
+    public ResponseEntity<InvestmentResponse> patchInvestment(@PathVariable int id, @RequestBody InvestmentPatchRequest patchRequest) {
+        InvestmentResponse updateInvestment =  investmentService.patchInvestment(id, patchRequest);
+        return  ResponseEntity.ok().body(updateInvestment);
     }
 
     @DeleteMapping("/delete/{id}")

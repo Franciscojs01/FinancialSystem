@@ -1,15 +1,17 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.dto.InvestmentResponse;
-import com.example.financialSystem.exceptions.InvestmentDuplicateException;
-import com.example.financialSystem.exceptions.InvestmentNotFoundException;
-import com.example.financialSystem.exceptions.NoChangeDetectedException;
+import com.example.financialSystem.dto.requests.InvestmentPatchRequest;
+import com.example.financialSystem.dto.responses.InvestmentResponse;
+import com.example.financialSystem.exception.InvestmentDuplicateException;
+import com.example.financialSystem.exception.InvestmentNotFoundException;
+import com.example.financialSystem.exception.NoChangeDetectedException;
 import com.example.financialSystem.model.Investment;
 import com.example.financialSystem.model.Login;
 import com.example.financialSystem.model.User;
 import com.example.financialSystem.model.enums.InvestmentType;
 import com.example.financialSystem.repository.InvestmentRepository;
 import com.example.financialSystem.util.BenchMarkRate;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
@@ -50,7 +52,7 @@ public class InvestmentService extends UserLoggedService {
 
     public InvestmentResponse editInvestment(int id, Investment updatedInvestment) {
         Investment existingInvestment = investmentRepository.findById(id)
-                .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
+                .orElseThrow(() -> new InvestmentNotFoundException(id));
 
         validateOnwerShip(existingInvestment);
         ensureChanged(existingInvestment, updatedInvestment);
@@ -70,7 +72,7 @@ public class InvestmentService extends UserLoggedService {
 
     public InvestmentResponse getInvestmentById(int id) {
         Investment investment = investmentRepository.findById(id)
-                .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
+                .orElseThrow(() -> new InvestmentNotFoundException(id));
 
         validateOnwerShip(investment);
 
@@ -79,7 +81,7 @@ public class InvestmentService extends UserLoggedService {
 
     public InvestmentResponse simulateInvestment(int id, int days) {
         Investment investment = investmentRepository.findById(id)
-                .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + " not found"));
+                .orElseThrow(() -> new InvestmentNotFoundException(id));
 
         validateOnwerShip(investment);
 
@@ -107,9 +109,48 @@ public class InvestmentService extends UserLoggedService {
         return investmentRepository.findByUser(getLoggedUser().getUser());
     }
 
-    public void deleteInvestment(long id) {
+    public InvestmentResponse patchInvestment(int id, InvestmentPatchRequest patchRequest) {
+        Investment existingInvestment = investmentRepository.findById(id)
+                .orElseThrow(() -> new InvestmentNotFoundException(id));
+
+        validateOnwerShip(existingInvestment);
+        validateInvestmentDate(existingInvestment);
+
+        if (patchRequest.getInvestmentType() != null) {
+            existingInvestment.setType(patchRequest.getInvestmentType());
+        }
+
+        if (patchRequest.getValue() != null) {
+            existingInvestment.setValue(patchRequest.getValue());
+        }
+
+        if (patchRequest.getBaseCurrency() != null) {
+            existingInvestment.setBaseCurrency(patchRequest.getBaseCurrency());
+        }
+
+        if (patchRequest.getDateFinancial() != null) {
+            existingInvestment.setDateFinancial(patchRequest.getDateFinancial());
+        }
+
+        if (patchRequest.getActionQuantity() != null) {
+            existingInvestment.setActionQuantity(patchRequest.getActionQuantity());
+        }
+
+        if (patchRequest.getBrokerName() != null) {
+            existingInvestment.setBrokerName(patchRequest.getBrokerName());
+        }
+
+        existingInvestment.setCurrentValue(calculateCurrentValue(existingInvestment));
+
+        investmentRepository.save(existingInvestment);
+
+        return new InvestmentResponse(existingInvestment);
+    }
+
+    @Transactional
+    public void deleteInvestment(int id) {
         Investment investment = investmentRepository.findById(id)
-                .orElseThrow(() -> new InvestmentNotFoundException("Investment with Id " + id + "Not found"));
+                .orElseThrow(() -> new InvestmentNotFoundException(id));
 
         validateOnwerShip(investment);
 
@@ -173,7 +214,7 @@ public class InvestmentService extends UserLoggedService {
     private void validateOnwerShip(Investment investment) {
         Login loggedInUser = getLoggedUser();
 
-        if (investment.getUser().getId() != loggedInUser.getId()) {
+        if (investment.getUser().getId() != loggedInUser.getUser().getId()) {
             throw new AccessDeniedException("You are not authorized to view this investment");
         }
     }

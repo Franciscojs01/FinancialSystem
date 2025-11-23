@@ -1,0 +1,534 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Financial System API",
+    "description" : "API documentation for the financial system",
+    "version" : "1.0.0"
+  },
+  "servers" : [ {
+    "url" : "http://localhost:8080",
+    "description" : "Generated server url"
+  } ],
+  "security" : [ {
+    "bearer" : [ ]
+  } ],
+  "paths" : {
+    "/user/{id}" : {
+      "put" : {
+        "tags" : [ "user-controller" ],
+        "operationId" : "updateUser",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "format" : "int32"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UserRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/{id}/deactivate" : {
+      "put" : {
+        "tags" : [ "user-controller" ],
+        "operationId" : "deactivateUser",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "format" : "int32"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        }
+      }
+    },
+    "/user/{id}/active" : {
+      "put" : {
+        "tags" : [ "user-controller" ],
+        "operationId" : "activateUser",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "format" : "int32"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        }
+      }
+    },
+    "/investments/edit/{id}" : {
+      "put" : {
+        "tags" : [ "investment-controller" ],
+        "operationId" : "edit",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "format" : "int32"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/InvestmentRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvestmentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/expense/edit/{id}" : {
+      "put" : {
+        "tags" : [ "expense-controller" ],
+        "operationId" : "editExpense",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "format" : "int32"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ExpenseRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ExpenseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/register" : {
+      "post" : {
+        "tags" : [ "user-controller" ],
+        "operationId" : "registerUser",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UserRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/investments/create" : {
+      "post" : {
+        "tags" : [ "investment-controller" ],
+        "operationId" : "create",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/InvestmentRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvestmentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/expense/create" : {
+      "post" : {
+        "tags" : [ "expense-controller" ],
+        "operationId" : "createExpense",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ExpenseRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ExpenseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login" : {
+      "post" : {
+        "tags" : [ "login-controller" ],
+        "operationId" : "login",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/LoginDataDto"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LoginDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/list" : {
+      "get" : {
+        "tags" : [ "user-controller" ],
+        "operationId" : "getAllUsers",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/UserResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/investments/{id}" : {
+      "get" : {
+        "tags" : [ "investment-controller" ],
+        "operationId" : "getInvestment",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "format" : "int32"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvestmentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/investments/{id}/simulate" : {
+      "get" : {
+        "tags" : [ "investment-controller" ],
+        "operationId" : "simulateInvestment",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "format" : "int32"
+          }
+        }, {
+          "name" : "days",
+          "in" : "query",
+          "required" : true,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "format" : "int32"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/InvestmentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/investments/list" : {
+      "get" : {
+        "tags" : [ "investment-controller" ],
+        "operationId" : "getInvestments",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "items" : {
+                    "$ref" : "#/components/schemas/InvestmentResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/investments/delete/{id}" : {
+      "delete" : {
+        "tags" : [ "investment-controller" ],
+        "operationId" : "deleteInvestment",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "format" : "int32"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : { }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "UserRequest" : {
+        "properties" : {
+          "name" : { },
+          "email" : { },
+          "password" : { }
+        }
+      },
+      "UserResponse" : {
+        "properties" : {
+          "name" : { },
+          "email" : { }
+        }
+      },
+      "InvestmentRequest" : {
+        "properties" : {
+          "investmentType" : {
+            "enum" : [ "STOCK", "FUND", "CRYPTO", "FIXED_INCOME", "TREASURY" ]
+          },
+          "value" : { },
+          "baseCurrency" : {
+            "enum" : [ "BRL", "USD", "EUR" ]
+          },
+          "dateFinancial" : {
+            "format" : "date"
+          },
+          "actionQuantity" : {
+            "format" : "int32"
+          },
+          "brokerName" : { }
+        }
+      },
+      "InvestmentResponse" : {
+        "properties" : {
+          "idInvestment" : {
+            "format" : "int32"
+          },
+          "type" : {
+            "enum" : [ "STOCK", "FUND", "CRYPTO", "FIXED_INCOME", "TREASURY" ]
+          },
+          "value" : { },
+          "baseCurrency" : {
+            "enum" : [ "BRL", "USD", "EUR" ]
+          },
+          "dateFinancial" : {
+            "format" : "date"
+          },
+          "actionQuantity" : {
+            "format" : "int32"
+          },
+          "currentValue" : { },
+          "brokerName" : { },
+          "daysInvested" : {
+            "format" : "int32"
+          }
+        }
+      },
+      "ExpenseRequest" : {
+        "properties" : {
+          "expenseType" : {
+            "enum" : [ "FOOD", "TRANSPORT", "HOUSING", "HEALTH", "LEISURE", "OTHER" ]
+          },
+          "value" : { },
+          "dateFinancial" : {
+            "format" : "date"
+          },
+          "baseCurrency" : {
+            "enum" : [ "BRL", "USD", "EUR" ]
+          },
+          "paymentMethod" : { },
+          "isFixed" : { }
+        }
+      },
+      "ExpenseResponse" : {
+        "properties" : {
+          "idExpense" : {
+            "format" : "int32"
+          },
+          "expenseType" : {
+            "enum" : [ "FOOD", "TRANSPORT", "HOUSING", "HEALTH", "LEISURE", "OTHER" ]
+          },
+          "value" : { },
+          "baseCurrency" : {
+            "enum" : [ "BRL", "USD", "EUR" ]
+          },
+          "expenseDate" : {
+            "format" : "date"
+          },
+          "paymentMethod" : { },
+          "fixed" : { }
+        }
+      },
+      "LoginDataDto" : {
+        "properties" : {
+          "username" : { },
+          "password" : { }
+        }
+      },
+      "LoginDto" : {
+        "properties" : {
+          "userName" : { },
+          "token" : { },
+          "id" : {
+            "format" : "int32"
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "bearer" : {
+        "type" : "http",
+        "name" : "bearer",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
+      }
+    }
+  }
+}
