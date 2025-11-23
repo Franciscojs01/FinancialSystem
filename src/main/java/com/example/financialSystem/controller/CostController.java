@@ -34,7 +34,7 @@ public class CostController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<Cost>> getAllCost() {
+    public ResponseEntity<List<CostResponse>> getAllCost() {
         return ResponseEntity.ok().body(costService.listCosts());
     }
 

@@ -18,34 +18,30 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> registerUser(@Valid @RequestBody UserRequest userData) {
-        UserResponse userDto = userService.registerUser(userData);
-        return ResponseEntity.ok().body(userDto);
+    public ResponseEntity<UserResponse> registerUser(@Valid @RequestBody UserRequest request) {
+        return ResponseEntity.ok().body(userService.registerUser(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable int id, @RequestBody UserRequest userEditDto) {
-        UserResponse userEdited = userService.editUser(id, userEditDto);
-        return ResponseEntity.ok().body(userEdited);
+    public ResponseEntity<UserResponse> editUser(@PathVariable int id, @RequestBody UserRequest request) {
+        return ResponseEntity.ok().body(userService.userUpdate(id, request));
     }
 
     @GetMapping("/list")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
-        List<UserResponse> users = userService.listUser();
-
-        return ResponseEntity.ok().body(users);
+        return ResponseEntity.ok().body(userService.listUser());
     }
 
     @PutMapping("/{id}/deactivate")
     public ResponseEntity<Void> deactivateUser(@PathVariable int id) {
         userService.deactivateUser(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("{id}/active")
     public ResponseEntity<Void> activateUser(@PathVariable int id) {
         userService.activateUser(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 

@@ -20,23 +20,14 @@ public class InvestmentController{
     @Autowired
     InvestmentService investmentService;
 
-    @Autowired
-    InvestmentMapper investmentMapper;
-
     @PostMapping("/create")
     public ResponseEntity<InvestmentResponse> create(@Valid @RequestBody InvestmentRequest investmentRequest) {
-        Investment investment = investmentMapper.toEntity(investmentRequest);
-        InvestmentResponse createdInvestment = investmentService.createInvestment(investment);
-        return ResponseEntity.ok().body(createdInvestment);
+        return ResponseEntity.ok().body(investmentService.createInvestment(investmentRequest));
     }
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<InvestmentResponse> edit(@PathVariable int id, @Valid @RequestBody InvestmentRequest investmentRequest) {
-        Investment investment = investmentMapper.toEntity(investmentRequest);
-
-        InvestmentResponse updatedInvestment = investmentService.editInvestment(id, investment);
-
-        return ResponseEntity.ok().body(updatedInvestment);
+        return ResponseEntity.ok().body(investmentService.updateInvestment(id,  investmentRequest));
     }
 
     @GetMapping("/{id}")
@@ -46,26 +37,23 @@ public class InvestmentController{
 
     @GetMapping("/{id}/simulate")
     public ResponseEntity<InvestmentResponse> simulateInvestment(@PathVariable int id, @RequestParam int days) {
-        InvestmentResponse simulated = investmentService.simulateInvestment(id, days);
-        return ResponseEntity.ok().body(simulated);
+        return ResponseEntity.ok().body(investmentService.simulateInvestment(id, days));
     }
 
     @GetMapping("/list")
     public ResponseEntity<List<InvestmentResponse>> getInvestments() {
-        List<InvestmentResponse> investments = investmentMapper.toDtoList(investmentService.listInvestments());
-        return ResponseEntity.ok(investments);
+        return ResponseEntity.ok().body(investmentService.listInvestments());
     }
 
     @PatchMapping("/patch/{id}")
     public ResponseEntity<InvestmentResponse> patchInvestment(@PathVariable int id, @RequestBody InvestmentPatchRequest patchRequest) {
-        InvestmentResponse updateInvestment =  investmentService.patchInvestment(id, patchRequest);
-        return  ResponseEntity.ok().body(updateInvestment);
+        return  ResponseEntity.ok().body(investmentService.patchInvestment(id,  patchRequest));
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteInvestment(@PathVariable int id) {
         investmentService.deleteInvestment(id);
-        return ResponseEntity.ok("Investment success deleted! ");
+        return ResponseEntity.ok("Investment success deleted with id: " + id);
     }
 
 

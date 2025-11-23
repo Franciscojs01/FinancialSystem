@@ -1,4 +1,12 @@
 package com.example.financialSystem.dto.requests;
 
-public record LoginRequest(String username, String password) {
+import jakarta.persistence.Column;
+
+public record LoginRequest(
+        @Column(unique = true, nullable = false)
+        String username,
+
+        @Column(nullable = false)
+        String password
+) {
 }

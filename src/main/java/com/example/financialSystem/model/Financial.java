@@ -6,11 +6,20 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.format.annotation.DateTimeFormat;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Financial {
@@ -34,55 +43,4 @@ public abstract class Financial {
     @JsonBackReference
     private User user;
 
-    public Financial(BigDecimal value, BenchMarkRate baseCurrency, LocalDate dateFinancial, User user) {
-        this.value = value;
-        this.baseCurrency = baseCurrency;
-        this.dateFinancial = dateFinancial;
-        this.user = user;
-    }
-
-    public Financial() {
-
-    }
-
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public BigDecimal getValue() {
-        return value;
-    }
-
-    public void setValue(BigDecimal value) {
-        this.value = value;
-    }
-
-    public BenchMarkRate getBaseCurrency() {
-        return baseCurrency;
-    }
-
-    public void setBaseCurrency(BenchMarkRate baseCurrency) {
-        this.baseCurrency = baseCurrency;
-    }
-
-    public LocalDate getDateFinancial() {
-        return dateFinancial;
-    }
-
-    public void setDateFinancial(LocalDate dateFinancial) {
-        this.dateFinancial = dateFinancial;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
 }

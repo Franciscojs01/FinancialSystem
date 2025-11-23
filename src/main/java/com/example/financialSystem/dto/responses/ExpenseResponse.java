@@ -3,10 +3,16 @@ package com.example.financialSystem.dto.responses;
 import com.example.financialSystem.model.Expense;
 import com.example.financialSystem.model.enums.ExpenseType;
 import com.example.financialSystem.util.BenchMarkRate;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
+@Getter
+@Setter
+@NoArgsConstructor
 public class ExpenseResponse {
     private int idExpense;
     private ExpenseType expenseType;
@@ -16,10 +22,6 @@ public class ExpenseResponse {
     private String paymentMethod;
     private boolean isFixed;
 
-    public ExpenseResponse() {
-
-    }
-
     public ExpenseResponse(Expense entityExpense) {
         this.idExpense = entityExpense.getId();
         this.expenseType = entityExpense.getType();
@@ -28,61 +30,5 @@ public class ExpenseResponse {
         this.expenseDate = entityExpense.getDateFinancial();
         this.paymentMethod = entityExpense.getPaymentMethod();
         this.isFixed = entityExpense.isFixed();
-    }
-
-    public int getIdExpense() {
-        return idExpense;
-    }
-
-    public void setIdExpense(int idExpense) {
-        this.idExpense = idExpense;
-    }
-
-    public ExpenseType getExpenseType() {
-        return expenseType;
-    }
-
-    public void setExpenseType(ExpenseType expenseType) {
-        this.expenseType = expenseType;
-    }
-
-    public BigDecimal getValue() {
-        return value;
-    }
-
-    public void setValue(BigDecimal value) {
-        this.value = value;
-    }
-
-    public BenchMarkRate getBaseCurrency() {
-        return baseCurrency;
-    }
-
-    public void setBaseCurrency(BenchMarkRate baseCurrency) {
-        this.baseCurrency = baseCurrency;
-    }
-
-    public LocalDate getExpenseDate() {
-        return expenseDate;
-    }
-
-    public void setExpenseDate(LocalDate expenseDate) {
-        this.expenseDate = expenseDate;
-    }
-
-    public String getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
-
-    public boolean isFixed() {
-        return isFixed;
-    }
-
-    public void setFixed(boolean fixed) {
-        isFixed = fixed;
     }
 }

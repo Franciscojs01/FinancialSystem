@@ -20,21 +20,14 @@ public class ExpenseController {
     @Autowired
     private ExpenseService expenseService;
 
-    @Autowired
-    private ExpenseMapper expenseMapper;
-
     @PostMapping("/create")
     public ResponseEntity<ExpenseResponse> createExpense(@Valid @RequestBody ExpenseRequest expenseRequest) {
-        Expense expense = expenseMapper.toEntity(expenseRequest);
-        ExpenseResponse createdExpense = expenseService.createExpense(expense);
-        return ResponseEntity.ok().body(createdExpense);
+        return ResponseEntity.ok().body(expenseService.createExpense(expenseRequest));
     }
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<ExpenseResponse> editExpense(@PathVariable int id, @Valid @RequestBody ExpenseRequest expenseRequest) {
-        Expense expense = expenseMapper.toEntity(expenseRequest);
-        ExpenseResponse updatedExpense = expenseService.editExpense(id, expense);
-        return ResponseEntity.ok().body(updatedExpense);
+        return ResponseEntity.ok().body(expenseService.editExpense(id, expenseRequest));
     }
 
     @GetMapping("/{id}")
@@ -44,14 +37,12 @@ public class ExpenseController {
 
     @GetMapping("/list")
     public ResponseEntity<List<ExpenseResponse>> getAllExpense() {
-        List<ExpenseResponse> expenses = expenseMapper.toDtoList(expenseService.listExpense());
-        return ResponseEntity.ok().body(expenses);
+        return ResponseEntity.ok().body(expenseService.listExpense());
     }
 
     @PatchMapping("/patch/{id}")
     public ResponseEntity<ExpenseResponse> patchExpense(@PathVariable int id, @Valid @RequestBody ExpensePatchRequest patchRequest) {
-        ExpenseResponse updatedExpense = expenseService.patchExpense(id, patchRequest);
-        return ResponseEntity.ok().body(updatedExpense);
+        return ResponseEntity.ok().body(expenseService.patchExpense(id, patchRequest));
     }
 
     @DeleteMapping("/{id}")

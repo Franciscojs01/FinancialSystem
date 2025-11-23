@@ -14,7 +14,6 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class CostResponse {
     private int idCost;
     private CostType costType;

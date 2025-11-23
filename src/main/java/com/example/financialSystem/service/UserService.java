@@ -42,33 +42,32 @@ public class UserService extends UserLoggedService implements UserDetailsService
         return login;
     }
 
-    public UserResponse registerUser(UserRequest userRegisterDto) {
-        String email = userRegisterDto.getEmail();
+    public UserResponse registerUser(UserRequest request) {
+        String email = request.getEmail();
 
         loginRepository.findByUsername(email)
-                .ifPresent(userRegistered -> {
+                .ifPresent(existing -> {
                     throw new UserDuplicateException("email", email);
                 });
 
         User newUser = new User(
-                userRegisterDto.getName(),
+                request.getName(),
                 email,
                 LocalDate.now(),
                 true
         );
 
-        String encondedPassword = passwordEncoder.encode(userRegisterDto.getPassword());
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
 
-        Login login = new Login(newUser, email, encondedPassword);
+        Login login = new Login(newUser, email, encodedPassword);
         newUser.setLogin(login);
 
         userRepository.save(newUser);
-
         return new UserResponse(newUser.getName(), newUser.getEmail());
-
     }
 
-    public UserResponse editUser(int id, UserRequest userDto) {
+
+    public UserResponse userUpdate(int id, UserRequest userDto) {
         Login authenticatedLogin = getLoggedUser();
         if (authenticatedLogin.getUser().getId() != id) {
             throw new AccessDeniedException("You can only edit your own account");

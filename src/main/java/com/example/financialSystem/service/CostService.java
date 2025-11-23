@@ -99,8 +99,8 @@ public class CostService extends UserLoggedService {
         return new CostResponse(existingCost);
     }
 
-    public List<Cost> listCosts() {
-        return costRepository.findByUser(getLoggedUser().getUser());
+    public List<CostResponse> listCosts() {
+        return costMapper.toDtoList(costRepository.findByUser(getLoggedUser().getUser()));
     }
 
     @Transactional

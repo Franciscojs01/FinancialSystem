@@ -1,58 +1,27 @@
 package com.example.financialSystem.model;
 
 import com.example.financialSystem.model.enums.ExpenseType;
-import com.example.financialSystem.util.BenchMarkRate;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
 @Entity
 public class Expense extends Financial {
     @Enumerated(EnumType.STRING)
     private ExpenseType type;
 
-    @NotNull(message = "paymentMethod are required")
     private String paymentMethod;
-
-    @NotNull(message = "this value is required")
     private boolean isFixed;
 
-    public Expense(ExpenseType type, BigDecimal value, LocalDate dateFinancial, BenchMarkRate baseCurrency, User user, String paymentMethod, boolean isFixed) {
-        super(value,baseCurrency, dateFinancial,user);
-        this.type = type;
-        this.paymentMethod = paymentMethod;
-        this.isFixed = isFixed;
-    }
-
-    public Expense() {
-
-    }
-
-    public ExpenseType getType() {
-        return type;
-    }
-
-    public void setType(ExpenseType type) {
-        this.type = type;
-    }
-
-    public String getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
-
-    public boolean isFixed() {
-        return isFixed;
-    }
-
-    public void setFixed(boolean fixed) {
-        isFixed = fixed;
-    }
 }
