@@ -1,11 +1,11 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.dto.responses.UserResponse;
-import com.example.financialSystem.dto.requests.UserRequest;
+import com.example.financialSystem.model.dto.responses.UserResponse;
+import com.example.financialSystem.model.dto.requests.UserRequest;
 import com.example.financialSystem.exception.UserDuplicateException;
 import com.example.financialSystem.exception.UserNotFoundException;
-import com.example.financialSystem.model.Login;
-import com.example.financialSystem.model.User;
+import com.example.financialSystem.model.entity.Login;
+import com.example.financialSystem.model.entity.User;
 import com.example.financialSystem.repository.LoginRepository;
 import com.example.financialSystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.example.financialSystem.model;
+package com.example.financialSystem.model.entity;
 
 import com.example.financialSystem.model.enums.CostType;
 import jakarta.persistence.Entity;
@@ -17,9 +17,9 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @Entity
 public class Cost extends Financial {
-    private String observation;
-
     @Enumerated(EnumType.STRING)
-    private CostType type;
+    private CostType costType;
+
+    private String observation;
 
 }

@@ -1,12 +1,10 @@
-package com.example.financialSystem.model;
+package com.example.financialSystem.model.entity;
 
 import com.example.financialSystem.model.enums.InvestmentType;
-import com.example.financialSystem.util.BenchMarkRate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +12,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,7 +21,7 @@ import java.time.LocalDate;
 @Entity
 public class Investment extends Financial {
     @Enumerated(EnumType.STRING)
-    private InvestmentType type;
+    private InvestmentType investmentType;
 
     private int actionQuantity;
 

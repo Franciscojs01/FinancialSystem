@@ -1,8 +1,8 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.dto.requests.LoginRequest;
-import com.example.financialSystem.dto.responses.LoginResponse;
-import com.example.financialSystem.model.Login;
+import com.example.financialSystem.model.dto.requests.LoginRequest;
+import com.example.financialSystem.model.dto.responses.LoginResponse;
+import com.example.financialSystem.model.entity.Login;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

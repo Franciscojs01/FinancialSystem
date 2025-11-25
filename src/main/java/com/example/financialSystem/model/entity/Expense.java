@@ -1,10 +1,9 @@
-package com.example.financialSystem.model;
+package com.example.financialSystem.model.entity;
 
 import com.example.financialSystem.model.enums.ExpenseType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @Entity
 public class Expense extends Financial {
     @Enumerated(EnumType.STRING)
-    private ExpenseType type;
+    private ExpenseType expenseType;
 
     private String paymentMethod;
     private boolean isFixed;

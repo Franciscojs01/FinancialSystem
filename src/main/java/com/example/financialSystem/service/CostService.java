@@ -1,15 +1,15 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.dto.requests.CostPatchRequest;
-import com.example.financialSystem.dto.requests.CostRequest;
-import com.example.financialSystem.dto.responses.CostResponse;
+import com.example.financialSystem.model.dto.requests.CostPatchRequest;
+import com.example.financialSystem.model.dto.requests.CostRequest;
+import com.example.financialSystem.model.dto.responses.CostResponse;
 import com.example.financialSystem.exception.CostDuplicateException;
 import com.example.financialSystem.exception.CostNotFoundException;
 import com.example.financialSystem.exception.NoChangeDetectedException;
-import com.example.financialSystem.mapper.CostMapper;
-import com.example.financialSystem.model.Cost;
-import com.example.financialSystem.model.Login;
-import com.example.financialSystem.model.User;
+import com.example.financialSystem.model.mapper.CostMapper;
+import com.example.financialSystem.model.entity.Cost;
+import com.example.financialSystem.model.entity.Login;
+import com.example.financialSystem.model.entity.User;
 import com.example.financialSystem.repository.CostRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,14 +36,13 @@ public class CostService extends UserLoggedService {
         validateCostDate(cost.getDateFinancial());
 
         boolean exist = costRepository
-                .existsByUserAndTypeAndDateFinancial(user, cost.getType(), cost.getDateFinancial());
+                .existsByUserAndCostTypeAndDateFinancial(user, cost.getCostType(), cost.getDateFinancial());
 
         if (exist) {
             throw new CostDuplicateException("You already created a cost of this type on this date");
         }
 
-        costRepository.save(cost);
-        return new CostResponse(cost);
+        return costMapper.toResponse(costRepository.save(cost));
     }
 
     public CostResponse updateCost(int id, CostRequest request) {
@@ -57,13 +56,9 @@ public class CostService extends UserLoggedService {
 
         ensureChanged(cost, request);
 
-        cost.setType(request.costType());
-        cost.setObservation(request.observation());
-        cost.setBaseCurrency(request.baseCurrency());
-        cost.setDateFinancial(request.dateFinancial());
+        costMapper.updateFromUpdate(request, cost);
 
-        costRepository.save(cost);
-        return new CostResponse(cost);
+        return costMapper.toResponse(costRepository.save(cost));
     }
 
     public CostResponse getCostById(int id) {
@@ -72,35 +67,24 @@ public class CostService extends UserLoggedService {
 
         validateOwerShip(cost);
 
-        return new CostResponse(cost);
+        return costMapper.toResponse(cost);
     }
 
-    public CostResponse patchCost(int id, CostPatchRequest request) {
+    public CostResponse patchCost(int id, CostPatchRequest patchRequest) {
         Cost existingCost = costRepository.findById(id)
                 .orElseThrow(() -> new CostNotFoundException(id));
 
-        costMapper.toPatchEntity(request);
-
         validateOwerShip(existingCost);
 
-        if (request.getCostType() != null) existingCost.setType(request.getCostType());
-
-        if (request.getObservation() != null) existingCost.setObservation(request.getObservation());
-
-        if (request.getValue() != null) existingCost.setValue(request.getValue());
-
-        if (request.getDateFinancial() != null) existingCost.setDateFinancial(request.getDateFinancial());
-
-        if (request.getBaseCurrency() != null) existingCost.setBaseCurrency(request.getBaseCurrency());
+        costMapper.updateFromPatch(patchRequest, existingCost);
 
         validateCostDate(existingCost.getDateFinancial());
 
-        costRepository.save(existingCost);
-        return new CostResponse(existingCost);
+        return costMapper.toResponse(costRepository.save(existingCost));
     }
 
     public List<CostResponse> listCosts() {
-        return costMapper.toDtoList(costRepository.findByUser(getLoggedUser().getUser()));
+        return costMapper.toResponseList(costRepository.findByUser(getLoggedUser().getUser()));
     }
 
     @Transactional
@@ -117,17 +101,9 @@ public class CostService extends UserLoggedService {
         if (date.isAfter(LocalDate.now())) throw new IllegalArgumentException("Cost date cannot be in the future");
     }
 
-    public void ensureChanged(Cost existingCost, CostRequest updatedCost) {
-        boolean unchanged =
-                existingCost.getType().equals(updatedCost.costType()) &&
-                existingCost.getObservation().equals(updatedCost.observation()) &&
-                existingCost.getValue().compareTo(updatedCost.value()) == 0 &&
-                existingCost.getDateFinancial().equals(updatedCost.dateFinancial()) &&
-                existingCost.getBaseCurrency().equals(updatedCost.baseCurrency());
-
-        if (unchanged) {
-            throw new NoChangeDetectedException("No changes detected in this cost");
-        }
+    public void ensureChanged(Cost oldCost, CostRequest newCostReq) {
+        CostRequest oldAsRequest = costMapper.toRequest(oldCost);
+        if (oldAsRequest.equals(newCostReq)) throw new  NoChangeDetectedException("No change in this cost");
     }
 
     private void validateOwerShip(Cost cost) {

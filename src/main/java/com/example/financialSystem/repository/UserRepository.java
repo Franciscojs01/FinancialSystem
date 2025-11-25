@@ -1,6 +1,6 @@
 package com.example.financialSystem.repository;
 
-import com.example.financialSystem.model.User;
+import com.example.financialSystem.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

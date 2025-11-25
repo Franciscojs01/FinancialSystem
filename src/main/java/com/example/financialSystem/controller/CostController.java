@@ -1,9 +1,8 @@
 package com.example.financialSystem.controller;
 
-import com.example.financialSystem.dto.requests.CostPatchRequest;
-import com.example.financialSystem.dto.requests.CostRequest;
-import com.example.financialSystem.dto.responses.CostResponse;
-import com.example.financialSystem.model.Cost;
+import com.example.financialSystem.model.dto.requests.CostPatchRequest;
+import com.example.financialSystem.model.dto.requests.CostRequest;
+import com.example.financialSystem.model.dto.responses.CostResponse;
 import com.example.financialSystem.service.CostService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

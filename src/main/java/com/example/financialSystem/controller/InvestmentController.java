@@ -1,11 +1,9 @@
 package com.example.financialSystem.controller;
 
 
-import com.example.financialSystem.dto.requests.InvestmentPatchRequest;
-import com.example.financialSystem.dto.responses.InvestmentResponse;
-import com.example.financialSystem.dto.requests.InvestmentRequest;
-import com.example.financialSystem.mapper.InvestmentMapper;
-import com.example.financialSystem.model.Investment;
+import com.example.financialSystem.model.dto.requests.InvestmentPatchRequest;
+import com.example.financialSystem.model.dto.responses.InvestmentResponse;
+import com.example.financialSystem.model.dto.requests.InvestmentRequest;
 import com.example.financialSystem.service.InvestmentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

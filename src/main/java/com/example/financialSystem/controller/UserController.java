@@ -1,7 +1,7 @@
 package com.example.financialSystem.controller;
 
-import com.example.financialSystem.dto.responses.UserResponse;
-import com.example.financialSystem.dto.requests.UserRequest;
+import com.example.financialSystem.model.dto.responses.UserResponse;
+import com.example.financialSystem.model.dto.requests.UserRequest;
 import com.example.financialSystem.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

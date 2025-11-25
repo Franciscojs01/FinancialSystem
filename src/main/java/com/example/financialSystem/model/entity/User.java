@@ -1,4 +1,4 @@
-package com.example.financialSystem.model;
+package com.example.financialSystem.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;

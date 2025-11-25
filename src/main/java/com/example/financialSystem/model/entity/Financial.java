@@ -1,4 +1,4 @@
-package com.example.financialSystem.model;
+package com.example.financialSystem.model.entity;
 
 
 import com.example.financialSystem.util.BenchMarkRate;

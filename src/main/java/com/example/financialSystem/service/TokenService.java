@@ -4,15 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.example.financialSystem.dto.requests.LoginRequest;
-import com.example.financialSystem.dto.responses.LoginResponse;
-import com.example.financialSystem.model.Login;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.financialSystem.model.entity.Login;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;

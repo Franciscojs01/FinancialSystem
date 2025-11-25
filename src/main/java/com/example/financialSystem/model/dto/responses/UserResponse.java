@@ -1,4 +1,4 @@
-package com.example.financialSystem.dto.requests;
+package com.example.financialSystem.model.dto.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,11 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class UserRequest {
+public class UserResponse {
     private String name;
     private String email;
-    private String password;
 
 }
-
-

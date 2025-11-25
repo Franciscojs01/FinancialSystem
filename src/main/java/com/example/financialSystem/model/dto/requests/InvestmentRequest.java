@@ -1,4 +1,4 @@
-package com.example.financialSystem.dto.requests;
+package com.example.financialSystem.model.dto.requests;
 
 import com.example.financialSystem.model.enums.InvestmentType;
 import com.example.financialSystem.util.BenchMarkRate;
@@ -13,12 +13,11 @@ public record InvestmentRequest(
         InvestmentType investmentType,
 
         BigDecimal value,
-        BenchMarkRate baseCurrency,
         LocalDate dateFinancial,
+        BenchMarkRate baseCurrency,
 
         @Min(value = 1, message = "Action quantity must be greater than zero")
         int actionQuantity,
-
         @NotNull(message = "broker is required")
         String brokerName
 ) {}

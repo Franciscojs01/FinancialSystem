@@ -1,15 +1,15 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.dto.requests.ExpensePatchRequest;
-import com.example.financialSystem.dto.requests.ExpenseRequest;
-import com.example.financialSystem.dto.responses.ExpenseResponse;
+import com.example.financialSystem.model.dto.requests.ExpensePatchRequest;
+import com.example.financialSystem.model.dto.requests.ExpenseRequest;
+import com.example.financialSystem.model.dto.responses.ExpenseResponse;
 import com.example.financialSystem.exception.ExpenseDuplicateException;
 import com.example.financialSystem.exception.ExpenseNotFoundException;
 import com.example.financialSystem.exception.NoChangeDetectedException;
-import com.example.financialSystem.mapper.ExpenseMapper;
-import com.example.financialSystem.model.Expense;
-import com.example.financialSystem.model.Login;
-import com.example.financialSystem.model.User;
+import com.example.financialSystem.model.mapper.ExpenseMapper;
+import com.example.financialSystem.model.entity.Expense;
+import com.example.financialSystem.model.entity.Login;
+import com.example.financialSystem.model.entity.User;
 import com.example.financialSystem.repository.ExpenseRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +29,16 @@ public class ExpenseService extends UserLoggedService {
 
     public ExpenseResponse createExpense(ExpenseRequest request) {
         User user = getLoggedUser().getUser();
+
         Expense expense = expenseMapper.toEntity(request);
+        expense.setUser(user);
 
         validateExpenseDate(expense.getDateFinancial());
 
         expenseRepository
-                .findByUserAndTypeAndDateFinancialAndValueAndPaymentMethod(
+                .findByUserAndExpenseTypeAndDateFinancialAndValueAndPaymentMethod(
                         user,
-                        expense.getType(),
+                        expense.getExpenseType(),
                         expense.getDateFinancial(),
                         expense.getValue(),
                         expense.getPaymentMethod()
@@ -44,31 +46,25 @@ public class ExpenseService extends UserLoggedService {
                     throw new ExpenseDuplicateException("Expense already exists");
                 });
 
-        expenseRepository.save(expense);
-        return new ExpenseResponse(expense);
+
+        return expenseMapper.toResponse(expenseRepository.save(expense));
     }
 
-    public ExpenseResponse editExpense(int id, ExpenseRequest updatedExpense) {
+    public ExpenseResponse editExpense(int id, ExpenseRequest request) {
         Expense existingExpense = expenseRepository.findById(id)
                 .orElseThrow(() -> new ExpenseNotFoundException(id));
 
         validateOwnerShip(existingExpense);
         validateExpenseDate(existingExpense.getDateFinancial());
+        ensureChanged(existingExpense, request);
 
-        ensureChanged(existingExpense, updatedExpense);
+        expenseMapper.updateEntityFromUpdate(request, existingExpense);
 
-        existingExpense.setType(updatedExpense.expenseType());
-        existingExpense.setValue(updatedExpense.value());
-        existingExpense.setDateFinancial(updatedExpense.dateFinancial());
-        existingExpense.setBaseCurrency(updatedExpense.baseCurrency());
-        existingExpense.setPaymentMethod(updatedExpense.paymentMethod());
-        existingExpense.setFixed(updatedExpense.isFixed());
-
-        return new ExpenseResponse(expenseRepository.save(existingExpense));
+        return expenseMapper.toResponse(expenseRepository.save(existingExpense));
     }
 
     public List<ExpenseResponse> listExpense() {
-        return expenseMapper.toDtoList(expenseRepository.findByUser(getLoggedUser().getUser()));
+        return expenseMapper.toResponseList(expenseRepository.findByUser(getLoggedUser().getUser()));
     }
 
     public ExpenseResponse patchExpense(int id, ExpensePatchRequest patchRequest) {
@@ -76,35 +72,11 @@ public class ExpenseService extends UserLoggedService {
                 .orElseThrow(() -> new ExpenseNotFoundException(id));
 
         validateOwnerShip(existingExpense);
-
         validateExpenseDate(existingExpense.getDateFinancial());
 
-        if (patchRequest.getValue() != null) {
-            existingExpense.setValue(patchRequest.getValue());
-        }
+        expenseMapper.updateEntityFromPatch(patchRequest, existingExpense);
 
-        if (patchRequest.getDateFinancial() != null) {
-            existingExpense.setDateFinancial(patchRequest.getDateFinancial());
-        }
-
-        if (patchRequest.getPaymentMethod() != null) {
-            existingExpense.setPaymentMethod(patchRequest.getPaymentMethod());
-        }
-
-        if (patchRequest.getIsFixed() != null) {
-            existingExpense.setFixed(patchRequest.getIsFixed());
-        }
-
-        if (patchRequest.getBaseCurrency() != null)
-            existingExpense.setBaseCurrency(patchRequest.getBaseCurrency());
-
-        if (patchRequest.getExpenseType() != null) {
-            existingExpense.setType(patchRequest.getExpenseType());
-        }
-
-        expenseRepository.save(existingExpense);
-
-        return new ExpenseResponse(existingExpense);
+        return expenseMapper.toResponse(expenseRepository.save(existingExpense));
     }
 
     public ExpenseResponse getExpenseById(int id) {
@@ -113,7 +85,7 @@ public class ExpenseService extends UserLoggedService {
 
         validateOwnerShip(expense);
 
-        return new ExpenseResponse(expense);
+        return expenseMapper.toResponse(expense);
     }
 
     @Transactional
@@ -126,18 +98,10 @@ public class ExpenseService extends UserLoggedService {
         expenseRepository.deleteById(id);
     }
 
-    public void ensureChanged(Expense existingExpense, ExpenseRequest updatedExpense) {
-        boolean unchanged =
-                existingExpense.getType().equals(updatedExpense.expenseType()) &&
-                        existingExpense.getValue().compareTo(updatedExpense.value()) == 0 &&
-                        existingExpense.getDateFinancial().equals(updatedExpense.dateFinancial()) &&
-                        existingExpense.getBaseCurrency().equals(updatedExpense.baseCurrency()) &&
-                        existingExpense.getPaymentMethod().equals(updatedExpense.paymentMethod()) &&
-                        existingExpense.isFixed() == updatedExpense.isFixed();
+    public void ensureChanged(Expense oldExpense, ExpenseRequest newExpReq) {
+        ExpenseRequest oldAsRequest = expenseMapper.toRequest(oldExpense);
 
-        if (unchanged) {
-            throw new NoChangeDetectedException("No changes detected in this expense");
-        }
+        if (oldAsRequest.equals(newExpReq)) throw new NoChangeDetectedException("No changes in this expense");
 
     }
 
