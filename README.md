@@ -17,7 +17,6 @@ The project focuses on modeling complex entities and designing clear and functio
 - MapStruct
 - Jakarta Validation
 - MySQL/PostgresSQL
-- Docker
 - Lombok 
 - Scheduler (Spring Scheduling)
 ## 🔑 Authentication & User Management
