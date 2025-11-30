@@ -1,15 +1,18 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.model.dto.responses.UserResponse;
-import com.example.financialSystem.model.dto.requests.UserRequest;
 import com.example.financialSystem.exception.UserDuplicateException;
 import com.example.financialSystem.exception.UserNotFoundException;
+import com.example.financialSystem.model.dto.requests.UserAdminRequest;
+import com.example.financialSystem.model.dto.requests.UserRequest;
+import com.example.financialSystem.model.dto.responses.UserResponse;
 import com.example.financialSystem.model.entity.Login;
 import com.example.financialSystem.model.entity.User;
+import com.example.financialSystem.model.enums.UserRole;
 import com.example.financialSystem.repository.LoginRepository;
 import com.example.financialSystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -42,6 +45,34 @@ public class UserService extends UserLoggedService implements UserDetailsService
         return login;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    public UserResponse registerAdminUser(UserAdminRequest request) {
+        loginRepository.findByUsername(request.getEmail())
+                .ifPresent(existing -> {
+                    throw new UserDuplicateException("email", request.getEmail());
+                });
+
+        User newUser = new User();
+        newUser.setEmail(request.getEmail());
+        newUser.setName(request.getName());
+        newUser.setRegisterDate(LocalDate.now());
+        newUser.setUserState(true);
+        newUser.setUserRole(UserRole.ADMIN);
+
+
+        Login login = new Login(
+                newUser,
+                request.getEmail(),
+                passwordEncoder.encode(request.getPassword())
+        );
+
+        newUser.setLogin(login);
+
+        userRepository.save(newUser);
+
+        return new UserResponse(newUser.getName(), newUser.getEmail());
+    }
+
     public UserResponse registerUser(UserRequest request) {
         String email = request.getEmail();
 
@@ -57,49 +88,52 @@ public class UserService extends UserLoggedService implements UserDetailsService
                 true
         );
 
-        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        newUser.setUserRole(UserRole.USER);
 
-        Login login = new Login(newUser, email, encodedPassword);
+        Login login = new Login(
+                newUser,
+                email,
+                passwordEncoder.encode(request.getPassword())
+        );
+
         newUser.setLogin(login);
 
         userRepository.save(newUser);
         return new UserResponse(newUser.getName(), newUser.getEmail());
     }
 
-
     public UserResponse userUpdate(int id, UserRequest userDto) {
-        Login authenticatedLogin = getLoggedUser();
-        if (authenticatedLogin.getUser().getId() != id) {
-            throw new AccessDeniedException("You can only edit your own account");
-        }
-
-        User userExistent = userRepository.findById(id)
+        User user = userRepository.findById(id)
                         .orElseThrow(() -> new UserNotFoundException(id));
 
+        validateOwnerShip(user);
+
         if (userDto.getName() != null && !userDto.getName().isBlank()) {
-            userExistent.setName(userDto.getName());
+            user.setName(userDto.getName());
         }
 
         if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
-            userExistent.setEmail(userDto.getEmail());
-            userExistent.getLogin().setUsername(userDto.getEmail());
+            user.setEmail(userDto.getEmail());
+            user.getLogin().setUsername(userDto.getEmail());
         }
 
         if (userDto.getPassword() != null && !userDto.getPassword().isBlank()) {
-            userExistent.getLogin().setPassword(passwordEncoder.encode(userDto.getPassword()));
+            user.getLogin().setPassword(passwordEncoder.encode(userDto.getPassword()));
         }
 
-        userRepository.save(userExistent);
+        userRepository.save(user);
 
         return new UserResponse(userDto.getName(), userDto.getEmail());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> listUser() {
         return userRepository.findAll().stream()
                 .map(user -> new UserResponse(user.getEmail(), user.getName()))
                 .toList();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void deactivateUser(int id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
@@ -112,6 +146,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
         userRepository.save(user);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void activateUser(int id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
@@ -122,6 +157,17 @@ public class UserService extends UserLoggedService implements UserDetailsService
 
         user.setUserState(true);
         userRepository.save(user);
+    }
+
+    private void validateOwnerShip(User user) {
+        Login loggedUser = getLoggedUser();
+
+        boolean isOwnerOrAdmin = loggedUser.getUser().getId() == user.getId() ||
+                loggedUser.getUser().getUserRole() == UserRole.ADMIN;
+
+        if (!isOwnerOrAdmin) {
+            throw new AccessDeniedException("You can only edit your own account");
+        }
     }
 
 }

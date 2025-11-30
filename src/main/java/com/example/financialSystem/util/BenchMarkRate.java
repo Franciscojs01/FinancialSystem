@@ -1,5 +1,8 @@
 package com.example.financialSystem.util;
 
+import lombok.Getter;
+
+@Getter
 public enum BenchMarkRate {
     BRL("CDI", 0.1365),
     USD("Fedaral funds Rate", 0.0525),
@@ -11,13 +14,5 @@ public enum BenchMarkRate {
     BenchMarkRate(String name, double annualRate) {
         this.name = name;
         this.annualRate = annualRate;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public double getAnnualRate() {
-        return annualRate;
     }
 }

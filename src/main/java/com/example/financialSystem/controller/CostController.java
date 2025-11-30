@@ -32,9 +32,14 @@ public class CostController {
         return ResponseEntity.ok().body(costService.updateCost(id, costRequest));
     }
 
-    @GetMapping("/list")
+    @GetMapping("/list/me")
+    public ResponseEntity<List<CostResponse>> getAllCostByUser() {
+        return ResponseEntity.ok().body(costService.listCost());
+    }
+
+    @GetMapping("/list/all")
     public ResponseEntity<List<CostResponse>> getAllCost() {
-        return ResponseEntity.ok().body(costService.listCosts());
+        return ResponseEntity.ok().body(costService.listAllCost());
     }
 
     @PatchMapping("/patch/{id}")

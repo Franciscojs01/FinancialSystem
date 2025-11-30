@@ -1,19 +1,21 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.model.dto.requests.CostPatchRequest;
-import com.example.financialSystem.model.dto.requests.CostRequest;
-import com.example.financialSystem.model.dto.responses.CostResponse;
 import com.example.financialSystem.exception.CostDuplicateException;
 import com.example.financialSystem.exception.CostNotFoundException;
 import com.example.financialSystem.exception.NoChangeDetectedException;
-import com.example.financialSystem.model.mapper.CostMapper;
+import com.example.financialSystem.model.dto.requests.CostPatchRequest;
+import com.example.financialSystem.model.dto.requests.CostRequest;
+import com.example.financialSystem.model.dto.responses.CostResponse;
 import com.example.financialSystem.model.entity.Cost;
 import com.example.financialSystem.model.entity.Login;
 import com.example.financialSystem.model.entity.User;
+import com.example.financialSystem.model.enums.UserRole;
+import com.example.financialSystem.model.mapper.CostMapper;
 import com.example.financialSystem.repository.CostRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -83,8 +85,13 @@ public class CostService extends UserLoggedService {
         return costMapper.toResponse(costRepository.save(existingCost));
     }
 
-    public List<CostResponse> listCosts() {
+    public List<CostResponse> listCost() {
         return costMapper.toResponseList(costRepository.findByUser(getLoggedUser().getUser()));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<CostResponse> listAllCost() {
+        return costMapper.toResponseList(costRepository.findAll());
     }
 
     @Transactional
@@ -107,10 +114,14 @@ public class CostService extends UserLoggedService {
     }
 
     private void validateOwerShip(Cost cost) {
-       Login login = getLoggedUser();
+       Login loggedUser = getLoggedUser();
 
-        if (cost.getUser().getId() != login.getId()) {
-            throw new AccessDeniedException("You are not authorized to view this cost");
-        }
+       boolean isOwnerOrAdmin = cost.getUser().getId() == loggedUser.getId()
+               || loggedUser.getUser().getUserRole() == UserRole.ADMIN;
+
+       if (!isOwnerOrAdmin) {
+              throw new AccessDeniedException("You do not have permission to access this cost");
+       }
+
     }
 }

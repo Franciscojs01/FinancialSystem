@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,6 +20,19 @@ import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ExceptionDetails> handleAccessDeniedException(AccessDeniedException ex) {
+        ExceptionDetails body = ExceptionDetails.builder()
+                .timestamp(LocalDateTime.now())
+                .statusCode(HttpStatus.FORBIDDEN.value())
+                .title("Access Denied")
+                .details(ex.getMessage())
+                .developerMessage(ex.getClass().getName())
+                .build();
+
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
 
     @ExceptionHandler(FinancialException.class)
     public ResponseEntity<ExceptionDetails> handleFinancialExceptions(FinancialException ex) {

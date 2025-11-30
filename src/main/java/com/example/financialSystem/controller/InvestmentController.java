@@ -2,8 +2,8 @@ package com.example.financialSystem.controller;
 
 
 import com.example.financialSystem.model.dto.requests.InvestmentPatchRequest;
-import com.example.financialSystem.model.dto.responses.InvestmentResponse;
 import com.example.financialSystem.model.dto.requests.InvestmentRequest;
+import com.example.financialSystem.model.dto.responses.InvestmentResponse;
 import com.example.financialSystem.service.InvestmentService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +38,14 @@ public class InvestmentController{
         return ResponseEntity.ok().body(investmentService.simulateInvestment(id, days));
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<List<InvestmentResponse>> getInvestments() {
+    @GetMapping("/list/me")
+    public ResponseEntity<List<InvestmentResponse>> getAllInvestmentByUser() {
         return ResponseEntity.ok().body(investmentService.listInvestments());
+    }
+
+    @GetMapping("/list/all")
+    public ResponseEntity<List<InvestmentResponse>> getAllInvestment() {
+        return ResponseEntity.ok().body(investmentService.listAllInvestments());
     }
 
     @PatchMapping("/patch/{id}")

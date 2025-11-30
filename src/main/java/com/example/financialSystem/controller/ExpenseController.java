@@ -2,8 +2,8 @@ package com.example.financialSystem.controller;
 
 
 import com.example.financialSystem.model.dto.requests.ExpensePatchRequest;
-import com.example.financialSystem.model.dto.responses.ExpenseResponse;
 import com.example.financialSystem.model.dto.requests.ExpenseRequest;
+import com.example.financialSystem.model.dto.responses.ExpenseResponse;
 import com.example.financialSystem.service.ExpenseService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +33,14 @@ public class ExpenseController {
         return ResponseEntity.ok().body(expenseService.getExpenseById(id));
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<List<ExpenseResponse>> getAllExpense() {
+    @GetMapping("/list/me")
+    public ResponseEntity<List<ExpenseResponse>> getAllExpenseByUser() {
         return ResponseEntity.ok().body(expenseService.listExpense());
+    }
+
+    @GetMapping("list/all")
+    public ResponseEntity<List<ExpenseResponse>> getAllExpense() {
+        return ResponseEntity.ok().body(expenseService.listAllExpense());
     }
 
     @PatchMapping("/patch/{id}")

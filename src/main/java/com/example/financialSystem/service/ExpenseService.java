@@ -1,19 +1,21 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.model.dto.requests.ExpensePatchRequest;
-import com.example.financialSystem.model.dto.requests.ExpenseRequest;
-import com.example.financialSystem.model.dto.responses.ExpenseResponse;
 import com.example.financialSystem.exception.ExpenseDuplicateException;
 import com.example.financialSystem.exception.ExpenseNotFoundException;
 import com.example.financialSystem.exception.NoChangeDetectedException;
-import com.example.financialSystem.model.mapper.ExpenseMapper;
+import com.example.financialSystem.model.dto.requests.ExpensePatchRequest;
+import com.example.financialSystem.model.dto.requests.ExpenseRequest;
+import com.example.financialSystem.model.dto.responses.ExpenseResponse;
 import com.example.financialSystem.model.entity.Expense;
 import com.example.financialSystem.model.entity.Login;
 import com.example.financialSystem.model.entity.User;
+import com.example.financialSystem.model.enums.UserRole;
+import com.example.financialSystem.model.mapper.ExpenseMapper;
 import com.example.financialSystem.repository.ExpenseRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -67,6 +69,11 @@ public class ExpenseService extends UserLoggedService {
         return expenseMapper.toResponseList(expenseRepository.findByUser(getLoggedUser().getUser()));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<ExpenseResponse> listAllExpense() {
+        return expenseMapper.toResponseList(expenseRepository.findAll());
+    }
+
     public ExpenseResponse patchExpense(int id, ExpensePatchRequest patchRequest) {
         Expense existingExpense = expenseRepository.findById(id)
                 .orElseThrow(() -> new ExpenseNotFoundException(id));
@@ -91,7 +98,7 @@ public class ExpenseService extends UserLoggedService {
     @Transactional
     public void deleteExpense(int id) {
         Expense expense = expenseRepository.findById(id)
-                        .orElseThrow(() -> new ExpenseNotFoundException(id));
+                .orElseThrow(() -> new ExpenseNotFoundException(id));
 
         validateOwnerShip(expense);
 
@@ -106,10 +113,13 @@ public class ExpenseService extends UserLoggedService {
     }
 
     private void validateOwnerShip(Expense expense) {
-        Login loggedInUser = getLoggedUser();
+        Login loggedUser = getLoggedUser();
 
-        if (expense.getUser().getId() != loggedInUser.getId()) {
-            throw new AccessDeniedException("You are not authorized to view this expense");
+        boolean isOwnerOrAdmin = loggedUser.getUser().getUserRole() == UserRole.ADMIN
+                || loggedUser.getUser().getId() == expense.getUser().getId();
+
+        if (!isOwnerOrAdmin) {
+            throw new AccessDeniedException("You can only edit your own account");
         }
     }
 

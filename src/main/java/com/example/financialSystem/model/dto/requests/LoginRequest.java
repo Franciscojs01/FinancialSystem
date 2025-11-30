@@ -8,5 +8,7 @@ public record LoginRequest(
 
         @Column(nullable = false)
         String password
+
+
 ) {
 }

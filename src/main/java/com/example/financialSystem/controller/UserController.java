@@ -1,7 +1,8 @@
 package com.example.financialSystem.controller;
 
-import com.example.financialSystem.model.dto.responses.UserResponse;
+import com.example.financialSystem.model.dto.requests.UserAdminRequest;
 import com.example.financialSystem.model.dto.requests.UserRequest;
+import com.example.financialSystem.model.dto.responses.UserResponse;
 import com.example.financialSystem.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,11 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @PostMapping("/admin/create")
+    public ResponseEntity<UserResponse> registerAdminUser(@Valid @RequestBody UserAdminRequest request) {
+        return ResponseEntity.ok().body(userService.registerAdminUser(request));
+    }
+
     @PostMapping("/register")
     public ResponseEntity<UserResponse> registerUser(@Valid @RequestBody UserRequest request) {
         return ResponseEntity.ok().body(userService.registerUser(request));
@@ -27,7 +33,7 @@ public class UserController {
         return ResponseEntity.ok().body(userService.userUpdate(id, request));
     }
 
-    @GetMapping("/list")
+    @GetMapping("/list/all")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok().body(userService.listUser());
     }

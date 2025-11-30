@@ -1,21 +1,23 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.model.dto.requests.InvestmentPatchRequest;
-import com.example.financialSystem.model.dto.requests.InvestmentRequest;
-import com.example.financialSystem.model.dto.responses.InvestmentResponse;
 import com.example.financialSystem.exception.InvestmentDuplicateException;
 import com.example.financialSystem.exception.InvestmentNotFoundException;
 import com.example.financialSystem.exception.NoChangeDetectedException;
-import com.example.financialSystem.model.mapper.InvestmentMapper;
+import com.example.financialSystem.model.dto.requests.InvestmentPatchRequest;
+import com.example.financialSystem.model.dto.requests.InvestmentRequest;
+import com.example.financialSystem.model.dto.responses.InvestmentResponse;
 import com.example.financialSystem.model.entity.Investment;
 import com.example.financialSystem.model.entity.Login;
 import com.example.financialSystem.model.entity.User;
 import com.example.financialSystem.model.enums.InvestmentType;
+import com.example.financialSystem.model.enums.UserRole;
+import com.example.financialSystem.model.mapper.InvestmentMapper;
 import com.example.financialSystem.repository.InvestmentRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -108,6 +110,11 @@ public class InvestmentService extends UserLoggedService {
         return resp;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<InvestmentResponse> listAllInvestments() {
+        return investmentMapper.toResponseList(investmentRepository.findAll());
+    }
+
     public List<InvestmentResponse> listInvestments() {
         return investmentMapper.toResponseList(investmentRepository.findByUser(getLoggedUser().getUser()));
     }
@@ -181,7 +188,10 @@ public class InvestmentService extends UserLoggedService {
     private void validateOwnerShip(Investment investment) {
         Login loggedInUser = getLoggedUser();
 
-        if (investment.getUser().getId() != loggedInUser.getUser().getId()) {
+        boolean isOwnerOrAdmin = investment.getUser().getId() == loggedInUser.getUser().getId()
+                || loggedInUser.getUser().getUserRole() == UserRole.ADMIN;;
+
+        if (!isOwnerOrAdmin) {
             throw new AccessDeniedException("You are not authorized to view this investment");
         }
     }
