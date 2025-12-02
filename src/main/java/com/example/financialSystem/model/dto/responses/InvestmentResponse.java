@@ -35,12 +35,6 @@ public class InvestmentResponse {
         this.currentValue = entityInvestment.getCurrentValue();
         this.brokerName = entityInvestment.getBrokerName();
         this.daysInvested = entityInvestment.getDaysInvested();
-
-        if (entityInvestment.getDateFinancial() != null) {
-            this.daysInvested = (int) ChronoUnit.DAYS.between(dateFinancial, LocalDate.now());
-        } else {
-            this.daysInvested = 0;
-        }
     }
 
 }

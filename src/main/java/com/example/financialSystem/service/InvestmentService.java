@@ -26,7 +26,6 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-
 @Service
 public class InvestmentService extends UserLoggedService {
     @Autowired
@@ -52,11 +51,7 @@ public class InvestmentService extends UserLoggedService {
                     }
                 });
 
-        investment.setCurrentValue(calculateCurrentValue(investment));
-        investment.setDaysInvested((int) ChronoUnit.DAYS.between(
-                investment.getDateFinancial(),
-                LocalDate.now()
-        ));
+        recalculateFields(investment);
 
         return investmentMapper.toResponse(investmentRepository.save(investment));
     }
@@ -71,8 +66,7 @@ public class InvestmentService extends UserLoggedService {
 
         investmentMapper.updateEntityFromUpdate(request, investment);
 
-        investment.setCurrentValue(calculateCurrentValue(investment));
-        investment.setDaysInvested((int) ChronoUnit.DAYS.between(investment.getDateFinancial(), LocalDate.now()));
+        recalculateFields(investment);
 
         return investmentMapper.toResponse(investmentRepository.save(investment));
     }
@@ -82,6 +76,7 @@ public class InvestmentService extends UserLoggedService {
                 .orElseThrow(() -> new InvestmentNotFoundException(id));
 
         validateOwnerShip(investment);
+        recalculateFields(investment);
 
         return investmentMapper.toResponse(investment);
     }
@@ -112,11 +107,19 @@ public class InvestmentService extends UserLoggedService {
 
     @PreAuthorize("hasRole('ADMIN')")
     public List<InvestmentResponse> listAllInvestments() {
-        return investmentMapper.toResponseList(investmentRepository.findAll());
+        List<Investment> investments = investmentRepository.findAll();
+
+        investments.forEach(this::recalculateFields);
+
+        return investmentMapper.toResponseList(investments);
     }
 
     public List<InvestmentResponse> listInvestments() {
-        return investmentMapper.toResponseList(investmentRepository.findByUser(getLoggedUser().getUser()));
+        List<Investment> investments = investmentRepository.findByUser(getLoggedUser().getUser());
+
+        investments.forEach(this::recalculateFields);
+
+        return investmentMapper.toResponseList(investments);
     }
 
     public InvestmentResponse patchInvestment(int id, InvestmentPatchRequest patchRequest) {
@@ -128,8 +131,7 @@ public class InvestmentService extends UserLoggedService {
 
         investmentMapper.updateEntityFromPatch(patchRequest, existingInvestment);
 
-        existingInvestment.setCurrentValue(calculateCurrentValue(existingInvestment));
-        existingInvestment.setDaysInvested((int) ChronoUnit.DAYS.between(existingInvestment.getDateFinancial(), LocalDate.now()));
+        recalculateFields(existingInvestment);
 
         return investmentMapper.toResponse(investmentRepository.save(existingInvestment));
     }
@@ -170,26 +172,17 @@ public class InvestmentService extends UserLoggedService {
         return calculateFutureValue(investment.getValue(), annualRate, days);
     }
 
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void updateAllInvestmentsDaily() {
-        List<Investment> investments = investmentRepository.findAll();
-
-        for (Investment inv : investments) {
-            inv.setDaysInvested((int) ChronoUnit.DAYS.between(inv.getDateFinancial(), LocalDate.now()));
-            inv.setCurrentValue(calculateCurrentValue(inv));
-        }
-        investmentRepository.saveAll(investments);
-    }
-
-    private void validateInvestmentDate(LocalDate date)  {
-        if (date.isAfter(LocalDate.now())) throw new IllegalArgumentException("Investment date cannot be in the future");
+    private void validateInvestmentDate(LocalDate date) {
+        if (date.isAfter(LocalDate.now()))
+            throw new IllegalArgumentException("Investment date cannot be in the future");
     }
 
     private void validateOwnerShip(Investment investment) {
         Login loggedInUser = getLoggedUser();
 
         boolean isOwnerOrAdmin = investment.getUser().getId() == loggedInUser.getUser().getId()
-                || loggedInUser.getUser().getUserRole() == UserRole.ADMIN;;
+                || loggedInUser.getUser().getUserRole() == UserRole.ADMIN;
+        ;
 
         if (!isOwnerOrAdmin) {
             throw new AccessDeniedException("You are not authorized to view this investment");
@@ -197,11 +190,18 @@ public class InvestmentService extends UserLoggedService {
     }
 
     public void ensureChanged(Investment oldInvestment, InvestmentRequest newInvReq) {
-       InvestmentRequest oldAsRequest = investmentMapper.toRequest(oldInvestment);
+        InvestmentRequest oldAsRequest = investmentMapper.toRequest(oldInvestment);
 
-       if (oldAsRequest.equals(newInvReq)) throw new NoChangeDetectedException("No changes in this investment");
+        if (oldAsRequest.equals(newInvReq)) throw new NoChangeDetectedException("No changes in this investment");
 
     }
 
+    public void recalculateFields(Investment investment) {
+        investment.setCurrentValue(calculateCurrentValue(investment));
+        investment.setDaysInvested((int) ChronoUnit.DAYS.between(
+                investment.getDateFinancial(),
+                LocalDate.now()
+        ));
+    }
 
 }
