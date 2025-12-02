@@ -1,6 +1,7 @@
 package com.example.financialSystem.controller;
 
 import com.example.financialSystem.model.dto.requests.UserAdminRequest;
+import com.example.financialSystem.model.dto.requests.UserPatchRequest;
 import com.example.financialSystem.model.dto.requests.UserRequest;
 import com.example.financialSystem.model.dto.responses.UserResponse;
 import com.example.financialSystem.service.UserService;
@@ -28,14 +29,24 @@ public class UserController {
         return ResponseEntity.ok().body(userService.registerUser(request));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/edit/{id}")
     public ResponseEntity<UserResponse> editUser(@PathVariable int id, @RequestBody UserRequest request) {
         return ResponseEntity.ok().body(userService.userUpdate(id, request));
     }
 
+    @PatchMapping("/patch/{id}")
+    public ResponseEntity<UserResponse> patchUser(@PathVariable int id, @RequestBody UserPatchRequest request) {
+        return ResponseEntity.ok().body(userService.userPatch(id, request));
+    }
+
     @GetMapping("/list/all")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
-        return ResponseEntity.ok().body(userService.listUser());
+        return ResponseEntity.ok().body(userService.listAllUser());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> getUser(@PathVariable int id) {
+        return ResponseEntity.ok().body(userService.getUserById(id));
     }
 
     @PutMapping("/{id}/deactivate")

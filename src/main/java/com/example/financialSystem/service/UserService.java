@@ -3,11 +3,13 @@ package com.example.financialSystem.service;
 import com.example.financialSystem.exception.UserDuplicateException;
 import com.example.financialSystem.exception.UserNotFoundException;
 import com.example.financialSystem.model.dto.requests.UserAdminRequest;
+import com.example.financialSystem.model.dto.requests.UserPatchRequest;
 import com.example.financialSystem.model.dto.requests.UserRequest;
 import com.example.financialSystem.model.dto.responses.UserResponse;
 import com.example.financialSystem.model.entity.Login;
 import com.example.financialSystem.model.entity.User;
 import com.example.financialSystem.model.enums.UserRole;
+import com.example.financialSystem.model.mapper.UserMapper;
 import com.example.financialSystem.repository.LoginRepository;
 import com.example.financialSystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,9 @@ public class UserService extends UserLoggedService implements UserDetailsService
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UserNotFoundException {
         Login login = loginRepository.findByUsername(username)
@@ -52,13 +57,9 @@ public class UserService extends UserLoggedService implements UserDetailsService
                     throw new UserDuplicateException("email", request.getEmail());
                 });
 
-        User newUser = new User();
-        newUser.setEmail(request.getEmail());
-        newUser.setName(request.getName());
+        User newUser = userMapper.toEntityAdmin(request);
         newUser.setRegisterDate(LocalDate.now());
-        newUser.setUserState(true);
         newUser.setUserRole(UserRole.ADMIN);
-
 
         Login login = new Login(
                 newUser,
@@ -74,25 +75,20 @@ public class UserService extends UserLoggedService implements UserDetailsService
     }
 
     public UserResponse registerUser(UserRequest request) {
-        String email = request.getEmail();
-
-        loginRepository.findByUsername(email)
+        loginRepository.findByUsername(request.getEmail())
                 .ifPresent(existing -> {
-                    throw new UserDuplicateException("email", email);
+                    throw new UserDuplicateException("email", request.getEmail());
                 });
 
-        User newUser = new User(
-                request.getName(),
-                email,
-                LocalDate.now(),
-                true
-        );
+        User newUser = userMapper.toEntity(request);
 
+
+        newUser.setRegisterDate(LocalDate.now());
         newUser.setUserRole(UserRole.USER);
 
         Login login = new Login(
                 newUser,
-                email,
+                request.getEmail(),
                 passwordEncoder.encode(request.getPassword())
         );
 
@@ -102,35 +98,42 @@ public class UserService extends UserLoggedService implements UserDetailsService
         return new UserResponse(newUser.getName(), newUser.getEmail());
     }
 
-    public UserResponse userUpdate(int id, UserRequest userDto) {
+    public UserResponse userUpdate(int id, UserRequest request) {
         User user = userRepository.findById(id)
                         .orElseThrow(() -> new UserNotFoundException(id));
 
         validateOwnerShip(user);
+        ensureChanged(user, request);
 
-        if (userDto.getName() != null && !userDto.getName().isBlank()) {
-            user.setName(userDto.getName());
-        }
+        userMapper.updateEntityFromUpdate(request, user);
 
-        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
-            user.setEmail(userDto.getEmail());
-            user.getLogin().setUsername(userDto.getEmail());
-        }
+        return userMapper.toResponse(userRepository.save(user));
+    }
 
-        if (userDto.getPassword() != null && !userDto.getPassword().isBlank()) {
-            user.getLogin().setPassword(passwordEncoder.encode(userDto.getPassword()));
-        }
+    public UserResponse userPatch(int id, UserPatchRequest patchRequest) {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
 
-        userRepository.save(user);
+        validateOwnerShip(existingUser);
 
-        return new UserResponse(userDto.getName(), userDto.getEmail());
+        userMapper.updateEntityFromPatch(patchRequest, existingUser);
+
+        return userMapper.toResponse(userRepository.save(existingUser));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    public List<UserResponse> listUser() {
-        return userRepository.findAll().stream()
-                .map(user -> new UserResponse(user.getEmail(), user.getName()))
-                .toList();
+    public UserResponse getUserById(int id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
+        validateOwnerShip(user);
+
+        return userMapper.toResponse(user);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<UserResponse> listAllUser() {
+        return userMapper.toResponseList(userRepository.findAll());
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -170,4 +173,8 @@ public class UserService extends UserLoggedService implements UserDetailsService
         }
     }
 
+    private void ensureChanged(User oldUser, UserRequest newUserReq) {
+        UserRequest oldAsRequest = userMapper.toRequest(oldUser);
+        if (oldAsRequest.equals(newUserReq)) throw new IllegalArgumentException("No change in this user");
+    }
 }
