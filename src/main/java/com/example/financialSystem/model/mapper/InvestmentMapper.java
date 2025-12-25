@@ -4,33 +4,28 @@ import com.example.financialSystem.model.dto.requests.InvestmentPatchRequest;
 import com.example.financialSystem.model.dto.requests.InvestmentRequest;
 import com.example.financialSystem.model.dto.responses.InvestmentResponse;
 import com.example.financialSystem.model.entity.Investment;
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.*;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", imports = {ChronoUnit.class, LocalDate.class})
 public interface InvestmentMapper {
-    Investment toEntity(InvestmentRequest investmentRequest);
 
+    @Mapping(target = "daysInvested",
+            expression = "java((int) ChronoUnit.DAYS.between(entity.getDateFinancial(), LocalDate.now()))")
+    @Mapping(target = "financialType", constant = "INVESTMENT")
     InvestmentResponse toResponse(Investment entity);
 
     List<InvestmentResponse> toResponseList(List<Investment> entity);
 
-    InvestmentRequest toRequest(Investment entity);
+    Investment toEntity(InvestmentRequest investmentRequest);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateEntityFromPatch(InvestmentPatchRequest investmentPatchRequest, @MappingTarget Investment entity);
+    void updateEntityFromPatch(InvestmentPatchRequest request, @MappingTarget Investment entity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
-    void updateEntityFromUpdate(InvestmentRequest investmentRequest, @MappingTarget Investment entity);
+    void updateEntityFromUpdate(InvestmentRequest request, @MappingTarget Investment entity);
 
 }
-
-
-
-
-
-

@@ -1,5 +1,6 @@
 package com.example.financialSystem.model.entity;
 
+import com.example.financialSystem.model.enums.FinancialType;
 import com.example.financialSystem.model.enums.InvestmentType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -30,5 +31,4 @@ public class Investment extends Financial {
 
     private String brokerName;
 
-    private int daysInvested;
 }

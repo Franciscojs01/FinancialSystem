@@ -1,5 +1,8 @@
 package com.example.financialSystem.model.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum InvestmentType {
     STOCK(null),
     FUND(null),
@@ -13,7 +16,4 @@ public enum InvestmentType {
         this.rate = rate;
     }
 
-    public Double getRate() {
-        return rate;
-    }
 }

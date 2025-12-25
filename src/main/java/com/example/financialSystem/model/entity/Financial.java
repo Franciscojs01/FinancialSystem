@@ -1,6 +1,7 @@
 package com.example.financialSystem.model.entity;
 
 
+import com.example.financialSystem.model.enums.FinancialType;
 import com.example.financialSystem.util.BenchMarkRate;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
@@ -37,6 +38,9 @@ public abstract class Financial {
 
     @NotNull(message = "Date is required")
     private LocalDate dateFinancial;
+
+    @Enumerated(EnumType.STRING)
+    private FinancialType financialType;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

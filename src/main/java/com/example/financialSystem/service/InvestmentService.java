@@ -9,6 +9,7 @@ import com.example.financialSystem.model.dto.responses.InvestmentResponse;
 import com.example.financialSystem.model.entity.Investment;
 import com.example.financialSystem.model.entity.Login;
 import com.example.financialSystem.model.entity.User;
+import com.example.financialSystem.model.enums.FinancialType;
 import com.example.financialSystem.model.enums.InvestmentType;
 import com.example.financialSystem.model.enums.UserRole;
 import com.example.financialSystem.model.mapper.InvestmentMapper;
@@ -26,6 +27,8 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import static com.example.financialSystem.model.enums.FinancialType.INVESTMENT;
+
 @Service
 public class InvestmentService extends UserLoggedService {
     @Autowired
@@ -39,6 +42,7 @@ public class InvestmentService extends UserLoggedService {
 
         Investment investment = investmentMapper.toEntity(request);
         investment.setUser(user);
+        investment.setFinancialType(FinancialType.INVESTMENT);
 
         validateInvestmentDate(investment.getDateFinancial());
 
@@ -56,19 +60,37 @@ public class InvestmentService extends UserLoggedService {
         return investmentMapper.toResponse(investmentRepository.save(investment));
     }
 
+    @Transactional
     public InvestmentResponse updateInvestment(int id, InvestmentRequest request) {
         Investment investment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException(id));
 
         validateOwnerShip(investment);
         validateInvestmentDate(investment.getDateFinancial());
+
         ensureChanged(investment, request);
 
         investmentMapper.updateEntityFromUpdate(request, investment);
 
+        investment.setFinancialType(FinancialType.INVESTMENT);
         recalculateFields(investment);
-
         return investmentMapper.toResponse(investmentRepository.save(investment));
+    }
+
+    @Transactional
+    public InvestmentResponse patchInvestment(int id, InvestmentPatchRequest patchRequest) {
+        Investment existingInvestment = investmentRepository.findById(id)
+                .orElseThrow(() -> new InvestmentNotFoundException(id));
+
+        validateOwnerShip(existingInvestment);
+
+        investmentMapper.updateEntityFromPatch(patchRequest, existingInvestment);
+
+        validateInvestmentDate(existingInvestment.getDateFinancial());
+
+        existingInvestment.setFinancialType(FinancialType.INVESTMENT);
+        recalculateFields(existingInvestment);
+        return investmentMapper.toResponse(investmentRepository.save(existingInvestment));
     }
 
     public InvestmentResponse getInvestmentById(int id) {
@@ -79,30 +101,6 @@ public class InvestmentService extends UserLoggedService {
         recalculateFields(investment);
 
         return investmentMapper.toResponse(investment);
-    }
-
-    public InvestmentResponse simulateInvestment(int id, int days) {
-        if (days <= 0) {
-            throw new IllegalArgumentException("Days must be greater than zero");
-        }
-
-        Investment investment = investmentRepository.findById(id)
-                .orElseThrow(() -> new InvestmentNotFoundException(id));
-
-        validateOwnerShip(investment);
-
-        double annualRate = (investment.getInvestmentType().getRate() != null)
-                ? investment.getInvestmentType().getRate()
-                : investment.getBaseCurrency().getAnnualRate();
-
-        BigDecimal futureValue =
-                calculateFutureValue(investment.getValue(), annualRate, days);
-
-        InvestmentResponse resp = new InvestmentResponse(investment);
-        resp.setCurrentValue(futureValue);
-        resp.setDaysInvested(days);
-
-        return resp;
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -122,20 +120,6 @@ public class InvestmentService extends UserLoggedService {
         return investmentMapper.toResponseList(investments);
     }
 
-    public InvestmentResponse patchInvestment(int id, InvestmentPatchRequest patchRequest) {
-        Investment existingInvestment = investmentRepository.findById(id)
-                .orElseThrow(() -> new InvestmentNotFoundException(id));
-
-        validateOwnerShip(existingInvestment);
-        validateInvestmentDate(existingInvestment.getDateFinancial());
-
-        investmentMapper.updateEntityFromPatch(patchRequest, existingInvestment);
-
-        recalculateFields(existingInvestment);
-
-        return investmentMapper.toResponse(investmentRepository.save(existingInvestment));
-    }
-
     @Transactional
     public void deleteInvestment(int id) {
         Investment investment = investmentRepository.findById(id)
@@ -144,6 +128,30 @@ public class InvestmentService extends UserLoggedService {
         validateOwnerShip(investment);
 
         investmentRepository.deleteById(id);
+    }
+
+    public InvestmentResponse simulateInvestment(int id, int days) {
+        if (days <= 0) {
+            throw new IllegalArgumentException("Days must be greater than zero");
+        }
+
+        Investment investment = investmentRepository.findById(id)
+                .orElseThrow(() -> new InvestmentNotFoundException(id));
+
+        validateOwnerShip(investment);
+
+        double annualRate = (investment.getInvestmentType().getRate() != null)
+                ? investment.getInvestmentType().getRate()
+                : investment.getBaseCurrency().getAnnualRate();
+
+        BigDecimal futureValue =
+                calculateFutureValue(investment.getValue(), annualRate, days);
+
+        InvestmentResponse resp = investmentMapper.toResponse(investment);
+        resp.setCurrentValue(futureValue);
+        resp.setDaysInvested(days);
+
+        return resp;
     }
 
     private BigDecimal calculateFutureValue(BigDecimal initialValue, double annualRate, long days) {
@@ -182,26 +190,29 @@ public class InvestmentService extends UserLoggedService {
 
         boolean isOwnerOrAdmin = investment.getUser().getId() == loggedInUser.getUser().getId()
                 || loggedInUser.getUser().getUserRole() == UserRole.ADMIN;
-        ;
 
         if (!isOwnerOrAdmin) {
             throw new AccessDeniedException("You are not authorized to view this investment");
         }
     }
 
-    public void ensureChanged(Investment oldInvestment, InvestmentRequest newInvReq) {
-        InvestmentRequest oldAsRequest = investmentMapper.toRequest(oldInvestment);
+    public void ensureChanged(Investment old, InvestmentRequest req) {
 
-        if (oldAsRequest.equals(newInvReq)) throw new NoChangeDetectedException("No changes in this investment");
+        boolean changed =
+                !old.getInvestmentType().equals(req.investmentType()) ||
+                        old.getActionQuantity() != req.actionQuantity() ||
+                        !old.getDateFinancial().isEqual(req.dateFinancial()) ||
+                        old.getValue().compareTo(req.value()) != 0 ||
+                        !old.getBrokerName().equals(req.brokerName());
 
+        if (!changed) {
+            throw new NoChangeDetectedException("No changes in this investment");
+        }
     }
+
 
     public void recalculateFields(Investment investment) {
         investment.setCurrentValue(calculateCurrentValue(investment));
-        investment.setDaysInvested((int) ChronoUnit.DAYS.between(
-                investment.getDateFinancial(),
-                LocalDate.now()
-        ));
     }
 
 }

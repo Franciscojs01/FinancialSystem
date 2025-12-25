@@ -1,5 +1,6 @@
 package com.example.financialSystem.model.dto.requests;
 
+import com.example.financialSystem.model.enums.FinancialType;
 import com.example.financialSystem.model.enums.InvestmentType;
 import com.example.financialSystem.util.BenchMarkRate;
 import jakarta.validation.constraints.Min;
@@ -7,6 +8,8 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
+import static com.example.financialSystem.model.enums.FinancialType.INVESTMENT;
 
 public record InvestmentRequest(
         @NotNull(message = "type is required")

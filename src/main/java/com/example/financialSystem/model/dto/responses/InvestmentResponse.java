@@ -1,6 +1,6 @@
 package com.example.financialSystem.model.dto.responses;
 
-import com.example.financialSystem.model.entity.Investment;
+import com.example.financialSystem.model.enums.FinancialType;
 import com.example.financialSystem.model.enums.InvestmentType;
 import com.example.financialSystem.util.BenchMarkRate;
 import lombok.Getter;
@@ -9,7 +9,8 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
+
+import static com.example.financialSystem.model.enums.FinancialType.INVESTMENT;
 
 @Getter
 @Setter
@@ -17,6 +18,7 @@ import java.time.temporal.ChronoUnit;
 public class InvestmentResponse {
     private int id;
     private InvestmentType investmentType;
+    private FinancialType financialType;
     private BigDecimal value;
     private LocalDate dateFinancial;
     private BenchMarkRate baseCurrency;
@@ -24,17 +26,4 @@ public class InvestmentResponse {
     private BigDecimal currentValue;
     private String brokerName;
     private int daysInvested;
-
-    public InvestmentResponse(Investment entityInvestment) {
-        this.id = entityInvestment.getId();
-        this.investmentType = entityInvestment.getInvestmentType();
-        this.value = entityInvestment.getValue();
-        this.dateFinancial = entityInvestment.getDateFinancial();
-        this.baseCurrency = entityInvestment.getBaseCurrency();
-        this.actionQuantity = entityInvestment.getActionQuantity();
-        this.currentValue = entityInvestment.getCurrentValue();
-        this.brokerName = entityInvestment.getBrokerName();
-        this.daysInvested = entityInvestment.getDaysInvested();
-    }
-
 }
