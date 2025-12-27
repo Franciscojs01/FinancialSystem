@@ -46,7 +46,8 @@ public class SecurityFilter extends OncePerRequestFilter {
     }
 
     private boolean isPublicPath(HttpServletRequest request) {
-        return PUBLIC_PATHS.contains(request.getRequestURI());
+        String uri = request.getRequestURI();
+        return PUBLIC_PATHS.stream().anyMatch(uri::startsWith);
     }
 
     private String extractToken(HttpServletRequest request) {
@@ -66,8 +67,6 @@ public class SecurityFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             });
         }
-
-
     }
 
 }

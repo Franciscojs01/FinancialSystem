@@ -1,7 +1,9 @@
 package com.example.financialSystem.controller;
 
-import com.example.financialSystem.dto.responses.UserResponse;
-import com.example.financialSystem.dto.requests.UserRequest;
+import com.example.financialSystem.model.dto.requests.UserAdminRequest;
+import com.example.financialSystem.model.dto.requests.UserPatchRequest;
+import com.example.financialSystem.model.dto.requests.UserRequest;
+import com.example.financialSystem.model.dto.responses.UserResponse;
 import com.example.financialSystem.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,35 +19,46 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @PostMapping("/admin/create")
+    public ResponseEntity<UserResponse> registerAdminUser(@Valid @RequestBody UserAdminRequest request) {
+        return ResponseEntity.ok().body(userService.registerAdminUser(request));
+    }
+
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> registerUser(@Valid @RequestBody UserRequest userData) {
-        UserResponse userDto = userService.registerUser(userData);
-        return ResponseEntity.ok().body(userDto);
+    public ResponseEntity<UserResponse> registerUser(@Valid @RequestBody UserRequest request) {
+        return ResponseEntity.ok().body(userService.registerUser(request));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable int id, @RequestBody UserRequest userEditDto) {
-        UserResponse userEdited = userService.editUser(id, userEditDto);
-        return ResponseEntity.ok().body(userEdited);
+    @PutMapping("/edit/{id}")
+    public ResponseEntity<UserResponse> editUser(@PathVariable int id, @RequestBody UserRequest request) {
+        return ResponseEntity.ok().body(userService.userUpdate(id, request));
     }
 
-    @GetMapping("/list")
+    @PatchMapping("/patch/{id}")
+    public ResponseEntity<UserResponse> patchUser(@PathVariable int id, @RequestBody UserPatchRequest request) {
+        return ResponseEntity.ok().body(userService.userPatch(id, request));
+    }
+
+    @GetMapping("/list/all")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
-        List<UserResponse> users = userService.listUser();
+        return ResponseEntity.ok().body(userService.listAllUser());
+    }
 
-        return ResponseEntity.ok().body(users);
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponse> getUser(@PathVariable int id) {
+        return ResponseEntity.ok().body(userService.getUserById(id));
     }
 
     @PutMapping("/{id}/deactivate")
     public ResponseEntity<Void> deactivateUser(@PathVariable int id) {
         userService.deactivateUser(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("{id}/active")
     public ResponseEntity<Void> activateUser(@PathVariable int id) {
         userService.activateUser(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
 

@@ -1,12 +1,21 @@
-package com.example.financialSystem.model;
+package com.example.financialSystem.model.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class Login implements UserDetails {
 
@@ -19,47 +28,20 @@ public class Login implements UserDetails {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(unique = true, nullable = false)
     private String username;
-
-    @Column(nullable = false)
     private String password;
 
-    public Login(User user, String username, String password) {
-        this.user = user;
-        this.username = username;
-        this.password = password;
-    }
-
-    public Login() {}
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    public Login(User newUser, String email, String encryptedPassword) {
+        this.user = newUser;
+        this.username = email;
+        this.password = encryptedPassword;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(
+                new SimpleGrantedAuthority(user.getUserRole().getRoleName())
+        );
     }
 
     @Override

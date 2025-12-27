@@ -1,5 +1,8 @@
 package com.example.financialSystem.model.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum ExpenseType {
     FOOD("Food" ),
     TRANSPORT("Transport"),
@@ -10,14 +13,7 @@ public enum ExpenseType {
 
     private final String name;
 
-
     ExpenseType(String name) {
         this.name = name;
-
     }
-
-    public String getName() {
-        return name;
-    }
-
 }

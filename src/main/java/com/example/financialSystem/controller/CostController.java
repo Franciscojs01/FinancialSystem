@@ -1,9 +1,8 @@
 package com.example.financialSystem.controller;
 
-import com.example.financialSystem.dto.requests.CostPatchRequest;
-import com.example.financialSystem.dto.requests.CostRequest;
-import com.example.financialSystem.dto.responses.CostResponse;
-import com.example.financialSystem.model.Cost;
+import com.example.financialSystem.model.dto.requests.CostPatchRequest;
+import com.example.financialSystem.model.dto.requests.CostRequest;
+import com.example.financialSystem.model.dto.responses.CostResponse;
 import com.example.financialSystem.service.CostService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +32,14 @@ public class CostController {
         return ResponseEntity.ok().body(costService.updateCost(id, costRequest));
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<List<Cost>> getAllCost() {
-        return ResponseEntity.ok().body(costService.listCosts());
+    @GetMapping("/list/me")
+    public ResponseEntity<List<CostResponse>> getAllCostByUser() {
+        return ResponseEntity.ok().body(costService.listCost());
+    }
+
+    @GetMapping("/list/all")
+    public ResponseEntity<List<CostResponse>> getAllCost() {
+        return ResponseEntity.ok().body(costService.listAllCost());
     }
 
     @PatchMapping("/patch/{id}")

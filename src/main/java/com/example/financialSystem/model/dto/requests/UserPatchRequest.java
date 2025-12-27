@@ -1,17 +1,14 @@
-package com.example.financialSystem.dto.requests;
+package com.example.financialSystem.model.dto.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Setter
 @AllArgsConstructor
-public class UserRequest {
+@NoArgsConstructor
+public class UserPatchRequest {
     private String name;
     private String email;
     private String password;
-
 }
-
-

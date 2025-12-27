@@ -1,8 +1,7 @@
-package com.example.financialSystem.dto.requests;
+package com.example.financialSystem.model.dto.responses;
 
 import com.example.financialSystem.model.enums.ExpenseType;
 import com.example.financialSystem.util.BenchMarkRate;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,13 +11,13 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class ExpensePatchRequest {
+public class ExpenseResponse {
+    private int id;
     private ExpenseType expenseType;
     private BigDecimal value;
     private LocalDate dateFinancial;
     private BenchMarkRate baseCurrency;
     private String paymentMethod;
-    private Boolean isFixed;
+    private boolean isFixed;
 }

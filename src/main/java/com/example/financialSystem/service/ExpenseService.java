@@ -1,156 +1,130 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.dto.requests.ExpensePatchRequest;
-import com.example.financialSystem.dto.responses.ExpenseResponse;
 import com.example.financialSystem.exception.ExpenseDuplicateException;
 import com.example.financialSystem.exception.ExpenseNotFoundException;
 import com.example.financialSystem.exception.NoChangeDetectedException;
-import com.example.financialSystem.model.Expense;
-import com.example.financialSystem.model.Login;
-import com.example.financialSystem.model.User;
+import com.example.financialSystem.model.dto.requests.ExpensePatchRequest;
+import com.example.financialSystem.model.dto.requests.ExpenseRequest;
+import com.example.financialSystem.model.dto.responses.ExpenseResponse;
+import com.example.financialSystem.model.entity.Expense;
+import com.example.financialSystem.model.entity.Login;
+import com.example.financialSystem.model.entity.User;
+import com.example.financialSystem.model.enums.UserRole;
+import com.example.financialSystem.model.mapper.ExpenseMapper;
 import com.example.financialSystem.repository.ExpenseRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ExpenseService extends UserLoggedService {
     @Autowired
     private ExpenseRepository expenseRepository;
 
-    public ExpenseResponse createExpense(Expense expense) {
+    @Autowired
+    private ExpenseMapper expenseMapper;
+
+    public ExpenseResponse createExpense(ExpenseRequest request) {
         User user = getLoggedUser().getUser();
+
+        Expense expense = expenseMapper.toEntity(request);
         expense.setUser(user);
 
-        validateExpenseDate(expense);
+        validateExpenseDate(expense.getDateFinancial());
 
-        Optional<Expense> existingExpense = expenseRepository
-                .findByUserAndTypeAndDateFinancialAndValueAndPaymentMethod(
+        expenseRepository
+                .findByUserAndExpenseTypeAndDateFinancialAndValueAndPaymentMethod(
                         user,
-                        expense.getType(),
+                        expense.getExpenseType(),
                         expense.getDateFinancial(),
                         expense.getValue(),
                         expense.getPaymentMethod()
-                );
+                ).ifPresent(existingExpense -> {
+                    throw new ExpenseDuplicateException("Expense already exists");
+                });
 
-        if (existingExpense.isPresent()) {
-            throw new ExpenseDuplicateException("Expense already exists");
-        }
 
-        expenseRepository.save(expense);
-        return new ExpenseResponse(expense);
+        return expenseMapper.toResponse(expenseRepository.save(expense));
     }
 
-    public ExpenseResponse editExpense(int id, Expense updatedExpense) {
+    public ExpenseResponse editExpense(int id, ExpenseRequest request) {
         Expense existingExpense = expenseRepository.findById(id)
                 .orElseThrow(() -> new ExpenseNotFoundException(id));
 
-        validateOnwerShip(existingExpense);
+        validateOwnerShip(existingExpense);
+        validateExpenseDate(existingExpense.getDateFinancial());
+        ensureChanged(existingExpense, request);
 
-        validateExpenseDate(updatedExpense);
+        expenseMapper.updateEntityFromUpdate(request, existingExpense);
 
-        ensureChanged(existingExpense, updatedExpense);
-
-        existingExpense.setType(updatedExpense.getType());
-        existingExpense.setValue(updatedExpense.getValue());
-        existingExpense.setDateFinancial(updatedExpense.getDateFinancial());
-        existingExpense.setBaseCurrency(updatedExpense.getBaseCurrency());
-        existingExpense.setPaymentMethod(updatedExpense.getPaymentMethod());
-        existingExpense.setFixed(updatedExpense.isFixed());
-
-        updatedExpense = expenseRepository.save(existingExpense);
-
-        return new ExpenseResponse(updatedExpense);
+        return expenseMapper.toResponse(expenseRepository.save(existingExpense));
     }
 
-    public List<Expense> listExpense() {
-        return expenseRepository.findByUser(getLoggedUser().getUser());
+    public List<ExpenseResponse> listExpense() {
+        return expenseMapper.toResponseList(expenseRepository.findByUser(getLoggedUser().getUser()));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<ExpenseResponse> listAllExpense() {
+        return expenseMapper.toResponseList(expenseRepository.findAll());
     }
 
     public ExpenseResponse patchExpense(int id, ExpensePatchRequest patchRequest) {
         Expense existingExpense = expenseRepository.findById(id)
                 .orElseThrow(() -> new ExpenseNotFoundException(id));
 
-        validateOnwerShip(existingExpense);
+        validateOwnerShip(existingExpense);
+        validateExpenseDate(existingExpense.getDateFinancial());
 
-        validateExpenseDate(existingExpense);
+        expenseMapper.updateEntityFromPatch(patchRequest, existingExpense);
 
-        if (patchRequest.getValue() != null) {
-            existingExpense.setValue(patchRequest.getValue());
-        }
-
-        if (patchRequest.getDateFinancial() != null) {
-            existingExpense.setDateFinancial(patchRequest.getDateFinancial());
-        }
-
-        if (patchRequest.getPaymentMethod() != null) {
-            existingExpense.setPaymentMethod(patchRequest.getPaymentMethod());
-        }
-
-        if (patchRequest.getIsFixed() != null) {
-            existingExpense.setFixed(patchRequest.getIsFixed());
-        }
-
-        if (patchRequest.getBaseCurrency() != null)
-            existingExpense.setBaseCurrency(patchRequest.getBaseCurrency());
-
-        if (patchRequest.getExpenseType() != null) {
-            existingExpense.setType(patchRequest.getExpenseType());
-        }
-
-        expenseRepository.save(existingExpense);
-
-        return new ExpenseResponse(existingExpense);
+        return expenseMapper.toResponse(expenseRepository.save(existingExpense));
     }
 
     public ExpenseResponse getExpenseById(int id) {
         Expense expense = expenseRepository.findById(id)
                 .orElseThrow(() -> new ExpenseNotFoundException(id));
 
-        validateOnwerShip(expense);
+        validateOwnerShip(expense);
 
-        return new ExpenseResponse(expense);
+        return expenseMapper.toResponse(expense);
     }
 
     @Transactional
     public void deleteExpense(int id) {
         Expense expense = expenseRepository.findById(id)
-                        .orElseThrow(() -> new ExpenseNotFoundException(id));
+                .orElseThrow(() -> new ExpenseNotFoundException(id));
 
-        validateOnwerShip(expense);
+        validateOwnerShip(expense);
 
         expenseRepository.deleteById(id);
     }
 
-    public void ensureChanged(Expense existingExpense, Expense updatedExpense) {
-        boolean unchanged =
-                existingExpense.getType().equals(updatedExpense.getType()) &&
-                        existingExpense.getValue().compareTo(updatedExpense.getValue()) == 0 &&
-                        existingExpense.getDateFinancial().equals(updatedExpense.getDateFinancial()) &&
-                        existingExpense.getBaseCurrency().equals(updatedExpense.getBaseCurrency()) &&
-                        existingExpense.getPaymentMethod().equals(updatedExpense.getPaymentMethod()) &&
-                        existingExpense.isFixed() == updatedExpense.isFixed();
+    public void ensureChanged(Expense oldExpense, ExpenseRequest newExpReq) {
+        ExpenseRequest oldAsRequest = expenseMapper.toRequest(oldExpense);
 
-        if (unchanged) {
-            throw new NoChangeDetectedException("No changes detected in this expense");
-        }
+        if (oldAsRequest.equals(newExpReq)) throw new NoChangeDetectedException("No changes in this expense");
 
     }
 
-    private void validateOnwerShip(Expense expense) {
-        Login loggedInUser = getLoggedUser();
+    private void validateOwnerShip(Expense expense) {
+        Login loggedUser = getLoggedUser();
 
-        if (expense.getUser().getId() != loggedInUser.getId()) {
-            throw new AccessDeniedException("You are not authorized to view this expense");
+        boolean isOwnerOrAdmin = loggedUser.getUser().getUserRole() == UserRole.ADMIN
+                || loggedUser.getUser().getId() == expense.getUser().getId();
+
+        if (!isOwnerOrAdmin) {
+            throw new AccessDeniedException("You can only edit your own account");
         }
     }
 
-    private void validateExpenseDate(Expense expense) {
-        if (expense.getDateFinancial().isAfter(java.time.LocalDate.now())) {
+    private void validateExpenseDate(LocalDate date) {
+        if (date.isAfter(LocalDate.now())) {
             throw new IllegalArgumentException("You cannot create an expense with an invalid date");
         }
 

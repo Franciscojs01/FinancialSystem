@@ -1,57 +1,64 @@
-# 💰 Financial System API (Incompleto)
+# 💰 Financial System API (Incomplete)
 
-API RESTful para gestão completa de finanças pessoais, desenvolvida em **Java** com **Spring Boot**. [cite_start]A arquitetura foi projetada para lidar com autenticação de usuários e o controle detalhado de **despesas** e **investimentos**, utilizando o padrão **API RESTful**.
+A RESTful API for complete personal finance management, developed in Java with Spring Boot.
+The architecture is designed to handle user authentication and detailed control of expenses and investments, following the RESTful API standard.
 
-## 🌟 Visão Geral e Arquitetura
+## 🌟 Overview & Architecture
 
-[cite_start]O sistema implementa uma arquitetura **API RESTful** e utiliza o **Bearer Token (JWT)** para autenticação e segurança. O foco do projeto foi na modelagem de entidades complexas e no design de endpoints claros e funcionais.
+The system implements a **RESTful** architecture and uses **Bearer Token (JWT)** for authentication and security.
+The project focuses on modeling complex entities and designing clear and functional endpoints.
 
-## 🛠️ Tecnologias Chave
+## 🛠️ Key Technologies
+- Java 17+
+- Spring Boot
+- Spring Web
+- Spring Data JPA (Hibernate)
+- Spring Security (JWT)
+- MapStruct
+- Jakarta Validation
+- MySQL/PostgresSQL
+- Lombok 
+- Scheduler (Spring Scheduling)
+## 🔑 Authentication & User Management
 
-* **Linguagem:** Java
-* **Framework:** Spring Boot
-* **Persistência de Dados:** JPA/Hibernate
-* **Segurança:** Autenticação via Bearer Token (JWT)
-* **Banco de Dados:** PostgreSQL (Recomendado)
+Endpoints
 
-## 🔑 Autenticação e Gestão de Usuários
+* **`POST /auth/login`**: Authenticates a user and returns a JWT token.
+* **`POST /user/register`**: Registers a new user.
+* **`GET /user/list`**: Returns a list of all users (Requires authentication).
+* **`PUT /user/{id}`**: Updates user profile data.
+* **`PUT /user/{id}/deactivate`**: Deactivates a user.
+* **`PUT /user/{id}/active`**: Reactivates a user.
 
-O sistema oferece as seguintes operações de usuário:
+## 📈 Investment Module
 
-* **`POST /auth/login`**: Autentica o usuário e retorna o token JWT para acesso seguro.
-* **`POST /user/register`**: Permite o registro de novos usuários.
-* **`GET /user/list`**: Retorna a lista de usuários (Requer autenticação).
-* **`PUT /user/{id}`**: Atualiza os dados do perfil de usuário.
-* **`PUT /user/{id}/deactivate` / `PUT /user/{id}/active`**: Controla o status de ativação/desativação do usuário.
+Manages different types of investments:
+STOCK, FUND, CRYPTO, FIXED_INCOME, TREASURY.
 
-## 📈 Módulo de Investimentos
+* **`POST /investments/create`**: Creates a new investment.
+* **`GET /investments/list` / `GET /investments/{id}`**: Returns all investments and return details of a specific investment.
+* **`PUT /investments/edit/{id}` / `DELETE /investments/delete/{id}`**: Updates an investment and deletes an investment.
+* **Funcionalidade Avançada:** **`GET /investments/{id}/simulate?days={dias}`**: Simulates the future value of an investment after a specified period.
 
-Este módulo gerencia o portfólio, suportando tipos como `STOCK`, `FUND`, `CRYPTO`, `FIXED_INCOME` e `TREASURY`.
-
-* **`POST /investments/create`**: Registra novos investimentos com detalhes como valor, moeda (`BRL`, `USD`, `EUR`) e corretora.
-* **`GET /investments/list` / `GET /investments/{id}`**: Visualiza a lista ou detalhes de um investimento específico.
-* **`PUT /investments/edit/{id}` / `DELETE /investments/delete/{id}`**: Edita e remove investimentos.
-* **Funcionalidade Avançada:** **`GET /investments/{id}/simulate?days={dias}`**: Simula o valor futuro do investimento após um período especificado.
-
-## 💸 Módulo de Despesas (Expenses)
+## 💸 Expense Module (Expenses)
 
 Permite o registro e categorização de gastos para controle financeiro:
 
 * **Tipos de Despesa:** `FOOD`, `TRANSPORT`, `HOUSING`, `HEALTH`, `LEISURE`, `OTHER`.
-* **`POST /expense/create`**: Registra novas despesas, incluindo tipo, valor, data, método de pagamento e flag para despesas fixas (`isFixed`).
-* **`PUT /expense/edit/{id}`**: Atualiza os detalhes de uma despesa existente.
-* **`GET /expense/list `**: Listar despesas
-* **`GET /expense/{id}`**: Buscar despesa por ID
-* **`DELETE /expense/delete/{id}`**: Deletar despesa
+* **`POST /expense/create`**: Creates a new expense.
+* **`PUT /expense/edit/{id}`**: Updates an existing expense.
+* **`GET /expense/list `**: Lists all expenses.
+* **`GET /expense/{id}`**: Retrieves an expense by ID.
+* **`DELETE /expense/delete/{id}`**: Deletes an expense.
 
-## 💸 Módulo de Custos (Cost)
-* **`POST /cost/create`**: – Criar cost
-* **`GET /cost/list`**: – Listar costs
-* **`GET /cost/{id}`**: – Buscar cost por ID
-* **`PUT /cost/edit/{id}`**: – Atualizar cost
-* **`DELETE /cost/delete/{id}`**: – Deletar cost
+## 💸 Cost Module
+* **`POST /cost/create`**: – Creates a new cost.
+* **`GET /cost/list`**: – Lists all costs.
+* **`GET /cost/{id}`**: – Retrieves a cost by ID.
+* **`PUT /cost/edit/{id}`**: – Updates a cost.
+* **`DELETE /cost/delete/{id}`**: – Deletes a cost.
 
-## 🤝 Contato
 
-* **Desenvolvedor:** Francisco José da Silva Mendes
+## 🤝 Contact
+* **Developer:** Francisco José da Silva Mendes
 * **GitHub:** [Franciscojs01](https://github.com/Franciscojs01)

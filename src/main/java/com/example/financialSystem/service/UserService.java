@@ -1,15 +1,20 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.dto.responses.UserResponse;
-import com.example.financialSystem.dto.requests.UserRequest;
 import com.example.financialSystem.exception.UserDuplicateException;
 import com.example.financialSystem.exception.UserNotFoundException;
-import com.example.financialSystem.model.Login;
-import com.example.financialSystem.model.User;
+import com.example.financialSystem.model.dto.requests.UserAdminRequest;
+import com.example.financialSystem.model.dto.requests.UserPatchRequest;
+import com.example.financialSystem.model.dto.requests.UserRequest;
+import com.example.financialSystem.model.dto.responses.UserResponse;
+import com.example.financialSystem.model.entity.Login;
+import com.example.financialSystem.model.entity.User;
+import com.example.financialSystem.model.enums.UserRole;
+import com.example.financialSystem.model.mapper.UserMapper;
 import com.example.financialSystem.repository.LoginRepository;
 import com.example.financialSystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,6 +35,9 @@ public class UserService extends UserLoggedService implements UserDetailsService
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UserNotFoundException {
         Login login = loginRepository.findByUsername(username)
@@ -42,65 +50,93 @@ public class UserService extends UserLoggedService implements UserDetailsService
         return login;
     }
 
-    public UserResponse registerUser(UserRequest userRegisterDto) {
-        String email = userRegisterDto.getEmail();
-
-        loginRepository.findByUsername(email)
-                .ifPresent(userRegistered -> {
-                    throw new UserDuplicateException("email", email);
+    @PreAuthorize("hasRole('ADMIN')")
+    public UserResponse registerAdminUser(UserAdminRequest request) {
+        loginRepository.findByUsername(request.getEmail())
+                .ifPresent(existing -> {
+                    throw new UserDuplicateException("email", request.getEmail());
                 });
 
-        User newUser = new User(
-                userRegisterDto.getName(),
-                email,
-                LocalDate.now(),
-                true
+        User newUser = userMapper.toEntityAdmin(request);
+        newUser.setRegisterDate(LocalDate.now());
+        newUser.setUserRole(UserRole.ADMIN);
+
+        Login login = new Login(
+                newUser,
+                request.getEmail(),
+                passwordEncoder.encode(request.getPassword())
         );
 
-        String encondedPassword = passwordEncoder.encode(userRegisterDto.getPassword());
-
-        Login login = new Login(newUser, email, encondedPassword);
         newUser.setLogin(login);
 
         userRepository.save(newUser);
 
         return new UserResponse(newUser.getName(), newUser.getEmail());
-
     }
 
-    public UserResponse editUser(int id, UserRequest userDto) {
-        Login authenticatedLogin = getLoggedUser();
-        if (authenticatedLogin.getUser().getId() != id) {
-            throw new AccessDeniedException("You can only edit your own account");
-        }
+    public UserResponse registerUser(UserRequest request) {
+        loginRepository.findByUsername(request.getEmail())
+                .ifPresent(existing -> {
+                    throw new UserDuplicateException("email", request.getEmail());
+                });
 
-        User userExistent = userRepository.findById(id)
+        User newUser = userMapper.toEntity(request);
+
+
+        newUser.setRegisterDate(LocalDate.now());
+        newUser.setUserRole(UserRole.USER);
+
+        Login login = new Login(
+                newUser,
+                request.getEmail(),
+                passwordEncoder.encode(request.getPassword())
+        );
+
+        newUser.setLogin(login);
+
+        userRepository.save(newUser);
+        return new UserResponse(newUser.getName(), newUser.getEmail());
+    }
+
+    public UserResponse userUpdate(int id, UserRequest request) {
+        User user = userRepository.findById(id)
                         .orElseThrow(() -> new UserNotFoundException(id));
 
-        if (userDto.getName() != null && !userDto.getName().isBlank()) {
-            userExistent.setName(userDto.getName());
-        }
+        validateOwnerShip(user);
+        ensureChanged(user, request);
 
-        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
-            userExistent.setEmail(userDto.getEmail());
-            userExistent.getLogin().setUsername(userDto.getEmail());
-        }
+        userMapper.updateEntityFromUpdate(request, user);
 
-        if (userDto.getPassword() != null && !userDto.getPassword().isBlank()) {
-            userExistent.getLogin().setPassword(passwordEncoder.encode(userDto.getPassword()));
-        }
-
-        userRepository.save(userExistent);
-
-        return new UserResponse(userDto.getName(), userDto.getEmail());
+        return userMapper.toResponse(userRepository.save(user));
     }
 
-    public List<UserResponse> listUser() {
-        return userRepository.findAll().stream()
-                .map(user -> new UserResponse(user.getEmail(), user.getName()))
-                .toList();
+    public UserResponse userPatch(int id, UserPatchRequest patchRequest) {
+        User existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
+        validateOwnerShip(existingUser);
+
+        userMapper.updateEntityFromPatch(patchRequest, existingUser);
+
+        return userMapper.toResponse(userRepository.save(existingUser));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    public UserResponse getUserById(int id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
+        validateOwnerShip(user);
+
+        return userMapper.toResponse(user);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<UserResponse> listAllUser() {
+        return userMapper.toResponseList(userRepository.findAll());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     public void deactivateUser(int id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
@@ -113,6 +149,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
         userRepository.save(user);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     public void activateUser(int id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
@@ -125,4 +162,19 @@ public class UserService extends UserLoggedService implements UserDetailsService
         userRepository.save(user);
     }
 
+    private void validateOwnerShip(User user) {
+        Login loggedUser = getLoggedUser();
+
+        boolean isOwnerOrAdmin = loggedUser.getUser().getId() == user.getId() ||
+                loggedUser.getUser().getUserRole() == UserRole.ADMIN;
+
+        if (!isOwnerOrAdmin) {
+            throw new AccessDeniedException("You can only edit your own account");
+        }
+    }
+
+    private void ensureChanged(User oldUser, UserRequest newUserReq) {
+        UserRequest oldAsRequest = userMapper.toRequest(oldUser);
+        if (oldAsRequest.equals(newUserReq)) throw new IllegalArgumentException("No change in this user");
+    }
 }

@@ -1,13 +1,11 @@
 package com.example.financialSystem.handler;
 
-import com.example.financialSystem.exception.AlreadyExistsException;
-import com.example.financialSystem.exception.ExceptionDetails;
-import com.example.financialSystem.exception.FinancialException;
-import com.example.financialSystem.exception.ValidationExceptionDetails;
+import com.example.financialSystem.exception.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,6 +17,32 @@ import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(NoChangeDetectedException.class)
+    public ResponseEntity<ExceptionDetails> handleNoChangeDetectedException(NoChangeDetectedException ex) {
+        ExceptionDetails body = ExceptionDetails.builder()
+                .timestamp(LocalDateTime.now())
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .title("No Change Detected")
+                .details(ex.getMessage())
+                .developerMessage(ex.getClass().getName())
+                .build();
+
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ExceptionDetails> handleAccessDeniedException(AccessDeniedException ex) {
+        ExceptionDetails body = ExceptionDetails.builder()
+                .timestamp(LocalDateTime.now())
+                .statusCode(HttpStatus.FORBIDDEN.value())
+                .title("Access Denied")
+                .details(ex.getMessage())
+                .developerMessage(ex.getClass().getName())
+                .build();
+
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
 
     @ExceptionHandler(FinancialException.class)
     public ResponseEntity<ExceptionDetails> handleFinancialExceptions(FinancialException ex) {
@@ -38,7 +62,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         ExceptionDetails body = ExceptionDetails.builder()
                 .timestamp(LocalDateTime.now())
-                .statusCode(HttpStatus.CONFLICT.value()) // 409 CONFLICT
+                .statusCode(HttpStatus.CONFLICT.value())
                 .title("Resource Already Exists")
                 .details(ex.getMessage())
                 .developerMessage(ex.getClass().getName())
