@@ -71,7 +71,6 @@ public class InvestmentService extends UserLoggedService {
 
         investmentMapper.updateEntityFromUpdate(request, existingInvestment);
 
-        existingInvestment.setFinancialType(FinancialType.INVESTMENT);
         recalculateFields(existingInvestment);
         return investmentMapper.toResponse(investmentRepository.save(existingInvestment));
     }
@@ -86,7 +85,6 @@ public class InvestmentService extends UserLoggedService {
 
         investmentMapper.updateEntityFromPatch(patchRequest, existingInvestment);
 
-        existingInvestment.setFinancialType(FinancialType.INVESTMENT);
         recalculateFields(existingInvestment);
         return investmentMapper.toResponse(investmentRepository.save(existingInvestment));
     }
