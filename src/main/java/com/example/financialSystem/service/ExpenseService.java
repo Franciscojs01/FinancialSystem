@@ -9,6 +9,7 @@ import com.example.financialSystem.model.dto.responses.ExpenseResponse;
 import com.example.financialSystem.model.entity.Expense;
 import com.example.financialSystem.model.entity.Login;
 import com.example.financialSystem.model.entity.User;
+import com.example.financialSystem.model.enums.FinancialType;
 import com.example.financialSystem.model.enums.UserRole;
 import com.example.financialSystem.model.mapper.ExpenseMapper;
 import com.example.financialSystem.repository.ExpenseRepository;
@@ -34,6 +35,7 @@ public class ExpenseService extends UserLoggedService {
 
         Expense expense = expenseMapper.toEntity(request);
         expense.setUser(user);
+        expense.setFinancialType(FinancialType.EXPENSE);
 
         validateExpenseDate(expense.getDateFinancial());
 
@@ -52,28 +54,23 @@ public class ExpenseService extends UserLoggedService {
         return expenseMapper.toResponse(expenseRepository.save(expense));
     }
 
-    public ExpenseResponse editExpense(int id, ExpenseRequest request) {
+    @Transactional
+    public ExpenseResponse updateExpense(int id, ExpenseRequest request) {
         Expense existingExpense = expenseRepository.findById(id)
                 .orElseThrow(() -> new ExpenseNotFoundException(id));
 
         validateOwnerShip(existingExpense);
         validateExpenseDate(existingExpense.getDateFinancial());
+
         ensureChanged(existingExpense, request);
 
         expenseMapper.updateEntityFromUpdate(request, existingExpense);
 
+        existingExpense.setFinancialType(FinancialType.EXPENSE);
         return expenseMapper.toResponse(expenseRepository.save(existingExpense));
     }
 
-    public List<ExpenseResponse> listExpense() {
-        return expenseMapper.toResponseList(expenseRepository.findByUser(getLoggedUser().getUser()));
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    public List<ExpenseResponse> listAllExpense() {
-        return expenseMapper.toResponseList(expenseRepository.findAll());
-    }
-
+    @Transactional
     public ExpenseResponse patchExpense(int id, ExpensePatchRequest patchRequest) {
         Expense existingExpense = expenseRepository.findById(id)
                 .orElseThrow(() -> new ExpenseNotFoundException(id));
@@ -83,6 +80,7 @@ public class ExpenseService extends UserLoggedService {
 
         expenseMapper.updateEntityFromPatch(patchRequest, existingExpense);
 
+        existingExpense.setFinancialType(FinancialType.EXPENSE);
         return expenseMapper.toResponse(expenseRepository.save(existingExpense));
     }
 
@@ -93,6 +91,15 @@ public class ExpenseService extends UserLoggedService {
         validateOwnerShip(expense);
 
         return expenseMapper.toResponse(expense);
+    }
+
+    public List<ExpenseResponse> listExpense() {
+        return expenseMapper.toResponseList(expenseRepository.findByUser(getLoggedUser().getUser()));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<ExpenseResponse> listAllExpense() {
+        return expenseMapper.toResponseList(expenseRepository.findAll());
     }
 
     @Transactional
@@ -106,10 +113,17 @@ public class ExpenseService extends UserLoggedService {
     }
 
     public void ensureChanged(Expense oldExpense, ExpenseRequest newExpReq) {
-        ExpenseRequest oldAsRequest = expenseMapper.toRequest(oldExpense);
+        boolean unchanged =
+                oldExpense.getExpenseType() == (newExpReq.expenseType()) ||
+                        oldExpense.getDateFinancial().equals(newExpReq.dateFinancial()) ||
+                        oldExpense.getValue().compareTo(newExpReq.value()) == 0 ||
+                        oldExpense.getBaseCurrency() == newExpReq.baseCurrency() ||
+                        oldExpense.getPaymentMethod().equals(newExpReq.paymentMethod()) ||
+                        oldExpense.isFixed() == newExpReq.isFixed();
 
-        if (oldAsRequest.equals(newExpReq)) throw new NoChangeDetectedException("No changes in this expense");
-
+        if (unchanged) {
+            throw new NoChangeDetectedException("No changes in this expense");
+        }
     }
 
     private void validateOwnerShip(Expense expense) {

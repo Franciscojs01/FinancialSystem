@@ -49,8 +49,7 @@ public class InvestmentService extends UserLoggedService {
         investmentRepository
                 .findByUserAndInvestmentTypeAndBrokerName(user, investment.getInvestmentType(), investment.getBrokerName())
                 .ifPresent(existingInvestment -> {
-                    if (existingInvestment.getInvestmentType().equals(InvestmentType.STOCK) ||
-                            existingInvestment.getInvestmentType().equals(InvestmentType.CRYPTO)) {
+                    if (existingInvestment.getInvestmentType().equals(InvestmentType.STOCK)) {
                         throw new InvestmentDuplicateException("You have already created investment");
                     }
                 });
@@ -62,19 +61,19 @@ public class InvestmentService extends UserLoggedService {
 
     @Transactional
     public InvestmentResponse updateInvestment(int id, InvestmentRequest request) {
-        Investment investment = investmentRepository.findById(id)
+        Investment existingInvestment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException(id));
 
-        validateOwnerShip(investment);
-        validateInvestmentDate(investment.getDateFinancial());
+        validateOwnerShip(existingInvestment);
+        validateInvestmentDate(existingInvestment.getDateFinancial());
 
-        ensureChanged(investment, request);
+        ensureChanged(existingInvestment, request);
 
-        investmentMapper.updateEntityFromUpdate(request, investment);
+        investmentMapper.updateEntityFromUpdate(request, existingInvestment);
 
-        investment.setFinancialType(FinancialType.INVESTMENT);
-        recalculateFields(investment);
-        return investmentMapper.toResponse(investmentRepository.save(investment));
+        existingInvestment.setFinancialType(FinancialType.INVESTMENT);
+        recalculateFields(existingInvestment);
+        return investmentMapper.toResponse(investmentRepository.save(existingInvestment));
     }
 
     @Transactional
@@ -83,10 +82,9 @@ public class InvestmentService extends UserLoggedService {
                 .orElseThrow(() -> new InvestmentNotFoundException(id));
 
         validateOwnerShip(existingInvestment);
+        validateInvestmentDate(existingInvestment.getDateFinancial());
 
         investmentMapper.updateEntityFromPatch(patchRequest, existingInvestment);
-
-        validateInvestmentDate(existingInvestment.getDateFinancial());
 
         existingInvestment.setFinancialType(FinancialType.INVESTMENT);
         recalculateFields(existingInvestment);
@@ -196,20 +194,19 @@ public class InvestmentService extends UserLoggedService {
         }
     }
 
-    public void ensureChanged(Investment old, InvestmentRequest req) {
+    public void ensureChanged(Investment oldInvestment, InvestmentRequest newInvestmentReq) {
+        boolean unchanged =
+                oldInvestment.getInvestmentType() == (newInvestmentReq.investmentType()) ||
+                        oldInvestment.getActionQuantity() == newInvestmentReq.actionQuantity() ||
+                        oldInvestment.getDateFinancial().isEqual(newInvestmentReq.dateFinancial()) ||
+                        oldInvestment.getValue().compareTo(newInvestmentReq.value()) == 0 ||
+                        oldInvestment.getBaseCurrency() == newInvestmentReq.baseCurrency() ||
+                        oldInvestment.getBrokerName().equals(newInvestmentReq.brokerName());
 
-        boolean changed =
-                !old.getInvestmentType().equals(req.investmentType()) ||
-                        old.getActionQuantity() != req.actionQuantity() ||
-                        !old.getDateFinancial().isEqual(req.dateFinancial()) ||
-                        old.getValue().compareTo(req.value()) != 0 ||
-                        !old.getBrokerName().equals(req.brokerName());
-
-        if (!changed) {
+        if (unchanged) {
             throw new NoChangeDetectedException("No changes in this investment");
         }
     }
-
 
     public void recalculateFields(Investment investment) {
         investment.setCurrentValue(calculateCurrentValue(investment));

@@ -25,7 +25,7 @@ public class ExpenseController {
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<ExpenseResponse> editExpense(@PathVariable int id, @Valid @RequestBody ExpenseRequest expenseRequest) {
-        return ResponseEntity.ok().body(expenseService.editExpense(id, expenseRequest));
+        return ResponseEntity.ok().body(expenseService.updateExpense(id, expenseRequest));
     }
 
     @GetMapping("/{id}")
