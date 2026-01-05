@@ -62,8 +62,6 @@ public class CostService extends UserLoggedService {
         ensureChanged(existingCost, request);
 
         costMapper.updateFromUpdate(request, existingCost);
-
-        existingCost.setFinancialType(FinancialType.COST);
         return costMapper.toResponse(costRepository.save(existingCost));
     }
 
@@ -77,8 +75,6 @@ public class CostService extends UserLoggedService {
         costMapper.updateFromPatch(patchRequest, existingCost);
 
         validateCostDate(existingCost.getDateFinancial());
-
-        existingCost.setFinancialType(FinancialType.COST);
         return costMapper.toResponse(costRepository.save(existingCost));
     }
 

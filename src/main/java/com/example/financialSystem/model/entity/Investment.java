@@ -26,7 +26,7 @@ public class Investment extends Financial {
 
     private int actionQuantity;
 
-    @JsonIgnore
+    @Transient
     private BigDecimal currentValue;
 
     private String brokerName;

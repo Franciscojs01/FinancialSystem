@@ -65,8 +65,6 @@ public class ExpenseService extends UserLoggedService {
         ensureChanged(existingExpense, request);
 
         expenseMapper.updateEntityFromUpdate(request, existingExpense);
-
-        existingExpense.setFinancialType(FinancialType.EXPENSE);
         return expenseMapper.toResponse(expenseRepository.save(existingExpense));
     }
 
@@ -79,8 +77,6 @@ public class ExpenseService extends UserLoggedService {
         validateExpenseDate(existingExpense.getDateFinancial());
 
         expenseMapper.updateEntityFromPatch(patchRequest, existingExpense);
-
-        existingExpense.setFinancialType(FinancialType.EXPENSE);
         return expenseMapper.toResponse(expenseRepository.save(existingExpense));
     }
 
