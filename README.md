@@ -1,4 +1,4 @@
-# 💰 Financial System API (Incomplete)
+# 💰 Financial System API 
 
 A RESTful API for complete personal finance management, developed in Java with Spring Boot.
 The architecture is designed to handle user authentication and detailed control of expenses and investments, following the RESTful API standard.
@@ -18,7 +18,6 @@ The project focuses on modeling complex entities and designing clear and functio
 - Jakarta Validation
 - MySQL/PostgresSQL
 - Lombok 
-- Scheduler (Spring Scheduling)
 ## 🔑 Authentication & User Management
 
 Endpoints
