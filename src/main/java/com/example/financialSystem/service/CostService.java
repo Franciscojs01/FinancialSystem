@@ -1,7 +1,7 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.exception.CostDuplicateException;
-import com.example.financialSystem.exception.CostNotFoundException;
+import com.example.financialSystem.exception.duplicate.CostDuplicateException;
+import com.example.financialSystem.exception.notFound.CostNotFoundException;
 import com.example.financialSystem.exception.NoChangeDetectedException;
 import com.example.financialSystem.model.dto.requests.CostPatchRequest;
 import com.example.financialSystem.model.dto.requests.CostRequest;
@@ -9,6 +9,7 @@ import com.example.financialSystem.model.dto.responses.CostResponse;
 import com.example.financialSystem.model.entity.Cost;
 import com.example.financialSystem.model.entity.Login;
 import com.example.financialSystem.model.entity.User;
+import com.example.financialSystem.model.enums.FinancialType;
 import com.example.financialSystem.model.enums.UserRole;
 import com.example.financialSystem.model.mapper.CostMapper;
 import com.example.financialSystem.repository.CostRepository;
@@ -24,7 +25,7 @@ import java.util.List;
 @Service
 public class CostService extends UserLoggedService {
     @Autowired
-    CostRepository costRepository;
+    private CostRepository costRepository;
 
     @Autowired
     private CostMapper costMapper;
@@ -47,20 +48,33 @@ public class CostService extends UserLoggedService {
         return costMapper.toResponse(costRepository.save(cost));
     }
 
+    @Transactional
     public CostResponse updateCost(int id, CostRequest request) {
-        Cost cost = costRepository.findById(id)
+        Cost existingCost = costRepository.findById(id)
                 .orElseThrow(() -> new CostNotFoundException(id));
 
         costMapper.toEntity(request);
 
-        validateOwerShip(cost);
-        validateCostDate(cost.getDateFinancial());
+        validateOwerShip(existingCost);
+        validateCostDate(existingCost.getDateFinancial());
 
-        ensureChanged(cost, request);
+        ensureChanged(existingCost, request);
 
-        costMapper.updateFromUpdate(request, cost);
+        costMapper.updateFromUpdate(request, existingCost);
+        return costMapper.toResponse(costRepository.save(existingCost));
+    }
 
-        return costMapper.toResponse(costRepository.save(cost));
+    @Transactional
+    public CostResponse patchCost(int id, CostPatchRequest patchRequest) {
+        Cost existingCost = costRepository.findById(id)
+                .orElseThrow(() -> new CostNotFoundException(id));
+
+        validateOwerShip(existingCost);
+
+        costMapper.updateFromPatch(patchRequest, existingCost);
+
+        validateCostDate(existingCost.getDateFinancial());
+        return costMapper.toResponse(costRepository.save(existingCost));
     }
 
     public CostResponse getCostById(int id) {
@@ -72,26 +86,13 @@ public class CostService extends UserLoggedService {
         return costMapper.toResponse(cost);
     }
 
-    public CostResponse patchCost(int id, CostPatchRequest patchRequest) {
-        Cost existingCost = costRepository.findById(id)
-                .orElseThrow(() -> new CostNotFoundException(id));
-
-        validateOwerShip(existingCost);
-
-        costMapper.updateFromPatch(patchRequest, existingCost);
-
-        validateCostDate(existingCost.getDateFinancial());
-
-        return costMapper.toResponse(costRepository.save(existingCost));
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<CostResponse> listAllCost() {
+        return costMapper.toResponseList(costRepository.findAllActive());
     }
 
     public List<CostResponse> listCost() {
-        return costMapper.toResponseList(costRepository.findByUser(getLoggedUser().getUser()));
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    public List<CostResponse> listAllCost() {
-        return costMapper.toResponseList(costRepository.findAll());
+        return costMapper.toResponseList(costRepository.findByUserAndDeletedFalse(getLoggedUser().getUser()));
     }
 
     @Transactional
@@ -101,7 +102,8 @@ public class CostService extends UserLoggedService {
 
         validateOwerShip(cost);
 
-        costRepository.deleteById(id);
+        cost.setDeleted(true);
+        costRepository.save(cost);
     }
 
     public void validateCostDate(LocalDate date) {
@@ -109,19 +111,27 @@ public class CostService extends UserLoggedService {
     }
 
     public void ensureChanged(Cost oldCost, CostRequest newCostReq) {
-        CostRequest oldAsRequest = costMapper.toRequest(oldCost);
-        if (oldAsRequest.equals(newCostReq)) throw new  NoChangeDetectedException("No change in this cost");
+        boolean unchanged =
+                oldCost.getCostType() ==(newCostReq.costType()) &&
+                        oldCost.getObservation().equals(newCostReq.observation()) &&
+                        oldCost.getValue().compareTo(newCostReq.value()) == 0 &&
+                        oldCost.getBaseCurrency() == newCostReq.baseCurrency() &&
+                        oldCost.getDateFinancial().equals(newCostReq.dateFinancial());
+
+        if (unchanged) {
+            throw new NoChangeDetectedException("No changes detected in the cost");
+        }
     }
 
     private void validateOwerShip(Cost cost) {
-       Login loggedUser = getLoggedUser();
+        Login loggedUser = getLoggedUser();
 
-       boolean isOwnerOrAdmin = cost.getUser().getId() == loggedUser.getId()
-               || loggedUser.getUser().getUserRole() == UserRole.ADMIN;
+        boolean isOwnerOrAdmin = cost.getUser().getId() == loggedUser.getId()
+                || loggedUser.getUser().getUserRole() == UserRole.ADMIN;
 
-       if (!isOwnerOrAdmin) {
-              throw new AccessDeniedException("You do not have permission to access this cost");
-       }
+        if (!isOwnerOrAdmin) {
+            throw new AccessDeniedException("You do not have permission to access this cost");
+        }
 
     }
 }

@@ -11,13 +11,12 @@ import java.util.List;
 import java.util.Optional;
 
 
-public interface ExpenseRepository extends JpaRepository<Expense, Long> {
+public interface ExpenseRepository extends BaseRepository<Expense, Integer> {
 
     Optional<Expense> findById(int id);
 
     Optional<Expense> findByUserAndExpenseTypeAndDateFinancialAndValueAndPaymentMethod(User user, ExpenseType expenseType, LocalDate dateFinancial, BigDecimal value, String paymentMethod);
 
-    List<Expense> findByUser(User user);
+    List<Expense> findByUserAndDeletedFalse(User user);
 
-    void deleteById(int id);
 }

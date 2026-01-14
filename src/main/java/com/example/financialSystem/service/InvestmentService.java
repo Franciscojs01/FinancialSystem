@@ -1,7 +1,7 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.exception.InvestmentDuplicateException;
-import com.example.financialSystem.exception.InvestmentNotFoundException;
+import com.example.financialSystem.exception.duplicate.InvestmentDuplicateException;
+import com.example.financialSystem.exception.notFound.InvestmentNotFoundException;
 import com.example.financialSystem.exception.NoChangeDetectedException;
 import com.example.financialSystem.model.dto.requests.InvestmentPatchRequest;
 import com.example.financialSystem.model.dto.requests.InvestmentRequest;
@@ -16,7 +16,6 @@ import com.example.financialSystem.model.mapper.InvestmentMapper;
 import com.example.financialSystem.repository.InvestmentRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -26,8 +25,6 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-
-import static com.example.financialSystem.model.enums.FinancialType.INVESTMENT;
 
 @Service
 public class InvestmentService extends UserLoggedService {
@@ -42,15 +39,13 @@ public class InvestmentService extends UserLoggedService {
 
         Investment investment = investmentMapper.toEntity(request);
         investment.setUser(user);
-        investment.setFinancialType(FinancialType.INVESTMENT);
 
         validateInvestmentDate(investment.getDateFinancial());
 
         investmentRepository
                 .findByUserAndInvestmentTypeAndBrokerName(user, investment.getInvestmentType(), investment.getBrokerName())
                 .ifPresent(existingInvestment -> {
-                    if (existingInvestment.getInvestmentType().equals(InvestmentType.STOCK) ||
-                            existingInvestment.getInvestmentType().equals(InvestmentType.CRYPTO)) {
+                    if (existingInvestment.getInvestmentType().equals(InvestmentType.STOCK)) {
                         throw new InvestmentDuplicateException("You have already created investment");
                     }
                 });
@@ -62,19 +57,18 @@ public class InvestmentService extends UserLoggedService {
 
     @Transactional
     public InvestmentResponse updateInvestment(int id, InvestmentRequest request) {
-        Investment investment = investmentRepository.findById(id)
+        Investment existingInvestment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException(id));
 
-        validateOwnerShip(investment);
-        validateInvestmentDate(investment.getDateFinancial());
+        validateOwnerShip(existingInvestment);
+        validateInvestmentDate(existingInvestment.getDateFinancial());
 
-        ensureChanged(investment, request);
+        ensureChanged(existingInvestment, request);
 
-        investmentMapper.updateEntityFromUpdate(request, investment);
+        investmentMapper.updateEntityFromUpdate(request, existingInvestment);
 
-        investment.setFinancialType(FinancialType.INVESTMENT);
-        recalculateFields(investment);
-        return investmentMapper.toResponse(investmentRepository.save(investment));
+        recalculateFields(existingInvestment);
+        return investmentMapper.toResponse(investmentRepository.save(existingInvestment));
     }
 
     @Transactional
@@ -83,12 +77,10 @@ public class InvestmentService extends UserLoggedService {
                 .orElseThrow(() -> new InvestmentNotFoundException(id));
 
         validateOwnerShip(existingInvestment);
+        validateInvestmentDate(existingInvestment.getDateFinancial());
 
         investmentMapper.updateEntityFromPatch(patchRequest, existingInvestment);
 
-        validateInvestmentDate(existingInvestment.getDateFinancial());
-
-        existingInvestment.setFinancialType(FinancialType.INVESTMENT);
         recalculateFields(existingInvestment);
         return investmentMapper.toResponse(investmentRepository.save(existingInvestment));
     }
@@ -105,7 +97,7 @@ public class InvestmentService extends UserLoggedService {
 
     @PreAuthorize("hasRole('ADMIN')")
     public List<InvestmentResponse> listAllInvestments() {
-        List<Investment> investments = investmentRepository.findAll();
+        List<Investment> investments = investmentRepository.findAllActive();
 
         investments.forEach(this::recalculateFields);
 
@@ -113,7 +105,7 @@ public class InvestmentService extends UserLoggedService {
     }
 
     public List<InvestmentResponse> listInvestments() {
-        List<Investment> investments = investmentRepository.findByUser(getLoggedUser().getUser());
+        List<Investment> investments = investmentRepository.findByUserAndDeletedFalse(getLoggedUser().getUser());
 
         investments.forEach(this::recalculateFields);
 
@@ -127,7 +119,8 @@ public class InvestmentService extends UserLoggedService {
 
         validateOwnerShip(investment);
 
-        investmentRepository.deleteById(id);
+        investment.setDeleted(true);
+        investmentRepository.save(investment);
     }
 
     public InvestmentResponse simulateInvestment(int id, int days) {
@@ -196,16 +189,17 @@ public class InvestmentService extends UserLoggedService {
         }
     }
 
-    public void ensureChanged(Investment old, InvestmentRequest req) {
+    public void ensureChanged(Investment oldInvestment, InvestmentRequest newInvestmentReq) {
 
-        boolean changed =
-                !old.getInvestmentType().equals(req.investmentType()) ||
-                        old.getActionQuantity() != req.actionQuantity() ||
-                        !old.getDateFinancial().isEqual(req.dateFinancial()) ||
-                        old.getValue().compareTo(req.value()) != 0 ||
-                        !old.getBrokerName().equals(req.brokerName());
+        boolean unchanged =
+                oldInvestment.getInvestmentType() == newInvestmentReq.investmentType()
+                        && oldInvestment.getActionQuantity() == newInvestmentReq.actionQuantity()
+                        && oldInvestment.getDateFinancial().isEqual(newInvestmentReq.dateFinancial())
+                        && oldInvestment.getValue().compareTo(newInvestmentReq.value()) == 0
+                        && oldInvestment.getBaseCurrency() == newInvestmentReq.baseCurrency()
+                        && oldInvestment.getBrokerName().equals(newInvestmentReq.brokerName());
 
-        if (!changed) {
+        if (unchanged) {
             throw new NoChangeDetectedException("No changes in this investment");
         }
     }

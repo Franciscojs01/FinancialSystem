@@ -18,7 +18,6 @@ import java.time.temporal.ChronoUnit;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
 @Entity
 public class Investment extends Financial {
     @Enumerated(EnumType.STRING)
@@ -26,7 +25,7 @@ public class Investment extends Financial {
 
     private int actionQuantity;
 
-    @JsonIgnore
+    @Transient
     private BigDecimal currentValue;
 
     private String brokerName;

@@ -1,4 +1,4 @@
-package com.example.financialSystem.handler;
+package com.example.financialSystem.exception.handler;
 
 import com.example.financialSystem.exception.*;
 import org.springframework.http.HttpHeaders;

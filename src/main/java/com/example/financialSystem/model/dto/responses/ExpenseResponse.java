@@ -1,6 +1,7 @@
 package com.example.financialSystem.model.dto.responses;
 
 import com.example.financialSystem.model.enums.ExpenseType;
+import com.example.financialSystem.model.enums.FinancialType;
 import com.example.financialSystem.util.BenchMarkRate;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 public class ExpenseResponse {
     private int id;
     private ExpenseType expenseType;
+    private FinancialType financialType;
     private BigDecimal value;
     private LocalDate dateFinancial;
     private BenchMarkRate baseCurrency;
