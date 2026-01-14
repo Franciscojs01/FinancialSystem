@@ -35,7 +35,6 @@ public class ExpenseService extends UserLoggedService {
 
         Expense expense = expenseMapper.toEntity(request);
         expense.setUser(user);
-        expense.setFinancialType(FinancialType.EXPENSE);
 
         validateExpenseDate(expense.getDateFinancial());
 
@@ -90,12 +89,12 @@ public class ExpenseService extends UserLoggedService {
     }
 
     public List<ExpenseResponse> listExpense() {
-        return expenseMapper.toResponseList(expenseRepository.findByUser(getLoggedUser().getUser()));
+        return expenseMapper.toResponseList(expenseRepository.findByUserAndDeletedFalse(getLoggedUser().getUser()));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     public List<ExpenseResponse> listAllExpense() {
-        return expenseMapper.toResponseList(expenseRepository.findAll());
+        return expenseMapper.toResponseList(expenseRepository.findAllActive());
     }
 
     @Transactional
@@ -105,17 +104,19 @@ public class ExpenseService extends UserLoggedService {
 
         validateOwnerShip(expense);
 
-        expenseRepository.deleteById(id);
+        expense.setDeleted(true);
+        expenseRepository.save(expense);
     }
 
     public void ensureChanged(Expense oldExpense, ExpenseRequest newExpReq) {
+
         boolean unchanged =
-                oldExpense.getExpenseType() == (newExpReq.expenseType()) ||
-                        oldExpense.getDateFinancial().equals(newExpReq.dateFinancial()) ||
-                        oldExpense.getValue().compareTo(newExpReq.value()) == 0 ||
-                        oldExpense.getBaseCurrency() == newExpReq.baseCurrency() ||
-                        oldExpense.getPaymentMethod().equals(newExpReq.paymentMethod()) ||
-                        oldExpense.isFixed() == newExpReq.isFixed();
+                oldExpense.getExpenseType() == newExpReq.expenseType()
+                        && oldExpense.getDateFinancial().equals(newExpReq.dateFinancial())
+                        && oldExpense.getValue().compareTo(newExpReq.value()) == 0
+                        && oldExpense.getBaseCurrency() == newExpReq.baseCurrency()
+                        && oldExpense.getPaymentMethod().equals(newExpReq.paymentMethod())
+                        && oldExpense.isFixed() == newExpReq.isFixed();
 
         if (unchanged) {
             throw new NoChangeDetectedException("No changes in this expense");

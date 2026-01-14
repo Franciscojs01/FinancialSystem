@@ -35,7 +35,6 @@ public class CostService extends UserLoggedService {
 
         Cost cost = costMapper.toEntity(request);
         cost.setUser(user);
-        cost.setFinancialType(FinancialType.COST);
 
         validateCostDate(cost.getDateFinancial());
 
@@ -89,11 +88,11 @@ public class CostService extends UserLoggedService {
 
     @PreAuthorize("hasRole('ADMIN')")
     public List<CostResponse> listAllCost() {
-        return costMapper.toResponseList(costRepository.findAll());
+        return costMapper.toResponseList(costRepository.findAllActive());
     }
 
     public List<CostResponse> listCost() {
-        return costMapper.toResponseList(costRepository.findByUser(getLoggedUser().getUser()));
+        return costMapper.toResponseList(costRepository.findByUserAndDeletedFalse(getLoggedUser().getUser()));
     }
 
     @Transactional
@@ -103,7 +102,8 @@ public class CostService extends UserLoggedService {
 
         validateOwerShip(cost);
 
-        costRepository.deleteById(id);
+        cost.setDeleted(true);
+        costRepository.save(cost);
     }
 
     public void validateCostDate(LocalDate date) {
@@ -112,10 +112,10 @@ public class CostService extends UserLoggedService {
 
     public void ensureChanged(Cost oldCost, CostRequest newCostReq) {
         boolean unchanged =
-                oldCost.getCostType() ==(newCostReq.costType()) ||
-                        oldCost.getObservation().equals(newCostReq.observation()) ||
-                        oldCost.getValue().compareTo(newCostReq.value()) == 0 ||
-                        oldCost.getBaseCurrency() == newCostReq.baseCurrency() ||
+                oldCost.getCostType() ==(newCostReq.costType()) &&
+                        oldCost.getObservation().equals(newCostReq.observation()) &&
+                        oldCost.getValue().compareTo(newCostReq.value()) == 0 &&
+                        oldCost.getBaseCurrency() == newCostReq.baseCurrency() &&
                         oldCost.getDateFinancial().equals(newCostReq.dateFinancial());
 
         if (unchanged) {

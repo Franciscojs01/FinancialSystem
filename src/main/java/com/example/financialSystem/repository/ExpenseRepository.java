@@ -17,7 +17,6 @@ public interface ExpenseRepository extends BaseRepository<Expense, Integer> {
 
     Optional<Expense> findByUserAndExpenseTypeAndDateFinancialAndValueAndPaymentMethod(User user, ExpenseType expenseType, LocalDate dateFinancial, BigDecimal value, String paymentMethod);
 
-    List<Expense> findByUser(User user);
+    List<Expense> findByUserAndDeletedFalse(User user);
 
-    void deleteById(int id);
 }

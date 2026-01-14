@@ -14,7 +14,6 @@ public interface CostRepository extends BaseRepository<Cost, Integer> {
 
     Optional<Cost> findById(int id);
 
-    List<Cost> findByUser(User user);
+    List<Cost> findByUserAndDeletedFalse(User user);
 
-    void deleteById(int id);
 }

@@ -2,6 +2,7 @@ package com.example.financialSystem.model.entity;
 
 
 import com.example.financialSystem.model.enums.FinancialType;
+import com.example.financialSystem.model.listener.FinancialTypeListener;
 import com.example.financialSystem.util.BenchMarkRate;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners(FinancialTypeListener.class)
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Financial extends BaseEntity {
     @NotNull(message = "Value is required")

@@ -39,7 +39,6 @@ public class InvestmentService extends UserLoggedService {
 
         Investment investment = investmentMapper.toEntity(request);
         investment.setUser(user);
-        investment.setFinancialType(FinancialType.INVESTMENT);
 
         validateInvestmentDate(investment.getDateFinancial());
 
@@ -98,7 +97,7 @@ public class InvestmentService extends UserLoggedService {
 
     @PreAuthorize("hasRole('ADMIN')")
     public List<InvestmentResponse> listAllInvestments() {
-        List<Investment> investments = investmentRepository.findAll();
+        List<Investment> investments = investmentRepository.findAllActive();
 
         investments.forEach(this::recalculateFields);
 
@@ -106,7 +105,7 @@ public class InvestmentService extends UserLoggedService {
     }
 
     public List<InvestmentResponse> listInvestments() {
-        List<Investment> investments = investmentRepository.findByUser(getLoggedUser().getUser());
+        List<Investment> investments = investmentRepository.findByUserAndDeletedFalse(getLoggedUser().getUser());
 
         investments.forEach(this::recalculateFields);
 
@@ -120,7 +119,8 @@ public class InvestmentService extends UserLoggedService {
 
         validateOwnerShip(investment);
 
-        investmentRepository.deleteById(id);
+        investment.setDeleted(true);
+        investmentRepository.save(investment);
     }
 
     public InvestmentResponse simulateInvestment(int id, int days) {
@@ -190,18 +190,20 @@ public class InvestmentService extends UserLoggedService {
     }
 
     public void ensureChanged(Investment oldInvestment, InvestmentRequest newInvestmentReq) {
+
         boolean unchanged =
-                oldInvestment.getInvestmentType() == (newInvestmentReq.investmentType()) ||
-                        oldInvestment.getActionQuantity() == newInvestmentReq.actionQuantity() ||
-                        oldInvestment.getDateFinancial().isEqual(newInvestmentReq.dateFinancial()) ||
-                        oldInvestment.getValue().compareTo(newInvestmentReq.value()) == 0 ||
-                        oldInvestment.getBaseCurrency() == newInvestmentReq.baseCurrency() ||
-                        oldInvestment.getBrokerName().equals(newInvestmentReq.brokerName());
+                oldInvestment.getInvestmentType() == newInvestmentReq.investmentType()
+                        && oldInvestment.getActionQuantity() == newInvestmentReq.actionQuantity()
+                        && oldInvestment.getDateFinancial().isEqual(newInvestmentReq.dateFinancial())
+                        && oldInvestment.getValue().compareTo(newInvestmentReq.value()) == 0
+                        && oldInvestment.getBaseCurrency() == newInvestmentReq.baseCurrency()
+                        && oldInvestment.getBrokerName().equals(newInvestmentReq.brokerName());
 
         if (unchanged) {
             throw new NoChangeDetectedException("No changes in this investment");
         }
     }
+
 
     public void recalculateFields(Investment investment) {
         investment.setCurrentValue(calculateCurrentValue(investment));
