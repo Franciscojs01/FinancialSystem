@@ -1,4 +1,4 @@
-package com.example.financialSystem.exception;
+package com.example.financialSystem.exception.handler;
 
 import lombok.Data;
 import lombok.experimental.SuperBuilder;

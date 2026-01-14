@@ -1,7 +1,7 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.exception.InvestmentDuplicateException;
-import com.example.financialSystem.exception.InvestmentNotFoundException;
+import com.example.financialSystem.exception.duplicate.InvestmentDuplicateException;
+import com.example.financialSystem.exception.notFound.InvestmentNotFoundException;
 import com.example.financialSystem.exception.NoChangeDetectedException;
 import com.example.financialSystem.model.dto.requests.InvestmentPatchRequest;
 import com.example.financialSystem.model.dto.requests.InvestmentRequest;
@@ -16,7 +16,6 @@ import com.example.financialSystem.model.mapper.InvestmentMapper;
 import com.example.financialSystem.repository.InvestmentRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -26,8 +25,6 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-
-import static com.example.financialSystem.model.enums.FinancialType.INVESTMENT;
 
 @Service
 public class InvestmentService extends UserLoggedService {

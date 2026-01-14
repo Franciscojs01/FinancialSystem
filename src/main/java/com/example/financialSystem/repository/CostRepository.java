@@ -3,13 +3,12 @@ package com.example.financialSystem.repository;
 import com.example.financialSystem.model.entity.Cost;
 import com.example.financialSystem.model.entity.User;
 import com.example.financialSystem.model.enums.CostType;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-public interface CostRepository extends JpaRepository<Cost,Long> {
+public interface CostRepository extends BaseRepository<Cost, Integer> {
 
     boolean existsByUserAndCostTypeAndDateFinancial(User user, CostType type, LocalDate dateFinancial);
 

@@ -17,13 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Login implements UserDetails {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "login_id")
-    private int id;
-
+public class Login extends BaseEntity implements UserDetails {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -31,14 +25,12 @@ public class Login implements UserDetails {
     private String username;
     private String password;
 
-    public Login(User newUser, String email, String encryptedPassword) {
-        this.user = newUser;
-        this.username = email;
-        this.password = encryptedPassword;
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (user == null || user.getUserRole() == null) {
+            return List.of();
+        }
+
         return List.of(
                 new SimpleGrantedAuthority(user.getUserRole().getRoleName())
         );
@@ -55,6 +47,8 @@ public class Login implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.isUserState();
+        return user != null && Boolean.FALSE.equals(user.getDeleted());
     }
+
 }
+

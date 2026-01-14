@@ -1,7 +1,7 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.exception.UserDuplicateException;
-import com.example.financialSystem.exception.UserNotFoundException;
+import com.example.financialSystem.exception.duplicate.UserDuplicateException;
+import com.example.financialSystem.exception.notFound.UserNotFoundException;
 import com.example.financialSystem.model.dto.requests.UserAdminRequest;
 import com.example.financialSystem.model.dto.requests.UserPatchRequest;
 import com.example.financialSystem.model.dto.requests.UserRequest;
@@ -39,16 +39,21 @@ public class UserService extends UserLoggedService implements UserDetailsService
     private UserMapper userMapper;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UserNotFoundException {
-        Login login = loginRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+    public UserDetails loadUserByUsername(String username)
+            throws UsernameNotFoundException {
 
-        if (!login.getUser().isUserState()) {
+        Login login = loginRepository.findByUsername(username)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found with username: " + username)
+                );
+
+        if (login.getUser() == null || Boolean.TRUE.equals(login.getUser().getDeleted())) {
             throw new UsernameNotFoundException("User is inactive");
         }
 
         return login;
     }
+
 
     @PreAuthorize("hasRole('ADMIN')")
     public UserResponse registerAdminUser(UserAdminRequest request) {
@@ -133,7 +138,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
 
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> listAllUser() {
-        return userMapper.toResponseList(userRepository.findAll());
+        return userMapper.toResponseList(userRepository.findAllActive());
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -141,11 +146,11 @@ public class UserService extends UserLoggedService implements UserDetailsService
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
-        if (!user.isUserState()) {
+        if (!user.getDeleted()) {
             throw new IllegalStateException("User is in inactive");
         }
 
-        user.setUserState(false);
+        user.setDeleted(true);
         userRepository.save(user);
     }
 
@@ -154,11 +159,11 @@ public class UserService extends UserLoggedService implements UserDetailsService
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
-        if (user.isUserState()) {
+        if (user.getDeleted()) {
             throw new IllegalStateException("User is already active");
         }
 
-        user.setUserState(true);
+        user.setDeleted(false);
         userRepository.save(user);
     }
 

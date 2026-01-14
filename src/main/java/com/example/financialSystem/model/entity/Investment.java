@@ -18,7 +18,6 @@ import java.time.temporal.ChronoUnit;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
 @Entity
 public class Investment extends Financial {
     @Enumerated(EnumType.STRING)

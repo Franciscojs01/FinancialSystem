@@ -18,11 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name="users")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
-
+public class User extends BaseEntity {
     @NotBlank(message = "Name cannot be blank")
     @Column(nullable = false)
     private String name;
@@ -42,12 +38,10 @@ public class User {
     private UserRole userRole;
 
     private LocalDate registerDate;
-    private boolean userState;
 
-    public User(String name, String email, LocalDate date, boolean state) {
+    public User(String name, String email, LocalDate date) {
         this.name = name;
         this.email = email;
         this.registerDate = date;
-        this.userState = state;
     }
 }

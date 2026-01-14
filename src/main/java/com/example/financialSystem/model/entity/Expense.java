@@ -15,7 +15,6 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
 @Entity
 public class Expense extends Financial {
     @Enumerated(EnumType.STRING)

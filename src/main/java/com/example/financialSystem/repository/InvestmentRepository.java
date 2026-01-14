@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface InvestmentRepository extends JpaRepository<Investment, Long> {
+public interface InvestmentRepository extends BaseRepository<Investment, Integer> {
     Optional<Investment> findByUserAndInvestmentTypeAndBrokerName(User user, InvestmentType investmentType, String brokerName);
     Optional<Investment> findById(int id);
 

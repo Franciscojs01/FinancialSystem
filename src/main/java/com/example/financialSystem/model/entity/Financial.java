@@ -20,15 +20,9 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Financial {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "financial_id")
-    private int id;
-
+public abstract class Financial extends BaseEntity {
     @NotNull(message = "Value is required")
     @DecimalMin(value = "0.01", message = "Value must be greater than 0")
     private BigDecimal value;

@@ -1,7 +1,7 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.exception.CostDuplicateException;
-import com.example.financialSystem.exception.CostNotFoundException;
+import com.example.financialSystem.exception.duplicate.CostDuplicateException;
+import com.example.financialSystem.exception.notFound.CostNotFoundException;
 import com.example.financialSystem.exception.NoChangeDetectedException;
 import com.example.financialSystem.model.dto.requests.CostPatchRequest;
 import com.example.financialSystem.model.dto.requests.CostRequest;

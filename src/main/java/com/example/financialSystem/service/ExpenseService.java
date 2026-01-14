@@ -1,7 +1,7 @@
 package com.example.financialSystem.service;
 
-import com.example.financialSystem.exception.ExpenseDuplicateException;
-import com.example.financialSystem.exception.ExpenseNotFoundException;
+import com.example.financialSystem.exception.duplicate.ExpenseDuplicateException;
+import com.example.financialSystem.exception.notFound.ExpenseNotFoundException;
 import com.example.financialSystem.exception.NoChangeDetectedException;
 import com.example.financialSystem.model.dto.requests.ExpensePatchRequest;
 import com.example.financialSystem.model.dto.requests.ExpenseRequest;
