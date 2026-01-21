@@ -63,7 +63,9 @@ public class UserService extends UserLoggedService implements UserDetailsService
                 });
 
         User newUser = userMapper.toEntityAdmin(request);
-        newUser.setRegisterDate(LocalDate.now());
+        if (request.getAnniversaryDate() != null) {
+            newUser.setAnniversaryDate(request.getAnniversaryDate());
+        }
         newUser.setUserRole(UserRole.ADMIN);
 
         Login login = new Login(
@@ -76,7 +78,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
 
         userRepository.save(newUser);
 
-        return new UserResponse(newUser.getName(), newUser.getEmail());
+        return new UserResponse(newUser.getName(), newUser.getEmail(), newUser.getAnniversaryDate());
     }
 
     public UserResponse registerUser(UserRequest request) {
@@ -86,9 +88,9 @@ public class UserService extends UserLoggedService implements UserDetailsService
                 });
 
         User newUser = userMapper.toEntity(request);
-
-
-        newUser.setRegisterDate(LocalDate.now());
+        if (request.getAnniversaryDate() != null) {
+            newUser.setAnniversaryDate(request.getAnniversaryDate());
+        }
         newUser.setUserRole(UserRole.USER);
 
         Login login = new Login(
@@ -100,7 +102,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
         newUser.setLogin(login);
 
         userRepository.save(newUser);
-        return new UserResponse(newUser.getName(), newUser.getEmail());
+        return new UserResponse(newUser.getName(), newUser.getEmail(), newUser.getAnniversaryDate());
     }
 
     public UserResponse userUpdate(int id, UserRequest request) {

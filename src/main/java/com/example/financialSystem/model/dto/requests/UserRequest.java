@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -18,6 +20,6 @@ public class UserRequest {
     @NotNull(message = "password is required")
     private String password;
 
+    private LocalDate anniversaryDate;
+
 }
-
-

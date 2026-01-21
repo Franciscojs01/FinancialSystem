@@ -80,7 +80,7 @@ class UserRepositoryTest {
         User user = new User();
         user.setName("John Doe");
         user.setEmail("john@gmail.com");
-        user.setRegisterDate(LocalDate.now());
+        user.setAnniversaryDate(LocalDate.of(2008, 1, 1));
         user.setUserRole(UserRole.USER);
         user.setDeleted(false);
 
@@ -98,7 +98,7 @@ class UserRepositoryTest {
         User user = new User();
         user.setName("adminn");
         user.setEmail("admin@.com");
-        user.setRegisterDate(LocalDate.now());
+        user.setAnniversaryDate(LocalDate.of(2008, 1, 1));
         user.setUserRole(UserRole.ADMIN);
         user.setDeleted(false);
 
