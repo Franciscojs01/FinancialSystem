@@ -1,5 +1,6 @@
 package com.example.financialSystem.model.dto.responses;
 
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,5 +11,5 @@ import lombok.Setter;
 public class UserResponse {
     private String name;
     private String email;
-
+    private LocalDate anniversaryDate;
 }
