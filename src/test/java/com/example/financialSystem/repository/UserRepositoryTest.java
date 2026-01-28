@@ -2,7 +2,8 @@ package com.example.financialSystem.repository;
 
 import com.example.financialSystem.model.entity.Login;
 import com.example.financialSystem.model.entity.User;
-import com.example.financialSystem.model.enums.UserRole;
+import com.example.financialSystem.util.UserCreator;
+import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,9 +18,15 @@ import java.util.Optional;
 @DataJpaTest
 @ActiveProfiles("test")
 @DisplayName("Test for User Repository")
-class UserRepositoryTest {
+class UserRepositoryTest extends UserCreator {
+    @Autowired
+    private EntityManager entityManager;
+
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private LoginRepository loginRepository;
 
     @Test
     @DisplayName("Save User When Successful")
@@ -76,40 +82,21 @@ class UserRepositoryTest {
         Assertions.assertThat(users).contains(savedUser);
     }
 
-    private User createUser() {
-        User user = new User();
-        user.setName("John Doe");
-        user.setEmail("john@gmail.com");
-        user.setAnniversaryDate(LocalDate.of(2008, 1, 1));
-        user.setUserRole(UserRole.USER);
-        user.setDeleted(false);
+    @Test
+    @DisplayName("findByUsername returns login when successful")
+    void findByUsername_ReturnsUser_WhenSuccessful() {
+        User user = createUser();
 
-        Login login = new Login();
-        login.setUsername(user.getEmail());
-        login.setPassword("123");
-        login.setUser(user);
+        userRepository.saveAndFlush(user);
+        entityManager.clear();
+        String username = user.getEmail();
 
-        user.setLogin(login);
+        Optional<Login> optionalLogin = loginRepository.findByUsername(username);
 
-        return user;
-    }
-
-    private User createUserAdmin() {
-        User user = new User();
-        user.setName("adminn");
-        user.setEmail("admin@.com");
-        user.setAnniversaryDate(LocalDate.of(2008, 1, 1));
-        user.setUserRole(UserRole.ADMIN);
-        user.setDeleted(false);
-
-        Login login = new Login();
-        login.setUsername(user.getEmail());
-        login.setPassword("admin123");
-        login.setUser(user);
-
-        user.setLogin(login);
-
-        return user;
+        Assertions.assertThat(optionalLogin).isPresent();
+        Assertions.assertThat(optionalLogin.get().getUsername()).isEqualTo(username);
+        Assertions.assertThat(optionalLogin.get().getUser()).isNotNull();
+        Assertions.assertThat(optionalLogin.get().getUser().getEmail()).isEqualTo(user.getEmail());
     }
 
 }
