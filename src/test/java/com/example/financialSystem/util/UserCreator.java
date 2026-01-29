@@ -29,7 +29,6 @@ public class UserCreator {
 
     public static User createUserAdmin() {
         User user = new User();
-        user.setId(2);
         user.setName("adminn");
         user.setEmail("admin@.com");
         user.setAnniversaryDate(LocalDate.of(2008, 1, 1));
@@ -50,6 +49,8 @@ public class UserCreator {
         User user = createUser();
         user.setName("Jane Doe");
         user.setEmail("jose@gmail.com");
+        user.setId(user.getId());
+        user.getLogin().setPassword("456");
         return user;
     }
 

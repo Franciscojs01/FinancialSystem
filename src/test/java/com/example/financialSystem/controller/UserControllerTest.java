@@ -28,11 +28,13 @@ class UserControllerTest {
     void setUp() {
         User user = UserCreator.createUser();
         UserResponse response = new UserResponse(user.getName(), user.getEmail(), user.getAnniversaryDate());
+
         BDDMockito.when(userServiceMock.registerUser(ArgumentMatchers.any(UserRequest.class)))
                 .thenReturn(response);
 
-        BDDMockito.when(userServiceMock.userUpdate(1, ArgumentMatchers.any(UserRequest.class)))
+        BDDMockito.when(userServiceMock.userUpdate(user.getId(), ArgumentMatchers.any(UserRequest.class)))
                 .thenReturn(response);
+
     }
 
     @Test
@@ -44,6 +46,9 @@ class UserControllerTest {
 
         Assertions.assertThat(userResponse).isEqualTo(UserCreator.createValidUser());
     }
+
+
+
 
 
 }
