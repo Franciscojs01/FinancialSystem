@@ -46,19 +46,46 @@ public class UserCreator {
     }
 
     public static User updateUser() {
+
         User user = createUser();
         user.setName("Jane Doe");
         user.setEmail("jose@gmail.com");
-        user.setId(user.getId());
-        user.getLogin().setPassword("456");
+
+        if (user.getLogin() != null) {
+            user.getLogin().setUsername(user.getEmail());
+        }
         return user;
+
+
+    }
+
+    public static User patchUser() {
+        User user = createUser();
+        user.setName("John Smith");
+        user.setEmail("john@gmail.com");
+
+        if (user.getLogin() != null) {
+            user.getLogin().setUsername(user.getEmail());
+        }
+
+        return user;
+
     }
 
     public static UserResponse createValidUser() {
         User user = createUser();
         user.setName("John Doe");
 
-        return new UserResponse(user.getEmail(), user.getEmail(), user.getAnniversaryDate());
+        return new UserResponse(user.getName(), user.getEmail());
+    }
+
+    public static UserResponse createValidAdminUser() {
+        User user = createUserAdmin();
+        user.setName("adminn");
+        user.setEmail("admin@.com");
+        user.setAnniversaryDate(LocalDate.of(2008, 1, 1));
+
+        return new UserResponse(user.getName(), user.getEmail());
     }
 
 }
