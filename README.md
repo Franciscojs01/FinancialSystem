@@ -14,6 +14,9 @@ The project focuses on modeling complex entities and designing clear and functio
 - Spring Web
 - Spring Data JPA (Hibernate)
 - Spring Security (JWT)
+- Junit 5
+- Swagger/OpenAPI
+- Maven
 - MapStruct
 - Jakarta Validation
 - MySQL/PostgresSQL
