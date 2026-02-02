@@ -1,7 +1,7 @@
 # 💰 Financial System API 
 
 A RESTful API for complete personal finance management, developed in Java with Spring Boot.
-The architecture is designed to handle user authentication and detailed control of expenses and investments, following the RESTful API standard.
+The architecture is designed to handle user authentication and detailed control of expenses and investments, following the RESTful API.
 
 ## 🌟 Overview & Architecture
 
