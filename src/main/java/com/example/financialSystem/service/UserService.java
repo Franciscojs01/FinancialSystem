@@ -78,7 +78,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
 
         userRepository.save(newUser);
 
-        return new UserResponse(newUser.getName(), newUser.getEmail(), newUser.getAnniversaryDate());
+        return new UserResponse(newUser.getName(), newUser.getEmail());
     }
 
     public UserResponse registerUser(UserRequest request) {
@@ -102,7 +102,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
         newUser.setLogin(login);
 
         userRepository.save(newUser);
-        return new UserResponse(newUser.getName(), newUser.getEmail(), newUser.getAnniversaryDate());
+        return new UserResponse(newUser.getName(), newUser.getEmail());
     }
 
     public UserResponse userUpdate(int id, UserRequest request) {

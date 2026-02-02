@@ -1,5 +1,6 @@
 package com.example.financialSystem.util;
 
+import com.example.financialSystem.model.dto.requests.UserAdminRequest;
 import com.example.financialSystem.model.dto.requests.UserRequest;
 
 import java.time.LocalDate;
@@ -13,5 +14,14 @@ public class UserPostRequestBodyCreator {
                 .anniversaryDate(LocalDate.of(2008, 1, 1))
                 .build();
 
+    }
+
+    public static UserAdminRequest createAdminUserPostRequestBody() {
+        return UserAdminRequest.builder()
+                .name("adminn")
+                .email("admin@.com")
+                .password("admin123")
+                .anniversaryDate(LocalDate.of(2008, 1, 1))
+                .build();
     }
 }

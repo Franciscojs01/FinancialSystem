@@ -1,0 +1,13 @@
+package com.example.financialSystem.util;
+
+import com.example.financialSystem.model.dto.requests.UserPatchRequest;
+
+public class UserPatchRequestBodyCreator {
+    public static UserPatchRequest updateUserPutRequestBody() {
+        return UserPatchRequest.builder()
+                .name(UserCreator.patchUser().getName())
+                .email(UserCreator.patchUser().getEmail())
+                .build();
+
+    }
+}
