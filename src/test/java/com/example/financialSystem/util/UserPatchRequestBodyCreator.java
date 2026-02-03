@@ -6,8 +6,6 @@ public class UserPatchRequestBodyCreator {
     public static UserPatchRequest updateUserPutRequestBody() {
         return UserPatchRequest.builder()
                 .name(UserCreator.patchUser().getName())
-                .email(UserCreator.patchUser().getEmail())
                 .build();
-
     }
 }

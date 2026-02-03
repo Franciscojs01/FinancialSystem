@@ -7,10 +7,11 @@ import com.example.financialSystem.model.enums.UserRole;
 
 import java.time.LocalDate;
 
-
 public class UserCreator {
+
     public static User createUser() {
         User user = new User();
+        user.setId(1);
         user.setName("John Doe");
         user.setEmail("john@gmail.com");
         user.setAnniversaryDate(LocalDate.of(2008, 1, 1));
@@ -29,6 +30,7 @@ public class UserCreator {
 
     public static User createUserAdmin() {
         User user = new User();
+        user.setId(2);
         user.setName("adminn");
         user.setEmail("admin@.com");
         user.setAnniversaryDate(LocalDate.of(2008, 1, 1));
@@ -45,46 +47,44 @@ public class UserCreator {
         return user;
     }
 
-    public static User updateUser() {
-
+    public static User createActiveUser() {
         User user = createUser();
+        user.setId(2);
+        user.setDeleted(false);
+        return user;
+    }
+
+    public static User createInactiveUser() {
+        User user = createUser();
+        user.setId(3);
+        user.setDeleted(true);
+        return user;
+    }
+
+    public static User updateUser() {
+        User user = createUser();
+        user.setId(4);
         user.setName("Jane Doe");
         user.setEmail("jose@gmail.com");
-
-        if (user.getLogin() != null) {
-            user.getLogin().setUsername(user.getEmail());
-        }
+        if (user.getLogin() != null) user.getLogin().setUsername(user.getEmail());
         return user;
-
-
     }
 
     public static User patchUser() {
         User user = createUser();
         user.setName("John Smith");
-        user.setEmail("john@gmail.com");
-
-        if (user.getLogin() != null) {
-            user.getLogin().setUsername(user.getEmail());
-        }
+        user.setId(5);
 
         return user;
-
     }
 
     public static UserResponse createValidUser() {
         User user = createUser();
-        user.setName("John Doe");
-
         return new UserResponse(user.getName(), user.getEmail());
     }
 
     public static UserResponse createValidAdminUser() {
         User user = createUserAdmin();
-        user.setName("adminn");
-        user.setEmail("admin@.com");
-        user.setAnniversaryDate(LocalDate.of(2008, 1, 1));
-
         return new UserResponse(user.getName(), user.getEmail());
     }
 

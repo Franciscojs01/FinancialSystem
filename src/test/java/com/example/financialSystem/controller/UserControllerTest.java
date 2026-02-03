@@ -27,6 +27,7 @@ import java.util.List;
 class UserControllerTest {
     @InjectMocks
     private UserController userController;
+
     @Mock
     private UserService userServiceMock;
 
@@ -171,5 +172,4 @@ class UserControllerTest {
         Assertions.assertThat(responseEntity).isNotNull();
         Assertions.assertThat(responseEntity.getStatusCodeValue()).isEqualTo(204);
     }
-
 }
