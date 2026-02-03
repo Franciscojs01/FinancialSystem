@@ -8,19 +8,18 @@ import java.time.LocalDate;
 public class UserPostRequestBodyCreator {
     public static UserRequest createUserPostRequestBody() {
         return UserRequest.builder()
-                .name("chico")
-                .email("chiquin@.com")
-                .password("1234")
+                .name(UserCreator.createUser().getName())
+                .email(UserCreator.createUser().getEmail())
+                .password(UserCreator.createUser().getLogin().getPassword())
                 .anniversaryDate(LocalDate.of(2008, 1, 1))
                 .build();
-
     }
 
     public static UserAdminRequest createAdminUserPostRequestBody() {
         return UserAdminRequest.builder()
-                .name("adminn")
-                .email("admin@.com")
-                .password("admin123")
+                .name(UserCreator.createUserAdmin().getName())
+                .email(UserCreator.createUserAdmin().getEmail())
+                .password(UserCreator.createUserAdmin().getLogin().getPassword())
                 .anniversaryDate(LocalDate.of(2008, 1, 1))
                 .build();
     }
