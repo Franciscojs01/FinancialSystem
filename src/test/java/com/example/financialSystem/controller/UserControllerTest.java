@@ -120,7 +120,7 @@ class UserControllerTest {
     void patch_User_WhenSuccessful() {
 
         ResponseEntity<UserResponse> responseEntity = userController.patchUser(
-                (UserCreator.patchUser().getId()), UserPatchRequestBodyCreator.updateUserPutRequestBody());
+                (UserCreator.patchUser().getId()), UserPatchRequestBodyCreator.patchUserRequestBody());
 
         Assertions.assertThat(responseEntity).isNotNull();
 

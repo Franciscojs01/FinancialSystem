@@ -148,8 +148,8 @@ public class UserService extends UserLoggedService implements UserDetailsService
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
-        if (!user.getDeleted()) {
-            throw new IllegalStateException("User is in inactive");
+        if (user.getDeleted()) {
+            throw new IllegalStateException("User is already inactive");
         }
 
         user.setDeleted(true);
@@ -161,7 +161,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
-        if (user.getDeleted()) {
+        if (!user.getDeleted()) {
             throw new IllegalStateException("User is already active");
         }
 

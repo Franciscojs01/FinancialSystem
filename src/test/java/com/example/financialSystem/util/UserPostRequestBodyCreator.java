@@ -23,4 +23,13 @@ public class UserPostRequestBodyCreator {
                 .anniversaryDate(LocalDate.of(2008, 1, 1))
                 .build();
     }
+
+    public static UserAdminRequest createAdminUserPostITRequestBody() {
+        return UserAdminRequest.builder()
+                .name("Integration Admin")
+                .email("integration-admin")
+                .password("admin321")
+                .anniversaryDate(LocalDate.of(2008, 1, 1))
+                .build();
+    }
 }

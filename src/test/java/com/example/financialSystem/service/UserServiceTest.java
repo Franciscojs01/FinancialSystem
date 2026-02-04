@@ -201,7 +201,7 @@ class UserServiceTest {
     @DisplayName("Return User When patch User is Successful")
     void patch_User_WhenSuccessful() {
         UserResponse userResponse = userService.userPatch(
-                UserCreator.patchUser().getId(), UserPatchRequestBodyCreator.updateUserPutRequestBody());
+                UserCreator.patchUser().getId(), UserPatchRequestBodyCreator.patchUserRequestBody());
 
         Assertions.assertThat(userResponse).isNotNull();
         Assertions.assertThat(userResponse.getName()).isEqualTo(UserCreator.patchUser().getName());

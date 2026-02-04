@@ -55,7 +55,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("{id}/active")
+    @PutMapping("{id}/activate")
     public ResponseEntity<Void> activateUser(@PathVariable int id) {
         userService.activateUser(id);
         return ResponseEntity.noContent().build();
