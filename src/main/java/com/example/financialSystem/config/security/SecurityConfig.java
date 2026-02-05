@@ -1,4 +1,4 @@
-package com.example.financialSystem.security;
+package com.example.financialSystem.config.security;
 
 import com.example.financialSystem.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,11 +62,9 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider(UserService userService) {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
-
-        authenticationProvider.setUserDetailsService(userService);
-
+        
         return authenticationProvider;
     }
 }

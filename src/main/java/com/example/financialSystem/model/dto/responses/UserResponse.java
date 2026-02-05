@@ -1,9 +1,8 @@
 package com.example.financialSystem.model.dto.responses;
 
-import java.time.LocalDate;
-
-import com.example.financialSystem.model.entity.User;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor

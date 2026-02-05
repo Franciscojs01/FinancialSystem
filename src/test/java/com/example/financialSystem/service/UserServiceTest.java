@@ -62,9 +62,9 @@ class UserServiceTest {
         BDDMockito.when(userRepositoryMock.findById(1))
                 .thenReturn(Optional.of(UserCreator.createUser()));
         BDDMockito.when(userRepositoryMock.findById(2))
-                .thenReturn(Optional.of(UserCreator.createActiveUser()));
-        BDDMockito.when(userRepositoryMock.findById(3))
                 .thenReturn(Optional.of(UserCreator.createInactiveUser()));
+        BDDMockito.when(userRepositoryMock.findById(3))
+                .thenReturn(Optional.of(UserCreator.createActiveUser()));
 
         User existingForUpdate = UserCreator.createUser();
         existingForUpdate.setId(4);
@@ -201,7 +201,7 @@ class UserServiceTest {
     @DisplayName("Return User When patch User is Successful")
     void patch_User_WhenSuccessful() {
         UserResponse userResponse = userService.userPatch(
-                UserCreator.patchUser().getId(), UserPatchRequestBodyCreator.updateUserPutRequestBody());
+                UserCreator.patchUser().getId(), UserPatchRequestBodyCreator.patchUserRequestBody());
 
         Assertions.assertThat(userResponse).isNotNull();
         Assertions.assertThat(userResponse.getName()).isEqualTo(UserCreator.patchUser().getName());
