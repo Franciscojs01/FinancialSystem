@@ -1,4 +1,4 @@
-package com.example.financialSystem.security;
+package com.example.financialSystem.config.security;
 
 import com.example.financialSystem.repository.LoginRepository;
 import com.example.financialSystem.service.TokenService;
@@ -29,29 +29,29 @@ public class SecurityFilter extends OncePerRequestFilter {
     );
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest servletHttp, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        if (isPublicPath(request)) {
-            filterChain.doFilter(request, response);
+        if (isPublicPath(servletHttp)) {
+            filterChain.doFilter(servletHttp, response);
             return;
         }
 
-        String token = extractToken(request);
+        String token = extractToken(servletHttp);
         if (token != null) {
             authenticateUser(token);
         }
 
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(servletHttp, response);
     }
 
-    private boolean isPublicPath(HttpServletRequest request) {
-        String uri = request.getRequestURI();
+    private boolean isPublicPath(HttpServletRequest servletHttp) {
+        String uri = servletHttp.getRequestURI();
         return PUBLIC_PATHS.stream().anyMatch(uri::startsWith);
     }
 
-    private String extractToken(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
+    private String extractToken(HttpServletRequest servletHttp) {
+        String authHeader = servletHttp.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return null;
         }

@@ -67,6 +67,7 @@ public class UserCreator {
 
     public static User patchUser() {
         User user = createUser();
+        user.setId(5);
         user.setName("John Smith");
 
         return user;

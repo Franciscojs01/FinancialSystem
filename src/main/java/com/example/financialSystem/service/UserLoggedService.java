@@ -14,8 +14,12 @@ public abstract class UserLoggedService {
 
     protected Login getLoggedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        return loginRepository.findByUsername(username)
+
+        if (auth != null && auth.getPrincipal() instanceof Login) {
+            return (Login) auth.getPrincipal();
+        }
+
+        return loginRepository.findByUsername(auth != null ? auth.getName() : null)
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
     }
 }

@@ -47,7 +47,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
                         new UsernameNotFoundException("User not found with username: " + username)
                 );
 
-        if (login.getUser() == null || Boolean.TRUE.equals(login.getUser().getDeleted())) {
+        if (Boolean.TRUE.equals(login.getUser().getDeleted())) {
             throw new UsernameNotFoundException("User is inactive");
         }
 
