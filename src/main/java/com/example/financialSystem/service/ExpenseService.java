@@ -98,11 +98,30 @@ public class ExpenseService extends UserLoggedService {
     }
 
     @Transactional
+    public void activateExpense(int id) {
+        Expense expense = expenseRepository.findById(id)
+                .orElseThrow(() -> new ExpenseNotFoundException(id));
+
+        validateOwnerShip(expense);
+
+        if (!expense.getDeleted()) {
+            throw new IllegalArgumentException("Expense is already active");
+        }
+
+        expense.setDeleted(false);
+        expenseRepository.save(expense);
+    }
+
+    @Transactional
     public void deleteExpense(int id) {
         Expense expense = expenseRepository.findById(id)
                 .orElseThrow(() -> new ExpenseNotFoundException(id));
 
         validateOwnerShip(expense);
+
+        if (expense.getDeleted()) {
+            throw new IllegalStateException("Expense is already deleted");
+        }
 
         expense.setDeleted(true);
         expenseRepository.save(expense);

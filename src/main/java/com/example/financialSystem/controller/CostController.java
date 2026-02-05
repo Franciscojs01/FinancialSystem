@@ -47,6 +47,12 @@ public class CostController {
         return ResponseEntity.ok().body(costService.patchCost(id, costRequest));
     }
 
+    @PutMapping("/activate/{id}")
+    public ResponseEntity<String> activateCost(@PathVariable int id) {
+        costService.activateCost(id);
+        return ResponseEntity.ok().body("Cost activated with id: " + id);
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteCost(@PathVariable int id) {
         costService.deleteCost(id);

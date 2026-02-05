@@ -53,6 +53,12 @@ public class InvestmentController{
         return  ResponseEntity.ok().body(investmentService.patchInvestment(id,  patchRequest));
     }
 
+    @PutMapping("/activate/{id}")
+    public ResponseEntity<String> activateInvestment(@PathVariable int id) {
+        investmentService.activateInvestment(id);
+        return ResponseEntity.ok("Investment activated with id: " + id);
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteInvestment(@PathVariable int id) {
         investmentService.deleteInvestment(id);

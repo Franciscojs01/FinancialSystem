@@ -3,6 +3,7 @@ package com.example.financialSystem.repository;
 import com.example.financialSystem.model.entity.Cost;
 import com.example.financialSystem.model.entity.User;
 import com.example.financialSystem.model.enums.CostType;
+import org.springframework.data.jpa.repository.EntityGraph;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -12,8 +13,13 @@ public interface CostRepository extends BaseRepository<Cost, Integer> {
 
     boolean existsByUserAndCostTypeAndDateFinancial(User user, CostType type, LocalDate dateFinancial);
 
+    @EntityGraph(attributePaths = {"user"})
     Optional<Cost> findById(int id);
 
+    @EntityGraph(attributePaths = {"user"})
     List<Cost> findByUserAndDeletedFalse(User user);
+
+    @EntityGraph(attributePaths = {"user"})
+    List<Cost> findAllActive();
 
 }
