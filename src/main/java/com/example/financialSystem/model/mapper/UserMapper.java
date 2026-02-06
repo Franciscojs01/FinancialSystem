@@ -1,8 +1,7 @@
 package com.example.financialSystem.model.mapper;
 
-import com.example.financialSystem.model.dto.requests.UserAdminRequest;
-import com.example.financialSystem.model.dto.requests.UserPatchRequest;
 import com.example.financialSystem.model.dto.requests.UserRequest;
+import com.example.financialSystem.model.dto.requests.UserPatchRequest;
 import com.example.financialSystem.model.dto.responses.UserResponse;
 import com.example.financialSystem.model.entity.User;
 import org.mapstruct.BeanMapping;
@@ -16,7 +15,7 @@ import java.util.List;
 public interface UserMapper {
     User toEntity(UserRequest userRequest);
 
-    User toEntityAdmin(UserAdminRequest userAdminRequest);
+    User toEntityAdmin(UserRequest userAdminRequest);
 
     UserResponse toResponse(User entity);
 

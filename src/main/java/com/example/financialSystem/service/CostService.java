@@ -24,11 +24,13 @@ import java.util.List;
 
 @Service
 public class CostService extends UserLoggedService {
-    @Autowired
-    private CostRepository costRepository;
+    private final CostRepository costRepository;
+    private final CostMapper costMapper;
 
-    @Autowired
-    private CostMapper costMapper;
+    public CostService(CostRepository costRepository, CostMapper costMapper) {
+        this.costRepository = costRepository;
+        this.costMapper = costMapper;
+    }
 
     public CostResponse createCost(CostRequest request) {
         User user = getLoggedUser().getUser();

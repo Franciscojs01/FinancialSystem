@@ -28,11 +28,14 @@ import java.util.List;
 
 @Service
 public class InvestmentService extends UserLoggedService {
-    @Autowired
-    private InvestmentRepository investmentRepository;
+    private final InvestmentRepository investmentRepository;
+    private final InvestmentMapper investmentMapper;
 
-    @Autowired
-    private InvestmentMapper investmentMapper;
+    public InvestmentService(InvestmentRepository investmentRepository,
+                             InvestmentMapper investmentMapper) {
+        this.investmentRepository = investmentRepository;
+        this.investmentMapper = investmentMapper;
+    }
 
     public InvestmentResponse createInvestment(InvestmentRequest request) {
         User user = getLoggedUser().getUser();

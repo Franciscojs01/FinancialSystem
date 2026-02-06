@@ -24,11 +24,13 @@ import java.util.List;
 
 @Service
 public class ExpenseService extends UserLoggedService {
-    @Autowired
-    private ExpenseRepository expenseRepository;
+    private final ExpenseRepository expenseRepository;
+    private final ExpenseMapper expenseMapper;
 
-    @Autowired
-    private ExpenseMapper expenseMapper;
+    public ExpenseService(ExpenseRepository expenseRepository, ExpenseMapper expenseMapper) {
+        this.expenseRepository = expenseRepository;
+        this.expenseMapper = expenseMapper;
+    }
 
     public ExpenseResponse createExpense(ExpenseRequest request) {
         User user = getLoggedUser().getUser();

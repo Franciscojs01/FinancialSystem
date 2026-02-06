@@ -1,7 +1,6 @@
 package com.example.financialSystem.integration;
 
 import com.example.financialSystem.model.dto.requests.LoginRequest;
-import com.example.financialSystem.model.dto.requests.UserAdminRequest;
 import com.example.financialSystem.model.dto.requests.UserPatchRequest;
 import com.example.financialSystem.model.dto.requests.UserRequest;
 import com.example.financialSystem.model.dto.responses.LoginResponse;
@@ -83,11 +82,11 @@ public class UserControllerIT {
     @Test
     @DisplayName("Register AdminUser When is Valid Return User")
     void registerAdminUser_WhenValid_ReturnUser() {
-        UserAdminRequest userRequest = UserPostRequestBodyCreator.createAdminUserPostITRequestBody();
+        UserRequest userRequest = UserPostRequestBodyCreator.createAdminUserPostITRequestBody();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(loginAsAdmin());
-        HttpEntity<UserAdminRequest> entity = new HttpEntity<>(userRequest, headers);
+        HttpEntity<UserRequest> entity = new HttpEntity<>(userRequest, headers);
 
         ResponseEntity<UserResponse> response = testRestTemplate.exchange(
                 "/user/admin/create",

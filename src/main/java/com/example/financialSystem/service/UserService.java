@@ -2,7 +2,6 @@ package com.example.financialSystem.service;
 
 import com.example.financialSystem.exception.duplicate.UserDuplicateException;
 import com.example.financialSystem.exception.notFound.UserNotFoundException;
-import com.example.financialSystem.model.dto.requests.UserAdminRequest;
 import com.example.financialSystem.model.dto.requests.UserPatchRequest;
 import com.example.financialSystem.model.dto.requests.UserRequest;
 import com.example.financialSystem.model.dto.responses.UserResponse;
@@ -12,7 +11,6 @@ import com.example.financialSystem.model.enums.UserRole;
 import com.example.financialSystem.model.mapper.UserMapper;
 import com.example.financialSystem.repository.LoginRepository;
 import com.example.financialSystem.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,22 +19,22 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
 public class UserService extends UserLoggedService implements UserDetailsService {
-    @Autowired
-    private LoginRepository loginRepository;
+    private final LoginRepository loginRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private UserMapper userMapper;
+    public UserService(LoginRepository loginRepository, PasswordEncoder passwordEncoder,
+                       UserRepository userRepository, UserMapper userMapper) {
+        this.loginRepository = loginRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username)
@@ -54,9 +52,8 @@ public class UserService extends UserLoggedService implements UserDetailsService
         return login;
     }
 
-
     @PreAuthorize("hasRole('ADMIN')")
-    public UserResponse registerAdminUser(UserAdminRequest request) {
+    public UserResponse registerAdminUser(UserRequest request) {
         loginRepository.findByUsername(request.getEmail())
                 .ifPresent(existing -> {
                     throw new UserDuplicateException("email", request.getEmail());
@@ -105,7 +102,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
         return new UserResponse(newUser.getName(), newUser.getEmail());
     }
 
-    public UserResponse userUpdate(int id, UserRequest request) {
+    public UserResponse updateUser(int id, UserRequest request) {
         User user = userRepository.findById(id)
                         .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -117,7 +114,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
         return userMapper.toResponse(userRepository.save(user));
     }
 
-    public UserResponse userPatch(int id, UserPatchRequest patchRequest) {
+    public UserResponse patchUser(int id, UserPatchRequest patchRequest) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
