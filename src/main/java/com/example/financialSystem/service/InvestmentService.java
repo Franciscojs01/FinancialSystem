@@ -113,11 +113,30 @@ public class InvestmentService extends UserLoggedService {
     }
 
     @Transactional
+    public void activateInvestment(int id) {
+        Investment investment = investmentRepository.findById(id)
+                .orElseThrow(() -> new InvestmentNotFoundException(id));
+
+        validateOwnerShip(investment);
+
+        if (!investment.getDeleted()) {
+            throw new IllegalStateException("Investment is already active");
+        }
+
+        investment.setDeleted(false);
+        investmentRepository.save(investment);
+    }
+
+    @Transactional
     public void deleteInvestment(int id) {
         Investment investment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException(id));
 
         validateOwnerShip(investment);
+
+        if (investment.getDeleted()) {
+            throw new IllegalStateException("Investment is already deleted");
+        }
 
         investment.setDeleted(true);
         investmentRepository.save(investment);

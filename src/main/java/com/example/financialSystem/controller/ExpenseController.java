@@ -48,7 +48,13 @@ public class ExpenseController {
         return ResponseEntity.ok().body(expenseService.patchExpense(id, patchRequest));
     }
 
-    @DeleteMapping("/{id}")
+    @PutMapping("/activate/{id}")
+    public ResponseEntity<String> activateExpense(@PathVariable int id) {
+        expenseService.activateExpense(id);
+        return ResponseEntity.ok("Expense activated with id: " + id);
+    }
+
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteExpense(@PathVariable int id) {
         expenseService.deleteExpense(id);
         return ResponseEntity.ok("Expense success deleted ");

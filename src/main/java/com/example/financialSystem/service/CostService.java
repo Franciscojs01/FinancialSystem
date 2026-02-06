@@ -96,11 +96,30 @@ public class CostService extends UserLoggedService {
     }
 
     @Transactional
+    public void activateCost(int id) {
+        Cost cost = costRepository.findById(id)
+                .orElseThrow(() -> new CostNotFoundException(id));
+
+        validateOwerShip(cost);
+
+        if (!cost.getDeleted()) {
+            throw new IllegalArgumentException("Cost is already active");
+        }
+
+        cost.setDeleted(false);
+        costRepository.save(cost);
+    }
+
+    @Transactional
     public void deleteCost(int id) {
         Cost cost = costRepository.findById(id)
                 .orElseThrow(() -> new CostNotFoundException(id));
 
         validateOwerShip(cost);
+
+        if (cost.getDeleted()) {
+            throw new IllegalStateException("Cost is already deleted");
+        }
 
         cost.setDeleted(true);
         costRepository.save(cost);
