@@ -12,11 +12,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
 
-    @Autowired
-    private TokenService tokenService;
+    public AuthService(AuthenticationManager authenticationManager, TokenService tokenService) {
+        this.authenticationManager = authenticationManager;
+        this.tokenService = tokenService;
+    }
 
     public LoginResponse login(LoginRequest loginRequest) {
         Authentication tokenAuthenticate = new UsernamePasswordAuthenticationToken(

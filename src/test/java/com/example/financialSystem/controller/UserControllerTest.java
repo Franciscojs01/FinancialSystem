@@ -1,6 +1,5 @@
 package com.example.financialSystem.controller;
 
-import com.example.financialSystem.model.dto.requests.UserAdminRequest;
 import com.example.financialSystem.model.dto.requests.UserRequest;
 import com.example.financialSystem.model.dto.responses.UserResponse;
 import com.example.financialSystem.model.entity.User;
@@ -54,13 +53,13 @@ class UserControllerTest {
         BDDMockito.when(userServiceMock.registerUser(ArgumentMatchers.any(UserRequest.class)))
                 .thenReturn(response);
 
-        BDDMockito.when(userServiceMock.registerAdminUser(ArgumentMatchers.any(UserAdminRequest.class)))
+        BDDMockito.when(userServiceMock.registerAdminUser(ArgumentMatchers.any(UserRequest.class)))
                 .thenReturn(adminResponse);
 
-        BDDMockito.when(userServiceMock.userUpdate(ArgumentMatchers.anyInt(), ArgumentMatchers.any(UserRequest.class)))
+        BDDMockito.when(userServiceMock.updateUser(ArgumentMatchers.anyInt(), ArgumentMatchers.any(UserRequest.class)))
                 .thenReturn(response2);
 
-        BDDMockito.when(userServiceMock.userPatch(ArgumentMatchers.anyInt(), ArgumentMatchers.any()))
+        BDDMockito.when(userServiceMock.patchUser(ArgumentMatchers.anyInt(), ArgumentMatchers.any()))
                 .thenReturn(response3);
 
         BDDMockito.when(userServiceMock.listAllUser())

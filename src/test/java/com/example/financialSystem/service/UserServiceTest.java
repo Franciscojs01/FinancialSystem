@@ -107,7 +107,7 @@ class UserServiceTest {
 
         BDDMockito.when(userMapperMock.toEntityAdmin(ArgumentMatchers.any()))
                 .thenAnswer(inv -> {
-                    var req = (com.example.financialSystem.model.dto.requests.UserAdminRequest) inv.getArgument(0);
+                    var req = (com.example.financialSystem.model.dto.requests.UserRequest) inv.getArgument(0);
                     User u = new User();
                     u.setName(req.getName());
                     u.setEmail(req.getEmail());
@@ -189,7 +189,7 @@ class UserServiceTest {
     void updateUser_ReturnsUpdatedUserResponse_WhenSuccessful() {
         var req = UserPutRequestBodyCreator.updateUserPutRequestBody();
 
-        UserResponse userResponse = userService.userUpdate(4, req);
+        UserResponse userResponse = userService.updateUser(4, req);
 
         Assertions.assertThat(userResponse).isNotNull();
         Assertions.assertThat(userResponse.getName()).isEqualTo(req.getName());
@@ -200,7 +200,7 @@ class UserServiceTest {
     @Test
     @DisplayName("Return User When patch User is Successful")
     void patch_User_WhenSuccessful() {
-        UserResponse userResponse = userService.userPatch(
+        UserResponse userResponse = userService.patchUser(
                 UserCreator.patchUser().getId(), UserPatchRequestBodyCreator.patchUserRequestBody());
 
         Assertions.assertThat(userResponse).isNotNull();

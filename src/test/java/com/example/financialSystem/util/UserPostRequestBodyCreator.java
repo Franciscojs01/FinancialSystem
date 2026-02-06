@@ -15,8 +15,8 @@ public class UserPostRequestBodyCreator {
                 .build();
     }
 
-    public static UserAdminRequest createAdminUserPostRequestBody() {
-        return UserAdminRequest.builder()
+    public static UserRequest createAdminUserPostRequestBody() {
+        return UserRequest.builder()
                 .name(UserCreator.createUserAdmin().getName())
                 .email(UserCreator.createUserAdmin().getEmail())
                 .password(UserCreator.createUserAdmin().getLogin().getPassword())
@@ -24,8 +24,8 @@ public class UserPostRequestBodyCreator {
                 .build();
     }
 
-    public static UserAdminRequest createAdminUserPostITRequestBody() {
-        return UserAdminRequest.builder()
+    public static UserRequest createAdminUserPostITRequestBody() {
+        return UserRequest.builder()
                 .name("Integration Admin")
                 .email("integration-admin")
                 .password("admin321")

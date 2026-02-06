@@ -1,6 +1,5 @@
 package com.example.financialSystem.controller;
 
-import com.example.financialSystem.model.dto.requests.UserAdminRequest;
 import com.example.financialSystem.model.dto.requests.UserPatchRequest;
 import com.example.financialSystem.model.dto.requests.UserRequest;
 import com.example.financialSystem.model.dto.responses.UserResponse;
@@ -20,7 +19,7 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/admin/create")
-    public ResponseEntity<UserResponse> registerAdminUser(@Valid @RequestBody UserAdminRequest request) {
+    public ResponseEntity<UserResponse> registerAdminUser(@Valid @RequestBody UserRequest request) {
         return ResponseEntity.ok().body(userService.registerAdminUser(request));
     }
 
@@ -31,12 +30,12 @@ public class UserController {
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<UserResponse> editUser(@PathVariable int id, @RequestBody UserRequest request) {
-        return ResponseEntity.ok().body(userService.userUpdate(id, request));
+        return ResponseEntity.ok().body(userService.updateUser(id, request));
     }
 
     @PatchMapping("/patch/{id}")
     public ResponseEntity<UserResponse> patchUser(@PathVariable int id, @RequestBody UserPatchRequest request) {
-        return ResponseEntity.ok().body(userService.userPatch(id, request));
+        return ResponseEntity.ok().body(userService.patchUser(id, request));
     }
 
     @GetMapping("/list/all")
