@@ -4,6 +4,7 @@ import com.example.financialSystem.exception.duplicate.UserDuplicateException;
 import com.example.financialSystem.exception.notFound.UserNotFoundException;
 import com.example.financialSystem.model.dto.requests.UserPatchRequest;
 import com.example.financialSystem.model.dto.requests.UserRequest;
+import com.example.financialSystem.model.dto.responses.UserFinancialResponse;
 import com.example.financialSystem.model.dto.responses.UserResponse;
 import com.example.financialSystem.model.entity.Login;
 import com.example.financialSystem.model.entity.User;
@@ -18,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -30,6 +32,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
 
     public UserService(LoginRepository loginRepository, PasswordEncoder passwordEncoder,
                        UserRepository userRepository, UserMapper userMapper) {
+        super(loginRepository);
         this.loginRepository = loginRepository;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
@@ -45,7 +48,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
                         new UsernameNotFoundException("User not found with username: " + username)
                 );
 
-        if (Boolean.TRUE.equals(login.getUser().getDeleted())) {
+        if (login.getUser().getDeleted()) {
             throw new UsernameNotFoundException("User is inactive");
         }
 
@@ -60,9 +63,6 @@ public class UserService extends UserLoggedService implements UserDetailsService
                 });
 
         User newUser = userMapper.toEntityAdmin(request);
-        if (request.getAnniversaryDate() != null) {
-            newUser.setAnniversaryDate(request.getAnniversaryDate());
-        }
         newUser.setUserRole(UserRole.ADMIN);
 
         Login login = new Login(
@@ -85,9 +85,6 @@ public class UserService extends UserLoggedService implements UserDetailsService
                 });
 
         User newUser = userMapper.toEntity(request);
-        if (request.getAnniversaryDate() != null) {
-            newUser.setAnniversaryDate(request.getAnniversaryDate());
-        }
         newUser.setUserRole(UserRole.USER);
 
         Login login = new Login(
@@ -141,6 +138,12 @@ public class UserService extends UserLoggedService implements UserDetailsService
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
+    public List<UserFinancialResponse> listAllUserFinancial() {
+        return userMapper.toFinancialResponseList(userRepository.findAllWithFinancials());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     public void deactivateUser(int id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
@@ -149,7 +152,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
             throw new IllegalStateException("User is already inactive");
         }
 
-        user.setDeleted(true);
+        user.setDeleted(Boolean.TRUE);
         userRepository.save(user);
     }
 
@@ -162,7 +165,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
             throw new IllegalStateException("User is already active");
         }
 
-        user.setDeleted(false);
+        user.setDeleted(Boolean.FALSE);
         userRepository.save(user);
     }
 

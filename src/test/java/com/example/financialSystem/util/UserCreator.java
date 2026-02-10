@@ -46,14 +46,38 @@ public class UserCreator {
     }
 
     public static User createActiveUser() {
-        User user = createUser();
+        User user = new User();
+        user.setName("John Active");
+        user.setEmail("john.active@gmail.com");
+        user.setAnniversaryDate(LocalDate.of(2008, 1, 1));
+        user.setUserRole(UserRole.USER);
         user.setDeleted(false);
+
+        Login login = new Login();
+        login.setUsername(user.getEmail());
+        login.setPassword("123");
+        login.setUser(user);
+
+        user.setLogin(login);
+
         return user;
     }
 
     public static User createInactiveUser() {
-        User user = createUser();
+        User user = new User();
+        user.setName("John Inactive");
+        user.setEmail("john.inactive@gmail.com");
+        user.setAnniversaryDate(LocalDate.of(2008, 1, 1));
+        user.setUserRole(UserRole.USER);
         user.setDeleted(true);
+
+        Login login = new Login();
+        login.setUsername(user.getEmail());
+        login.setPassword("123");
+        login.setUser(user);
+
+        user.setLogin(login);
+
         return user;
     }
 

@@ -14,4 +14,8 @@ public interface UserRepository extends BaseRepository<User, Integer> {
     @EntityGraph(attributePaths = {"login"})
     @Query("SELECT e FROM #{#entityName} e WHERE e.deleted = false")
     List<User> findAllActive();
+
+    @EntityGraph(attributePaths = {"financial","login"})
+    @Query("select u from User u where u.deleted = false")
+    List<User> findAllWithFinancials();
 }

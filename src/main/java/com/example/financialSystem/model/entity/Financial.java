@@ -25,7 +25,6 @@ import java.time.LocalDate;
 @EntityListeners(FinancialTypeListener.class)
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Financial extends BaseEntity {
-    @NotNull(message = "Value is required")
     @DecimalMin(value = "0.01", message = "Value must be greater than 0")
     private BigDecimal value;
 

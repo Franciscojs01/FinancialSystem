@@ -61,7 +61,7 @@ class UserRepositoryTest extends UserCreator {
         User userToBeSaved = createUserAdmin();
         User savedUser = userRepository.saveAndFlush(userToBeSaved);
 
-        savedUser.setDeleted(true);
+        savedUser.setDeleted(Boolean.TRUE);
         userRepository.saveAndFlush(savedUser);
 
         Optional<User> optionalUser = userRepository.findById(savedUser.getId());

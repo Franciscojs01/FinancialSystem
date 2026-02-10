@@ -15,8 +15,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/expense")
 public class ExpenseController {
-    @Autowired
-    private ExpenseService expenseService;
+
+    private final ExpenseService expenseService;
+
+    public ExpenseController(ExpenseService expenseService) {
+        this.expenseService = expenseService;
+    }
 
     @PostMapping("/create")
     public ResponseEntity<ExpenseResponse> createExpense(@Valid @RequestBody ExpenseRequest expenseRequest) {

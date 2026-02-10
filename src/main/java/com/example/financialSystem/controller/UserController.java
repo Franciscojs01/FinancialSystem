@@ -2,10 +2,10 @@ package com.example.financialSystem.controller;
 
 import com.example.financialSystem.model.dto.requests.UserPatchRequest;
 import com.example.financialSystem.model.dto.requests.UserRequest;
+import com.example.financialSystem.model.dto.responses.UserFinancialResponse;
 import com.example.financialSystem.model.dto.responses.UserResponse;
 import com.example.financialSystem.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,8 +15,11 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserController {
 
-    @Autowired
-    UserService userService;
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("/admin/create")
     public ResponseEntity<UserResponse> registerAdminUser(@Valid @RequestBody UserRequest request) {
@@ -41,6 +44,11 @@ public class UserController {
     @GetMapping("/list/all")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok().body(userService.listAllUser());
+    }
+
+    @GetMapping("/list/financial")
+    public ResponseEntity<List<UserFinancialResponse>> getAllUsersFinancial() {
+        return ResponseEntity.ok().body(userService.listAllUserFinancial());
     }
 
     @GetMapping("/{id}")

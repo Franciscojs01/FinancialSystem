@@ -1,5 +1,6 @@
 package com.example.financialSystem.model.dto.requests;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,15 +14,13 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class UserRequest {
-    @NotNull(message = "name is required")
+    @NotBlank(message = "name cannot be blank")
     private String name;
-
-    @NotNull(message = "email is required")
+    @NotBlank(message = "email cannot be blank")
     private String email;
-
-    @NotNull(message = "password is required")
+    @NotBlank(message = "password cannot be blank")
     private String password;
-
+    @NotNull(message = "anniversaryDate cannot be null")
     private LocalDate anniversaryDate;
 
 }

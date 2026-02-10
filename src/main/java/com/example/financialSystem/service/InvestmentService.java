@@ -14,6 +14,7 @@ import com.example.financialSystem.model.enums.InvestmentType;
 import com.example.financialSystem.model.enums.UserRole;
 import com.example.financialSystem.model.mapper.InvestmentMapper;
 import com.example.financialSystem.repository.InvestmentRepository;
+import com.example.financialSystem.repository.LoginRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -31,8 +32,10 @@ public class InvestmentService extends UserLoggedService {
     private final InvestmentRepository investmentRepository;
     private final InvestmentMapper investmentMapper;
 
-    public InvestmentService(InvestmentRepository investmentRepository,
+    public InvestmentService(LoginRepository loginRepository,
+                             InvestmentRepository investmentRepository,
                              InvestmentMapper investmentMapper) {
+        super(loginRepository);
         this.investmentRepository = investmentRepository;
         this.investmentMapper = investmentMapper;
     }
@@ -122,11 +125,11 @@ public class InvestmentService extends UserLoggedService {
 
         validateOwnerShip(investment);
 
-        if (!investment.getDeleted()) {
+        if (Boolean.FALSE.equals(investment.getDeleted())) {
             throw new IllegalStateException("Investment is already active");
         }
 
-        investment.setDeleted(false);
+        investment.setDeleted(Boolean.FALSE);
         investmentRepository.save(investment);
     }
 
@@ -137,11 +140,11 @@ public class InvestmentService extends UserLoggedService {
 
         validateOwnerShip(investment);
 
-        if (investment.getDeleted()) {
+        if (Boolean.TRUE.equals(investment.getDeleted())) {
             throw new IllegalStateException("Investment is already deleted");
         }
 
-        investment.setDeleted(true);
+        investment.setDeleted(Boolean.TRUE);
         investmentRepository.save(investment);
     }
 
@@ -155,9 +158,7 @@ public class InvestmentService extends UserLoggedService {
 
         validateOwnerShip(investment);
 
-        double annualRate = (investment.getInvestmentType().getRate() != null)
-                ? investment.getInvestmentType().getRate()
-                : investment.getBaseCurrency().getAnnualRate();
+        double annualRate = getAnnualRate(investment);
 
         BigDecimal futureValue =
                 calculateFutureValue(investment.getValue(), annualRate, days);
@@ -169,7 +170,7 @@ public class InvestmentService extends UserLoggedService {
         return resp;
     }
 
-    private BigDecimal calculateFutureValue(BigDecimal initialValue, double annualRate, long days) {
+    private BigDecimal calculateFutureValue(BigDecimal initialValue, double annualRate, int days) {
 
         if (days < 0) days = 0;
 
@@ -183,16 +184,20 @@ public class InvestmentService extends UserLoggedService {
 
     private BigDecimal calculateCurrentValue(Investment investment) {
 
-        long days = ChronoUnit.DAYS.between(
+        int days = Math.toIntExact(ChronoUnit.DAYS.between(
                 investment.getDateFinancial(),
                 LocalDate.now()
-        );
+        ));
 
-        double annualRate = (investment.getInvestmentType().getRate() != null)
-                ? investment.getInvestmentType().getRate()
-                : investment.getBaseCurrency().getAnnualRate();
+        double annualRate = getAnnualRate(investment);
 
         return calculateFutureValue(investment.getValue(), annualRate, days);
+    }
+
+    private double getAnnualRate(Investment investment) {
+        return (investment.getInvestmentType().getRate() != null)
+                ? investment.getInvestmentType().getRate()
+                : investment.getBaseCurrency().getAnnualRate();
     }
 
     private void validateInvestmentDate(LocalDate date) {
@@ -225,7 +230,6 @@ public class InvestmentService extends UserLoggedService {
             throw new NoChangeDetectedException("No changes in this investment");
         }
     }
-
 
     public void recalculateFields(Investment investment) {
         investment.setCurrentValue(calculateCurrentValue(investment));

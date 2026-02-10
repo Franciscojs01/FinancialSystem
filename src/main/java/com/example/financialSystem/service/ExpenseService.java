@@ -13,6 +13,7 @@ import com.example.financialSystem.model.enums.FinancialType;
 import com.example.financialSystem.model.enums.UserRole;
 import com.example.financialSystem.model.mapper.ExpenseMapper;
 import com.example.financialSystem.repository.ExpenseRepository;
+import com.example.financialSystem.repository.LoginRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -27,7 +28,8 @@ public class ExpenseService extends UserLoggedService {
     private final ExpenseRepository expenseRepository;
     private final ExpenseMapper expenseMapper;
 
-    public ExpenseService(ExpenseRepository expenseRepository, ExpenseMapper expenseMapper) {
+    public ExpenseService(LoginRepository loginRepository, ExpenseRepository expenseRepository, ExpenseMapper expenseMapper) {
+        super(loginRepository);
         this.expenseRepository = expenseRepository;
         this.expenseMapper = expenseMapper;
     }
@@ -106,11 +108,11 @@ public class ExpenseService extends UserLoggedService {
 
         validateOwnerShip(expense);
 
-        if (!expense.getDeleted()) {
+        if (Boolean.FALSE.equals(expense.getDeleted())) {
             throw new IllegalArgumentException("Expense is already active");
         }
 
-        expense.setDeleted(false);
+        expense.setDeleted(Boolean.FALSE);
         expenseRepository.save(expense);
     }
 
@@ -121,11 +123,11 @@ public class ExpenseService extends UserLoggedService {
 
         validateOwnerShip(expense);
 
-        if (expense.getDeleted()) {
+        if (Boolean.TRUE.equals(expense.getDeleted())) {
             throw new IllegalStateException("Expense is already deleted");
         }
 
-        expense.setDeleted(true);
+        expense.setDeleted(Boolean.TRUE);
         expenseRepository.save(expense);
     }
 

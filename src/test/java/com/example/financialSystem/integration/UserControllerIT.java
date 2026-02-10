@@ -324,7 +324,7 @@ public class UserControllerIT {
         user.setEmail(ADMIN_USERNAME);
         user.setAnniversaryDate(LocalDate.of(2008, 1, 1));
         user.setUserRole(UserRole.ADMIN);
-        user.setDeleted(false);
+        user.setDeleted(Boolean.FALSE);
 
         User savedUser = userRepository.save(user);
 
@@ -347,7 +347,7 @@ public class UserControllerIT {
         user.setEmail(USER_USERNAME);
         user.setAnniversaryDate(LocalDate.of(2008, 1, 1));
         user.setUserRole(UserRole.USER);
-        user.setDeleted(false);
+        user.setDeleted(Boolean.FALSE);
 
         User savedUser = userRepository.save(user);
 

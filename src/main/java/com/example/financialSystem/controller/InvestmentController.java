@@ -15,8 +15,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/investments")
 public class InvestmentController{
-    @Autowired
-    InvestmentService investmentService;
+
+    private final InvestmentService investmentService;
+
+    public InvestmentController(InvestmentService investmentService) {
+        this.investmentService = investmentService;
+    }
 
     @PostMapping("/create")
     public ResponseEntity<InvestmentResponse> create(@Valid @RequestBody InvestmentRequest investmentRequest) {

@@ -22,7 +22,10 @@ public class Login extends BaseEntity implements UserDetails {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Column(unique = true, nullable = false)
     private String username;
+
+    @Column(nullable = false)
     private String password;
 
     @Override

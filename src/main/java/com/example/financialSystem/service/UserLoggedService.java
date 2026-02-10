@@ -9,8 +9,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 
 public abstract class UserLoggedService {
-    @Autowired
-    private LoginRepository loginRepository;
+    private final LoginRepository loginRepository;
+
+    protected UserLoggedService(LoginRepository loginRepository) {
+        this.loginRepository = loginRepository;
+    }
 
     protected Login getLoggedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

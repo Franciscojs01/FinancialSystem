@@ -13,6 +13,7 @@ import com.example.financialSystem.model.enums.FinancialType;
 import com.example.financialSystem.model.enums.UserRole;
 import com.example.financialSystem.model.mapper.CostMapper;
 import com.example.financialSystem.repository.CostRepository;
+import com.example.financialSystem.repository.LoginRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -27,7 +28,8 @@ public class CostService extends UserLoggedService {
     private final CostRepository costRepository;
     private final CostMapper costMapper;
 
-    public CostService(CostRepository costRepository, CostMapper costMapper) {
+    public CostService(LoginRepository loginRepository, CostRepository costRepository, CostMapper costMapper) {
+        super(loginRepository);
         this.costRepository = costRepository;
         this.costMapper = costMapper;
     }
@@ -104,11 +106,11 @@ public class CostService extends UserLoggedService {
 
         validateOwerShip(cost);
 
-        if (!cost.getDeleted()) {
+        if (Boolean.FALSE.equals(cost.getDeleted())) {
             throw new IllegalArgumentException("Cost is already active");
         }
 
-        cost.setDeleted(false);
+        cost.setDeleted(Boolean.FALSE);
         costRepository.save(cost);
     }
 
@@ -119,11 +121,11 @@ public class CostService extends UserLoggedService {
 
         validateOwerShip(cost);
 
-        if (cost.getDeleted()) {
+        if (Boolean.TRUE.equals(cost.getDeleted())) {
             throw new IllegalStateException("Cost is already deleted");
         }
 
-        cost.setDeleted(true);
+        cost.setDeleted(Boolean.TRUE);
         costRepository.save(cost);
     }
 

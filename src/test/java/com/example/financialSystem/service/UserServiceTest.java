@@ -97,28 +97,28 @@ class UserServiceTest {
 
         BDDMockito.when(userMapperMock.toEntity(ArgumentMatchers.any()))
                 .thenAnswer(inv -> {
-                    var req = (com.example.financialSystem.model.dto.requests.UserRequest) inv.getArgument(0);
+                    var req = (UserRequest) inv.getArgument(0);
                     User u = new User();
                     u.setName(req.getName());
                     u.setEmail(req.getEmail());
-                    u.setDeleted(false);
+                    u.setDeleted(Boolean.FALSE);
                     return u;
                 });
 
         BDDMockito.when(userMapperMock.toEntityAdmin(ArgumentMatchers.any()))
                 .thenAnswer(inv -> {
-                    var req = (com.example.financialSystem.model.dto.requests.UserRequest) inv.getArgument(0);
+                    var req = (UserRequest) inv.getArgument(0);
                     User u = new User();
                     u.setName(req.getName());
                     u.setEmail(req.getEmail());
-                    u.setDeleted(false);
+                    u.setDeleted(Boolean.FALSE);
                     return u;
                 });
 
         BDDMockito.when(userMapperMock.toRequest(ArgumentMatchers.any(User.class)))
                 .thenAnswer(inv -> {
                     User u = inv.getArgument(0);
-                    return com.example.financialSystem.model.dto.requests.UserRequest.builder()
+                    return UserRequest.builder()
                             .name(u.getName())
                             .email(u.getEmail())
                             .build();
@@ -167,10 +167,12 @@ class UserServiceTest {
     @Test
     @DisplayName("Should return UserResponse when registering a default user successfully")
     void registerUser_ReturnsUserResponse_WhenSuccessful() {
-        UserResponse userResponse = userService.registerUser(UserPostRequestBodyCreator.createUserPostRequestBody());
+        UserRequest request = UserPostRequestBodyCreator.createUserPostRequestBody();
+        UserResponse userResponse = userService.registerUser(request);
 
         Assertions.assertThat(userResponse).isNotNull();
-        Assertions.assertThat(userResponse).isEqualTo(UserCreator.createValidUser());
+        Assertions.assertThat(userResponse.getName()).isEqualTo(request.getName());
+        Assertions.assertThat(userResponse.getEmail()).isEqualTo(request.getEmail());
     }
 
 

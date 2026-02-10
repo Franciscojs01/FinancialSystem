@@ -10,13 +10,12 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public abstract class BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
     @Column(nullable = false)
-    private Boolean deleted = false;
+    private Boolean deleted;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -26,11 +25,11 @@ public abstract class BaseEntity {
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
         if (this.deleted == null) {
             this.deleted = false;
         }
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate

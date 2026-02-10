@@ -14,8 +14,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/cost")
 public class CostController {
-    @Autowired
-    CostService costService;
+
+    private final CostService costService;
+
+    public CostController(CostService costService) {
+        this.costService = costService;
+    }
 
     @PostMapping("/create")
     public ResponseEntity<CostResponse> createCost(@Valid @RequestBody CostRequest costRequest) {

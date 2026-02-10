@@ -1,14 +1,12 @@
 package com.example.financialSystem.model.dto.requests;
 
-import jakarta.persistence.Column;
+import jakarta.validation.constraints.NotBlank;
 
 public record LoginRequest(
-        @Column(unique = true, nullable = false)
+        @NotBlank(message = "Username is required")
         String username,
 
-        @Column(nullable = false)
+        @NotBlank(message = "Password is required")
         String password
-
-
 ) {
 }
