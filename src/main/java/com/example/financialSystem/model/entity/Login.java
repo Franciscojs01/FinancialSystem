@@ -18,6 +18,11 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 public class Login extends BaseEntity implements UserDetails {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "login_id")
+    private int id;
+
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;

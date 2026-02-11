@@ -66,6 +66,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
         newUser.setUserRole(UserRole.ADMIN);
 
         Login login = new Login(
+                newUser.getId(),
                 newUser,
                 request.getEmail(),
                 passwordEncoder.encode(request.getPassword())
@@ -88,6 +89,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
         newUser.setUserRole(UserRole.USER);
 
         Login login = new Login(
+                newUser.getId(),
                 newUser,
                 request.getEmail(),
                 passwordEncoder.encode(request.getPassword())

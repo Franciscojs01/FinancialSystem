@@ -25,6 +25,11 @@ import java.time.LocalDate;
 @EntityListeners(FinancialTypeListener.class)
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Financial extends BaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "financial_id")
+    private int id;
+
     @DecimalMin(value = "0.01", message = "Value must be greater than 0")
     private BigDecimal value;
 

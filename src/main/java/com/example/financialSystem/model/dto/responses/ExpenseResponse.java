@@ -3,6 +3,7 @@ package com.example.financialSystem.model.dto.responses;
 import com.example.financialSystem.model.enums.ExpenseType;
 import com.example.financialSystem.model.enums.FinancialType;
 import com.example.financialSystem.util.BenchMarkRate;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,5 +22,7 @@ public class ExpenseResponse {
     private LocalDate dateFinancial;
     private BenchMarkRate baseCurrency;
     private String paymentMethod;
+
+    @JsonProperty("isFixed")
     private boolean isFixed;
 }

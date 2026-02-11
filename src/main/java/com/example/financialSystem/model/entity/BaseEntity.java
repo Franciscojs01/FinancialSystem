@@ -10,10 +10,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public abstract class BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
-
     @Column(nullable = false)
     private Boolean deleted;
 

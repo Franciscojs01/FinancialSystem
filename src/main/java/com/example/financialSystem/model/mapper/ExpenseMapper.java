@@ -10,6 +10,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ExpenseMapper {
+    @Mapping(target = "fixed", source = "isFixed")
     Expense toEntity(ExpenseRequest expenseRequest);
 
     @Mapping(target = "financialType", constant = "EXPENSE")
