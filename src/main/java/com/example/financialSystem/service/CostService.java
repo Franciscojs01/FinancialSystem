@@ -1,24 +1,22 @@
 package com.example.financialSystem.service;
 
+import com.example.financialSystem.exception.NoChangeDetectedException;
 import com.example.financialSystem.exception.duplicate.CostDuplicateException;
 import com.example.financialSystem.exception.notFound.CostNotFoundException;
-import com.example.financialSystem.exception.NoChangeDetectedException;
 import com.example.financialSystem.model.dto.requests.CostPatchRequest;
 import com.example.financialSystem.model.dto.requests.CostRequest;
 import com.example.financialSystem.model.dto.responses.CostResponse;
 import com.example.financialSystem.model.entity.Cost;
 import com.example.financialSystem.model.entity.Login;
 import com.example.financialSystem.model.entity.User;
-import com.example.financialSystem.model.enums.FinancialType;
 import com.example.financialSystem.model.enums.UserRole;
 import com.example.financialSystem.model.mapper.CostMapper;
 import com.example.financialSystem.repository.CostRepository;
 import com.example.financialSystem.repository.LoginRepository;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -34,6 +32,7 @@ public class CostService extends UserLoggedService {
         this.costMapper = costMapper;
     }
 
+    @Transactional
     public CostResponse createCost(CostRequest request) {
         User user = getLoggedUser().getUser();
 

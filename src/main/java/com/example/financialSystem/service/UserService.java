@@ -56,6 +56,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
     public UserResponse registerAdminUser(UserRequest request) {
         loginRepository.findByUsername(request.getEmail())
                 .ifPresent(existing -> {
@@ -79,6 +80,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
         return new UserResponse(newUser.getName(), newUser.getEmail());
     }
 
+    @Transactional
     public UserResponse registerUser(UserRequest request) {
         loginRepository.findByUsername(request.getEmail())
                 .ifPresent(existing -> {
@@ -101,6 +103,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
         return new UserResponse(newUser.getName(), newUser.getEmail());
     }
 
+    @Transactional
     public UserResponse updateUser(int id, UserRequest request) {
         User user = userRepository.findById(id)
                         .orElseThrow(() -> new UserNotFoundException(id));
@@ -113,6 +116,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
         return userMapper.toResponse(userRepository.save(user));
     }
 
+    @Transactional
     public UserResponse patchUser(int id, UserPatchRequest patchRequest) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));

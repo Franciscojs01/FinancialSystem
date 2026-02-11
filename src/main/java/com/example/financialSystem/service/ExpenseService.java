@@ -1,24 +1,22 @@
 package com.example.financialSystem.service;
 
+import com.example.financialSystem.exception.NoChangeDetectedException;
 import com.example.financialSystem.exception.duplicate.ExpenseDuplicateException;
 import com.example.financialSystem.exception.notFound.ExpenseNotFoundException;
-import com.example.financialSystem.exception.NoChangeDetectedException;
 import com.example.financialSystem.model.dto.requests.ExpensePatchRequest;
 import com.example.financialSystem.model.dto.requests.ExpenseRequest;
 import com.example.financialSystem.model.dto.responses.ExpenseResponse;
 import com.example.financialSystem.model.entity.Expense;
 import com.example.financialSystem.model.entity.Login;
 import com.example.financialSystem.model.entity.User;
-import com.example.financialSystem.model.enums.FinancialType;
 import com.example.financialSystem.model.enums.UserRole;
 import com.example.financialSystem.model.mapper.ExpenseMapper;
 import com.example.financialSystem.repository.ExpenseRepository;
 import com.example.financialSystem.repository.LoginRepository;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -34,6 +32,7 @@ public class ExpenseService extends UserLoggedService {
         this.expenseMapper = expenseMapper;
     }
 
+    @Transactional
     public ExpenseResponse createExpense(ExpenseRequest request) {
         User user = getLoggedUser().getUser();
 

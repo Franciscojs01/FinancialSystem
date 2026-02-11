@@ -1,25 +1,23 @@
 package com.example.financialSystem.service;
 
+import com.example.financialSystem.exception.NoChangeDetectedException;
 import com.example.financialSystem.exception.duplicate.InvestmentDuplicateException;
 import com.example.financialSystem.exception.notFound.InvestmentNotFoundException;
-import com.example.financialSystem.exception.NoChangeDetectedException;
 import com.example.financialSystem.model.dto.requests.InvestmentPatchRequest;
 import com.example.financialSystem.model.dto.requests.InvestmentRequest;
 import com.example.financialSystem.model.dto.responses.InvestmentResponse;
 import com.example.financialSystem.model.entity.Investment;
 import com.example.financialSystem.model.entity.Login;
 import com.example.financialSystem.model.entity.User;
-import com.example.financialSystem.model.enums.FinancialType;
 import com.example.financialSystem.model.enums.InvestmentType;
 import com.example.financialSystem.model.enums.UserRole;
 import com.example.financialSystem.model.mapper.InvestmentMapper;
 import com.example.financialSystem.repository.InvestmentRepository;
 import com.example.financialSystem.repository.LoginRepository;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -40,6 +38,7 @@ public class InvestmentService extends UserLoggedService {
         this.investmentMapper = investmentMapper;
     }
 
+    @Transactional
     public InvestmentResponse createInvestment(InvestmentRequest request) {
         User user = getLoggedUser().getUser();
 
