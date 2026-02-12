@@ -1,9 +1,9 @@
 package com.example.financialSystem.util;
 
-import com.example.financialSystem.model.dto.responses.UserResponse;
-import com.example.financialSystem.model.entity.Login;
-import com.example.financialSystem.model.entity.User;
-import com.example.financialSystem.model.enums.UserRole;
+import com.example.financialSystem.models.dto.responses.UserResponse;
+import com.example.financialSystem.models.entity.Login;
+import com.example.financialSystem.models.entity.User;
+import com.example.financialSystem.models.enums.UserRole;
 
 import java.time.LocalDate;
 

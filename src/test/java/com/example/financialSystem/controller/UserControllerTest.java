@@ -1,9 +1,10 @@
 package com.example.financialSystem.controller;
 
-import com.example.financialSystem.model.dto.requests.UserRequest;
-import com.example.financialSystem.model.dto.responses.UserResponse;
-import com.example.financialSystem.model.entity.User;
-import com.example.financialSystem.service.UserService;
+import com.example.financialSystem.controllers.UserController;
+import com.example.financialSystem.models.dto.requests.UserRequest;
+import com.example.financialSystem.models.dto.responses.UserResponse;
+import com.example.financialSystem.models.entity.User;
+import com.example.financialSystem.services.UserService;
 import com.example.financialSystem.util.UserCreator;
 import com.example.financialSystem.util.UserPatchRequestBodyCreator;
 import com.example.financialSystem.util.UserPostRequestBodyCreator;

@@ -1,6 +1,6 @@
 package com.example.financialSystem.util;
 
-import com.example.financialSystem.model.dto.requests.UserPatchRequest;
+import com.example.financialSystem.models.dto.requests.UserPatchRequest;
 
 public class UserPatchRequestBodyCreator {
     public static UserPatchRequest patchUserRequestBody() {

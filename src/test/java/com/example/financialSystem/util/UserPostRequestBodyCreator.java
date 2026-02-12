@@ -1,6 +1,6 @@
 package com.example.financialSystem.util;
 
-import com.example.financialSystem.model.dto.requests.UserRequest;
+import com.example.financialSystem.models.dto.requests.UserRequest;
 
 import java.time.LocalDate;
 

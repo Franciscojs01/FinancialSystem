@@ -1,15 +1,15 @@
 package com.example.financialSystem.integration;
 
-import com.example.financialSystem.model.dto.requests.LoginRequest;
-import com.example.financialSystem.model.dto.requests.UserPatchRequest;
-import com.example.financialSystem.model.dto.requests.UserRequest;
-import com.example.financialSystem.model.dto.responses.LoginResponse;
-import com.example.financialSystem.model.dto.responses.UserResponse;
-import com.example.financialSystem.model.entity.Login;
-import com.example.financialSystem.model.entity.User;
-import com.example.financialSystem.model.enums.UserRole;
-import com.example.financialSystem.repository.LoginRepository;
-import com.example.financialSystem.repository.UserRepository;
+import com.example.financialSystem.models.dto.requests.LoginRequest;
+import com.example.financialSystem.models.dto.requests.UserPatchRequest;
+import com.example.financialSystem.models.dto.requests.UserRequest;
+import com.example.financialSystem.models.dto.responses.LoginResponse;
+import com.example.financialSystem.models.dto.responses.UserResponse;
+import com.example.financialSystem.models.entity.Login;
+import com.example.financialSystem.models.entity.User;
+import com.example.financialSystem.models.enums.UserRole;
+import com.example.financialSystem.repositories.LoginRepository;
+import com.example.financialSystem.repositories.UserRepository;
 import com.example.financialSystem.util.UserCreator;
 import com.example.financialSystem.util.UserPatchRequestBodyCreator;
 import com.example.financialSystem.util.UserPostRequestBodyCreator;
