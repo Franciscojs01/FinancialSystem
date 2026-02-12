@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: financial-db
+    environment:
+      POSTGRES_DB: financial_organization
+      POSTGRES_USER: financial_user
+      POSTGRES_PASSWORD: financial_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U financial_user -d financial_organization"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: financial-api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_USERNAME: financial_user
+      DB_PASSWORD: financial_password
+      JWT_SECRET: change-me-in-production
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/financial_organization
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
