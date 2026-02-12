@@ -21,6 +21,7 @@ The project focuses on modeling complex entities and designing clear and functio
 - Jakarta Validation
 - MySQL/PostgresSQL
 - Lombok 
+- Docker
 ## 🔑 Authentication & User Management
 
 Endpoints
@@ -60,6 +61,11 @@ Permite o registro e categorização de gastos para controle financeiro:
 * **`PUT /cost/edit/{id}`**: – Updates a cost.
 * **`DELETE /cost/delete/{id}`**: – Deletes a cost.
 
+## Docker 
+git clone <repo>
+cd <folder>
+
+Application -> docker-compose up --build
 
 ## 🤝 Contact
 * **Developer:** Francisco José da Silva Mendes
