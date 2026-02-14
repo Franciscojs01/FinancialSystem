@@ -55,7 +55,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
         return login;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public UserResponse registerAdminUser(UserRequest request) {
         loginRepository.findByUsername(request.getEmail())

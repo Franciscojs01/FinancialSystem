@@ -17,9 +17,7 @@ services:
       retries: 5
 
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: francisc0j0s3/financial-api:1.0.1
     container_name: financial-api
     depends_on:
       db:
