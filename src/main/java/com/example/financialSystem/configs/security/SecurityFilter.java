@@ -6,7 +6,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -17,15 +16,18 @@ import java.util.List;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
-    @Autowired
-    private LoginRepository loginRepository;
+    private final LoginRepository loginRepository;
+    private final TokenService tokenService;
 
-    @Autowired
-    private TokenService tokenService;
+    public SecurityFilter(LoginRepository loginRepository, TokenService tokenService) {
+        this.loginRepository = loginRepository;
+        this.tokenService = tokenService;
+    }
 
     private static final List<String> PUBLIC_PATHS = List.of(
             "/auth/login",
-            "/user/register"
+            "/user/register",
+            "/user/admin/create"
     );
 
     @Override
