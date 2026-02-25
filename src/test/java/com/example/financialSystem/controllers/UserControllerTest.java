@@ -1,6 +1,5 @@
-package com.example.financialSystem.controller;
+package com.example.financialSystem.controllers;
 
-import com.example.financialSystem.controllers.UserController;
 import com.example.financialSystem.models.dto.requests.UserRequest;
 import com.example.financialSystem.models.dto.responses.UserResponse;
 import com.example.financialSystem.models.entity.User;

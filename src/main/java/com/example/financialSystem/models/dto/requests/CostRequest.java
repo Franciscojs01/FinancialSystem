@@ -31,4 +31,5 @@ public record CostRequest(
         BenchMarkRate baseCurrency
 
 ) {
+
 }
