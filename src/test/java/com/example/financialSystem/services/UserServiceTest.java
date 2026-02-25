@@ -1,4 +1,4 @@
-package com.example.financialSystem.service;
+package com.example.financialSystem.services;
 
 import com.example.financialSystem.models.dto.requests.UserPatchRequest;
 import com.example.financialSystem.models.dto.requests.UserRequest;
@@ -8,7 +8,6 @@ import com.example.financialSystem.models.entity.User;
 import com.example.financialSystem.models.mapper.UserMapper;
 import com.example.financialSystem.repositories.LoginRepository;
 import com.example.financialSystem.repositories.UserRepository;
-import com.example.financialSystem.services.UserService;
 import com.example.financialSystem.util.User.UserCreator;
 import com.example.financialSystem.util.User.UserPatchRequestBodyCreator;
 import com.example.financialSystem.util.User.UserPostRequestBodyCreator;
