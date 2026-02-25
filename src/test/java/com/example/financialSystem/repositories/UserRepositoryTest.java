@@ -1,10 +1,8 @@
-package com.example.financialSystem.repository;
+package com.example.financialSystem.repositories;
 
 import com.example.financialSystem.models.entity.Login;
 import com.example.financialSystem.models.entity.User;
-import com.example.financialSystem.repositories.LoginRepository;
-import com.example.financialSystem.repositories.UserRepository;
-import com.example.financialSystem.util.UserCreator;
+import com.example.financialSystem.util.User.UserCreator;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
