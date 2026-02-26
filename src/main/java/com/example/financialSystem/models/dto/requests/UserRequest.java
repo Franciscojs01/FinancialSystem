@@ -3,6 +3,7 @@ package com.example.financialSystem.models.dto.requests;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,7 +26,9 @@ public class UserRequest {
 
     @NotBlank(message = "password cannot be blank")
     private String password;
+
     @NotNull(message = "anniversaryDate cannot be null")
+    @Past(message = "you cannot set a future date for anniversaryDate")
     private LocalDate anniversaryDate;
 
 }

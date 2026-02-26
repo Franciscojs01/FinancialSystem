@@ -1,4 +1,4 @@
-package com.example.financialSystem.util;
+package com.example.financialSystem.util.User;
 
 import com.example.financialSystem.models.dto.requests.UserPatchRequest;
 
