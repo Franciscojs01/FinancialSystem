@@ -10,6 +10,7 @@ import com.example.financialSystem.models.entity.Investment;
 import com.example.financialSystem.models.entity.Login;
 import com.example.financialSystem.models.entity.User;
 import com.example.financialSystem.models.enums.InvestmentType;
+import com.example.financialSystem.models.enums.SupportedCrypto;
 import com.example.financialSystem.models.enums.UserRole;
 import com.example.financialSystem.models.mapper.InvestmentMapper;
 import com.example.financialSystem.repositories.InvestmentRepository;
@@ -29,13 +30,19 @@ import java.util.List;
 public class InvestmentService extends UserLoggedService {
     private final InvestmentRepository investmentRepository;
     private final InvestmentMapper investmentMapper;
+    private final CurrencyService currencyService;
+    private final CryptoService cryptoService;
 
     public InvestmentService(LoginRepository loginRepository,
                              InvestmentRepository investmentRepository,
-                             InvestmentMapper investmentMapper) {
+                             InvestmentMapper investmentMapper,
+                             CurrencyService currencyService,
+                             CryptoService cryptoService) {
         super(loginRepository);
         this.investmentRepository = investmentRepository;
         this.investmentMapper = investmentMapper;
+        this.currencyService = currencyService;
+        this.cryptoService = cryptoService;
     }
 
     @Transactional
@@ -170,7 +177,6 @@ public class InvestmentService extends UserLoggedService {
     }
 
     private BigDecimal calculateFutureValue(BigDecimal initialValue, double annualRate, int days) {
-
         if (days < 0) days = 0;
 
         double dailyRate = Math.pow(1 + annualRate, 1.0 / 365) - 1;
@@ -182,6 +188,23 @@ public class InvestmentService extends UserLoggedService {
     }
 
     private BigDecimal calculateCurrentValue(Investment investment) {
+        InvestmentType type = investment.getInvestmentType();
+
+        if (type.isCrypto()) {
+            String coinGeckoId = type.getCoinGeckoId();
+            String fiatBase = investment.getBaseCurrency().name().toLowerCase();
+
+            Double cryptoPrice = cryptoService.getCryptoPrice(coinGeckoId, fiatBase);
+
+            if (cryptoPrice != null) {
+                BigDecimal price = BigDecimal.valueOf(cryptoPrice);
+                BigDecimal quantity = BigDecimal.valueOf(investment.getActionQuantity());
+
+                return price.multiply(quantity).setScale(4, RoundingMode.HALF_UP);
+            }
+
+            return investment.getValue();
+        }
 
         int days = Math.toIntExact(ChronoUnit.DAYS.between(
                 investment.getDateFinancial(),
@@ -194,9 +217,13 @@ public class InvestmentService extends UserLoggedService {
     }
 
     private double getAnnualRate(Investment investment) {
-        return (investment.getInvestmentType().getRate() != null)
-                ? investment.getInvestmentType().getRate()
-                : investment.getBaseCurrency().getAnnualRate();
+        if (investment.getInvestmentType().getRate() != null) {
+            return investment.getInvestmentType().getRate();
+        }
+
+        String currencyCode = investment.getBaseCurrency().name();
+
+        return currencyService.getLiveRates(currencyCode);
     }
 
     private void validateInvestmentDate(LocalDate date) {
