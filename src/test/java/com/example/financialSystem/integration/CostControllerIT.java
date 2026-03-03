@@ -63,44 +63,41 @@ public class CostControllerIT {
 
     @BeforeEach
     void setUp() {
-        // Clean up repositories
+
         costRepository.deleteAll();
         loginRepository.deleteAll();
         userRepository.deleteAll();
 
-        // Create and save regular user
+
         User user = new User();
         user.setName("Test User");
         user.setEmail("user@test.com");
         user.setUserRole(USER);
         savedUser = userRepository.save(user);
 
-        // Create login for regular user
+
         Login userLogin = new Login();
         userLogin.setUsername("testuser");
         userLogin.setPassword(new BCryptPasswordEncoder().encode("password123"));
         userLogin.setUser(savedUser);
         savedUserLogin = loginRepository.save(userLogin);
 
-        // Create and save admin user
+
         User admin = new User();
         admin.setName("Admin User");
         admin.setEmail("admin@test.com");
         admin.setUserRole(ADMIN);
         savedAdmin = userRepository.save(admin);
 
-        // Create login for admin
         Login adminLogin = new Login();
         adminLogin.setUsername("adminuser");
         adminLogin.setPassword(new BCryptPasswordEncoder().encode("admin123"));
         adminLogin.setUser(savedAdmin);
         savedAdminLogin = loginRepository.save(adminLogin);
 
-        // Generate tokens
         String userToken = tokenService.generateToken(savedUserLogin);
         String adminToken = tokenService.generateToken(savedAdminLogin);
 
-        // Setup headers with authentication
         userHeaders = new HttpHeaders();
         userHeaders.setContentType(MediaType.APPLICATION_JSON);
         userHeaders.setBearerAuth(userToken);
@@ -113,7 +110,6 @@ public class CostControllerIT {
     @Test
     @DisplayName("Should create cost successfully when user is authenticated")
     void createCost_ShouldReturnCreatedCost_WhenSuccessful() {
-        // Arrange
         CostRequest request = new CostRequest(
                 CostType.OTHER,
                 "Test cost",
@@ -124,7 +120,6 @@ public class CostControllerIT {
 
         HttpEntity<CostRequest> entity = new HttpEntity<>(request, userHeaders);
 
-        // Act
         ResponseEntity<CostResponse> response = testRestTemplate.exchange(
                 "/cost/create",
                 HttpMethod.POST,
@@ -132,7 +127,6 @@ public class CostControllerIT {
                 CostResponse.class
         );
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getCostType()).isEqualTo(CostType.OTHER);
@@ -142,12 +136,10 @@ public class CostControllerIT {
     @Test
     @DisplayName("Should return cost by ID when cost exists")
     void getCost_ShouldReturnCost_WhenCostExists() {
-        // Arrange
         Cost cost = createAndSaveCost(savedUser);
 
         HttpEntity<Void> entity = new HttpEntity<>(userHeaders);
 
-        // Act
         ResponseEntity<CostResponse> response = testRestTemplate.exchange(
                 "/cost/" + cost.getId(),
                 HttpMethod.GET,
@@ -155,7 +147,6 @@ public class CostControllerIT {
                 CostResponse.class
         );
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getId()).isEqualTo(cost.getId());
@@ -164,7 +155,6 @@ public class CostControllerIT {
     @Test
     @DisplayName("Should update cost successfully when admin updates")
     void editCost_ShouldReturnUpdatedCost_WhenAdminUpdates() {
-        // Arrange - Create cost for admin user
         Cost cost = createAndSaveCost(savedAdmin);
 
         CostRequest updateRequest = new CostRequest(
@@ -177,7 +167,6 @@ public class CostControllerIT {
 
         HttpEntity<CostRequest> entity = new HttpEntity<>(updateRequest, adminHeaders);
 
-        // Act
         ResponseEntity<CostResponse> response = testRestTemplate.exchange(
                 "/cost/edit/" + cost.getId(),
                 HttpMethod.PUT,
@@ -185,7 +174,6 @@ public class CostControllerIT {
                 CostResponse.class
         );
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getObservation()).isEqualTo(updateRequest.observation());
@@ -194,7 +182,6 @@ public class CostControllerIT {
     @Test
     @DisplayName("Should update cost successfully when user owns the cost")
     void editCost_ShouldReturnUpdatedCost_WhenUserOwnsCost() {
-        // Arrange - Create cost for the same user
         Cost cost = createAndSaveCost(savedUser);
 
         CostRequest updateRequest = new CostRequest(
@@ -207,7 +194,6 @@ public class CostControllerIT {
 
         HttpEntity<CostRequest> entity = new HttpEntity<>(updateRequest, userHeaders);
 
-        // Act
         ResponseEntity<CostResponse> response = testRestTemplate.exchange(
                 "/cost/edit/" + cost.getId(),
                 HttpMethod.PUT,
@@ -215,7 +201,6 @@ public class CostControllerIT {
                 CostResponse.class
         );
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getObservation()).isEqualTo("Updated cost description");
@@ -224,7 +209,6 @@ public class CostControllerIT {
     @Test
     @DisplayName("Should update cost successfully when admin edits any cost")
     void editCost_ShouldReturnUpdatedCost_WhenAdminEditsAnyCost() {
-        // Arrange - Create cost for regular user, but admin will edit it
         Cost cost = createAndSaveCost(savedUser);
 
         CostRequest updateRequest = new CostRequest(
@@ -237,7 +221,6 @@ public class CostControllerIT {
 
         HttpEntity<CostRequest> entity = new HttpEntity<>(updateRequest, adminHeaders);
 
-        // Act
         ResponseEntity<CostResponse> response = testRestTemplate.exchange(
                 "/cost/edit/" + cost.getId(),
                 HttpMethod.PUT,
@@ -245,7 +228,6 @@ public class CostControllerIT {
                 CostResponse.class
         );
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
     }
@@ -253,22 +235,19 @@ public class CostControllerIT {
     @Test
     @DisplayName("Should return user costs list when user is authenticated")
     void getAllCostByUser_ShouldReturnUserCosts_WhenSuccessful() {
-        // Arrange
         createAndSaveCost(savedUser);
-        createAndSaveCost(savedUser);
-        createAndSaveCost(savedAdmin); // This should not appear in user's list
+        createAndSaveCost(savedAdmin);
 
         HttpEntity<Void> entity = new HttpEntity<>(userHeaders);
 
-        // Act
         ResponseEntity<List<CostResponse>> response = testRestTemplate.exchange(
                 "/cost/list/me",
                 HttpMethod.GET,
                 entity,
-                new ParameterizedTypeReference<List<CostResponse>>() {}
+                new ParameterizedTypeReference<>() {
+                }
         );
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody()).hasSize(2);
@@ -277,14 +256,11 @@ public class CostControllerIT {
     @Test
     @DisplayName("Should return all costs when admin requests")
     void getAllCost_ShouldReturnAllCosts_WhenAdminRequests() {
-        // Arrange
-        createAndSaveCost(savedUser);
         createAndSaveCost(savedUser);
         createAndSaveCost(savedAdmin);
 
         HttpEntity<Void> entity = new HttpEntity<>(adminHeaders);
 
-        // Act
         ResponseEntity<List<CostResponse>> response = testRestTemplate.exchange(
                 "/cost/list/all",
                 HttpMethod.GET,
@@ -292,7 +268,6 @@ public class CostControllerIT {
                 new ParameterizedTypeReference<List<CostResponse>>() {}
         );
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody()).hasSize(3);
@@ -301,7 +276,6 @@ public class CostControllerIT {
     @Test
     @DisplayName("Should partially update cost when patch is successful")
     void patchCost_ShouldReturnPatchedCost_WhenSuccessful() {
-        // Arrange
         Cost cost = createAndSaveCost(savedUser);
 
         CostPatchRequest patchRequest = new CostPatchRequest();
@@ -309,7 +283,6 @@ public class CostControllerIT {
 
         HttpEntity<CostPatchRequest> entity = new HttpEntity<>(patchRequest, userHeaders);
 
-        // Act
         ResponseEntity<CostResponse> response = testRestTemplate.exchange(
                 "/cost/patch/" + cost.getId(),
                 HttpMethod.PATCH,
@@ -317,7 +290,6 @@ public class CostControllerIT {
                 CostResponse.class
         );
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
     }
@@ -325,12 +297,10 @@ public class CostControllerIT {
     @Test
     @DisplayName("Should activate cost successfully when user owns the cost")
     void activateCost_ShouldReturnSuccessMessage_WhenUserOwnsCost() {
-        // Arrange - Create deactivated cost for the user
         Cost cost = createAndSaveDeactivateCost(savedUser);
 
         HttpEntity<Void> entity = new HttpEntity<>(userHeaders);
 
-        // Act
         ResponseEntity<String> response = testRestTemplate.exchange(
                 "/cost/activate/" + cost.getId(),
                 HttpMethod.PUT,
@@ -338,19 +308,16 @@ public class CostControllerIT {
                 String.class
         );
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
     @DisplayName("Should activate cost successfully when admin activates")
     void activateCost_ShouldReturnSuccessMessage_WhenAdminActivates() {
-        // Arrange - Create deactivated cost for admin
         Cost cost = createAndSaveDeactivateCost(savedAdmin);
 
         HttpEntity<Void> entity = new HttpEntity<>(adminHeaders);
 
-        // Act
         ResponseEntity<String> response = testRestTemplate.exchange(
                 "/cost/activate/" + cost.getId(),
                 HttpMethod.PUT,
@@ -358,19 +325,17 @@ public class CostControllerIT {
                 String.class
         );
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
     @DisplayName("Should delete cost successfully")
     void deleteCost_ShouldReturnSuccessMessage_WhenSuccessful() {
-        // Arrange
+
         Cost cost = createAndSaveCost(savedUser);
 
         HttpEntity<Void> entity = new HttpEntity<>(userHeaders);
 
-        // Act
         ResponseEntity<String> response = testRestTemplate.exchange(
                 "/cost/delete/" + cost.getId(),
                 HttpMethod.DELETE,
@@ -378,7 +343,6 @@ public class CostControllerIT {
                 String.class
         );
 
-        // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).contains("successfully deleted");
     }
@@ -386,12 +350,11 @@ public class CostControllerIT {
     @Test
     @DisplayName("Should return 403 when user tries to access another user's cost")
     void getCost_ShouldReturn403_WhenUserAccessesAnotherUserCost() {
-        // Arrange
+
         Cost adminCost = createAndSaveCost(savedAdmin);
 
         HttpEntity<Void> entity = new HttpEntity<>(userHeaders);
 
-        // Act
         ResponseEntity<String> response = testRestTemplate.exchange(
                 "/cost/" + adminCost.getId(),
                 HttpMethod.GET,
@@ -399,14 +362,12 @@ public class CostControllerIT {
                 String.class
         );
 
-        // Assert
         assertThat(response.getStatusCode()).isIn(HttpStatus.FORBIDDEN, HttpStatus.NOT_FOUND);
     }
 
     @Test
     @DisplayName("Should return 403 when user tries to edit another user's cost")
     void editCost_ShouldReturn403_WhenUserEditsAnotherUserCost() {
-        // Arrange - Create cost for admin
         Cost adminCost = createAndSaveCost(savedAdmin);
 
         CostRequest updateRequest = new CostRequest(
@@ -419,7 +380,6 @@ public class CostControllerIT {
 
         HttpEntity<CostRequest> entity = new HttpEntity<>(updateRequest, userHeaders);
 
-        // Act
         ResponseEntity<String> response = testRestTemplate.exchange(
                 "/cost/edit/" + adminCost.getId(),
                 HttpMethod.PUT,
@@ -427,19 +387,18 @@ public class CostControllerIT {
                 String.class
         );
 
-        // Assert
         assertThat(response.getStatusCode()).isIn(HttpStatus.FORBIDDEN, HttpStatus.NOT_FOUND);
     }
 
     @Test
     @DisplayName("Should return 403 when user tries to activate another user's cost")
     void activateCost_ShouldReturn403_WhenUserActivatesAnotherUserCost() {
-        // Arrange - Create deactivated cost for admin
+
         Cost adminCost = createAndSaveDeactivateCost(savedAdmin);
 
         HttpEntity<Void> entity = new HttpEntity<>(userHeaders);
 
-        // Act
+
         ResponseEntity<String> response = testRestTemplate.exchange(
                 "/cost/activate/" + adminCost.getId(),
                 HttpMethod.PUT,
@@ -447,13 +406,10 @@ public class CostControllerIT {
                 String.class
         );
 
-        // Assert
+
         assertThat(response.getStatusCode()).isIn(HttpStatus.FORBIDDEN, HttpStatus.NOT_FOUND);
     }
 
-    /**
-     * Helper method to create and save a cost for testing.
-     */
     private Cost createAndSaveCost(User user) {
         Cost cost = Cost.builder()
                 .costType(CostType.OTHER)

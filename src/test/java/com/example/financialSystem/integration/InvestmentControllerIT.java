@@ -198,7 +198,7 @@ public class InvestmentControllerIT {
         Investment investment = createAndSaveInvestment(savedUser);
 
         InvestmentRequest updateRequest = new InvestmentRequest(
-                InvestmentType.CRYPTO,
+                InvestmentType.CRYPTO_BTC,
                 new BigDecimal("5000.00"),
                 LocalDate.now(),
                 BenchMarkRate.BRL,
