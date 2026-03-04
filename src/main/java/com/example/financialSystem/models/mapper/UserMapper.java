@@ -21,7 +21,7 @@ public interface UserMapper {
 
     List<UserFinancialResponse> toFinancialResponseList(List<User> entity);
 
-    @Mapping(target = "financials", source = "financial")
+    @Mapping(source = "financials", target = "financial")
     UserFinancialResponse userToUserFinancialResponse(User user);
 
     UserRequest toRequest(User entity);
