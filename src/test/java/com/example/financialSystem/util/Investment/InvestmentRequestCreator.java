@@ -34,7 +34,7 @@ public class InvestmentRequestCreator {
 
     public static InvestmentPatchRequest createInvestmentPatchRequest() {
         return new InvestmentPatchRequest(
-                InvestmentType.CRYPTO,
+                InvestmentType.CRYPTO_DOGE,
                 new BigDecimal("7500.00"),
                 null,
                 null,
