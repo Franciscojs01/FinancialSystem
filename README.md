@@ -47,7 +47,7 @@ STOCK, FUND, CRYPTO, FIXED_INCOME, TREASURY.
 
 Permite o registro e categorização de gastos para controle financeiro:
 
-* **Tipos de Despesa:** `FOOD`, `TRANSPORT`, `HOUSING`, `HEALTH`, `LEISURE`, `OTHER`.
+* **Expenses Types:** `FOOD`, `TRANSPORT`, `HOUSING`, `HEALTH`, `LEISURE`, `OTHER`.
 * **`POST /expense/create`**: Creates a new expense.
 * **`PUT /expense/edit/{id}`**: Updates an existing expense.
 * **`GET /expense/list `**: Lists all expenses.
