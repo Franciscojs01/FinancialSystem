@@ -21,9 +21,6 @@ public interface UserMapper {
 
     List<UserFinancialResponse> toFinancialResponseList(List<User> entity);
 
-    @Mapping(source = "financials", target = "financial")
-    UserFinancialResponse userToUserFinancialResponse(User user);
-
     UserRequest toRequest(User entity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
