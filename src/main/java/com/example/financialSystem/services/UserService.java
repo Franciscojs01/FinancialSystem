@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService extends UserLoggedService implements UserDetailsService {
@@ -103,7 +104,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
     }
 
     @Transactional
-    public UserResponse updateUser(int id, UserRequest request) {
+    public UserResponse updateUser(UUID id, UserRequest request) {
         User user = userRepository.findById(id)
                         .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -116,7 +117,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
     }
 
     @Transactional
-    public UserResponse patchUser(int id, UserPatchRequest patchRequest) {
+    public UserResponse patchUser(UUID id, UserPatchRequest patchRequest) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -128,7 +129,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    public UserResponse getUserById(int id) {
+    public UserResponse getUserById(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -149,7 +150,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    public void deactivateUser(int id) {
+    public void deactivateUser(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -162,7 +163,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    public void activateUser(int id) {
+    public void activateUser(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 

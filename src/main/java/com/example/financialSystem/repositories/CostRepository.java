@@ -8,13 +8,14 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface CostRepository extends BaseRepository<Cost, Integer> {
 
     boolean existsByUserAndCostTypeAndDateFinancial(User user, CostType type, LocalDate dateFinancial);
 
     @EntityGraph(attributePaths = {"user"})
-    Optional<Cost> findById(int id);
+    Optional<Cost> findById(UUID id);
 
     @EntityGraph(attributePaths = {"user"})
     List<Cost> findByUserAndDeletedFalse(User user);

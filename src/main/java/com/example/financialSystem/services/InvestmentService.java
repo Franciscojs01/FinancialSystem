@@ -25,6 +25,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class InvestmentService extends UserLoggedService {
@@ -68,7 +69,7 @@ public class InvestmentService extends UserLoggedService {
     }
 
     @Transactional
-    public InvestmentResponse updateInvestment(int id, InvestmentRequest request) {
+    public InvestmentResponse updateInvestment(UUID id, InvestmentRequest request) {
         Investment existingInvestment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException(id));
 
@@ -84,7 +85,7 @@ public class InvestmentService extends UserLoggedService {
     }
 
     @Transactional
-    public InvestmentResponse patchInvestment(int id, InvestmentPatchRequest patchRequest) {
+    public InvestmentResponse patchInvestment(UUID id, InvestmentPatchRequest patchRequest) {
         Investment existingInvestment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException(id));
 
@@ -97,7 +98,7 @@ public class InvestmentService extends UserLoggedService {
         return investmentMapper.toResponse(investmentRepository.save(existingInvestment));
     }
 
-    public InvestmentResponse getInvestmentById(int id) {
+    public InvestmentResponse getInvestmentById(UUID id) {
         Investment investment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException(id));
 
@@ -125,7 +126,7 @@ public class InvestmentService extends UserLoggedService {
     }
 
     @Transactional
-    public void activateInvestment(int id) {
+    public void activateInvestment(UUID id) {
         Investment investment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException(id));
 
@@ -140,7 +141,7 @@ public class InvestmentService extends UserLoggedService {
     }
 
     @Transactional
-    public void deleteInvestment(int id) {
+    public void deleteInvestment(UUID id) {
         Investment investment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException(id));
 
@@ -154,7 +155,7 @@ public class InvestmentService extends UserLoggedService {
         investmentRepository.save(investment);
     }
 
-    public InvestmentResponse simulateInvestment(int id, int days) {
+    public InvestmentResponse simulateInvestment(UUID id, int days) {
         if (days <= 0) {
             throw new IllegalArgumentException("Days must be greater than zero");
         }

@@ -10,12 +10,13 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class ExpenseResponse {
-    private int id;
+    private UUID id;
     private ExpenseType expenseType;
     private FinancialType financialType;
     private BigDecimal value;

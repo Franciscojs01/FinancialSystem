@@ -7,12 +7,13 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Getter
 @Setter
 @AllArgsConstructor
 public class FinancialResponse {
-    private int id;
+    private UUID id;
     private BigDecimal value;
     private LocalDate dateFinancial;
     private FinancialType financialType;

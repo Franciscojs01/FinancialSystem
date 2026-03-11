@@ -16,19 +16,21 @@ import java.util.List;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
+
     private final LoginRepository loginRepository;
     private final TokenService tokenService;
+
+    private static final List<String> PUBLIC_PATHS = List.of(
+            "/auth/login",
+            "/user/register",
+            "/user/admin/create",
+            "/auth/logout"
+    );
 
     public SecurityFilter(LoginRepository loginRepository, TokenService tokenService) {
         this.loginRepository = loginRepository;
         this.tokenService = tokenService;
     }
-
-    private static final List<String> PUBLIC_PATHS = List.of(
-            "/auth/login",
-            "/user/register",
-            "/user/admin/create"
-    );
 
     @Override
     protected void doFilterInternal(HttpServletRequest servletHttp, HttpServletResponse response, FilterChain filterChain)
@@ -70,5 +72,4 @@ public class SecurityFilter extends OncePerRequestFilter {
             });
         }
     }
-
 }

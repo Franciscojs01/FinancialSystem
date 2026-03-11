@@ -13,6 +13,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -26,7 +27,7 @@ public abstract class Financial extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "financial_id")
-    private int id;
+    private UUID id;
 
     @DecimalMin(value = "0.01", message = "Value must be greater than 0")
     private BigDecimal value;
