@@ -1,5 +1,6 @@
 package com.example.financialSystem.services;
 
+import com.example.financialSystem.exceptions.UserInactiveException;
 import com.example.financialSystem.exceptions.duplicates.UserDuplicateException;
 import com.example.financialSystem.exceptions.notFound.UserNotFoundException;
 import com.example.financialSystem.models.dto.requests.UserPatchRequest;
@@ -50,7 +51,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
                 );
 
         if (login.getUser().getDeleted()) {
-            throw new UsernameNotFoundException("User is inactive");
+            throw new UserInactiveException("User is inactive");
         }
 
         return login;

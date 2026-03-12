@@ -22,5 +22,4 @@ public interface CostRepository extends BaseRepository<Cost, Integer> {
 
     @EntityGraph(attributePaths = {"user"})
     List<Cost> findAllActive();
-
 }

@@ -33,12 +33,10 @@ public class RefreshTokenService {
     }
 
     public RefreshTokenResponse createRefreshToken(UUID userId, boolean rememberMe) {
+        refreshTokenRepository.deleteByUserId(userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        refreshTokenRepository.findByUser_Id(userId)
-                .ifPresent(refreshTokenRepository::delete);
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
         long expiration = rememberMe ? jwtRefreshRememberMeExpirationMs : jwtRefreshExpirationMs;
 

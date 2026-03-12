@@ -73,6 +73,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(UserInactiveException.class)
+    public ResponseEntity<ExceptionDetails> handleUserInactive(UserInactiveException ex) {
+        ExceptionDetails body = ExceptionDetails.builder()
+                .timestamp(LocalDateTime.now())
+                .statusCode(HttpStatus.FORBIDDEN.value())
+                .title("Inactive User")
+                .details(ex.getMessage())
+                .developerMessage(ex.getClass().getName())
+                .build();
+
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex,

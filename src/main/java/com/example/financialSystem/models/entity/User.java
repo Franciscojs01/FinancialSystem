@@ -41,12 +41,12 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
-    private LocalDate anniversaryDate;
+    private LocalDate birthDay;
 
     public User(String name, String email, LocalDate date) {
         this.name = name;
         this.email = email;
-        this.anniversaryDate = date;
+        this.birthDay = date;
     }
 
 

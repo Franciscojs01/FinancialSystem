@@ -4,7 +4,11 @@ import com.example.financialSystem.models.entity.RefreshToken;
 import com.example.financialSystem.models.entity.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -14,8 +18,11 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Inte
     @EntityGraph(attributePaths = {"user"})
     Optional<RefreshToken> findByToken(String token);
 
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM RefreshToken rt WHERE rt.user.id = :userId")
+    void deleteByUserId(@Param("userId") UUID userId);
+
     void deleteByUser(User user);
 
-    @EntityGraph(attributePaths = {"user"})
-    Optional<RefreshToken> findByUser_Id(UUID userId);
 }

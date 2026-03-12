@@ -27,8 +27,8 @@ public class UserRequest {
     @NotBlank(message = "password cannot be blank")
     private String password;
 
-    @NotNull(message = "anniversaryDate cannot be null")
-    @Past(message = "you cannot set a future date for anniversaryDate")
-    private LocalDate anniversaryDate;
+    @NotNull(message = "birthDay cannot be null")
+    @Past(message = "you cannot set a future date for birthDay")
+    private LocalDate birthDay;
 
 }
