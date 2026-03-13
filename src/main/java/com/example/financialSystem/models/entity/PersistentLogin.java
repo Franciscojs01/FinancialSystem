@@ -11,19 +11,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-/**
- * Entidade que representa a tabela persistent_logins.
- *
- * Obrigatória para o funcionamento do PersistentTokenBasedRememberMeServices
- * do Spring Security. O Hibernate cria/atualiza a tabela automaticamente
- * via spring.jpa.hibernate.ddl-auto=update.
- *
- * Campos:
- *  - series:    chave primária que identifica a sessão (nunca muda)
- *  - username:  identifica o usuário dono do token
- *  - token:     valor do token (rotacionado a cada requisição)
- *  - lastUsed:  data/hora do último uso
- */
+
 @Getter
 @Setter
 @NoArgsConstructor
