@@ -14,9 +14,9 @@ public record CostRequest(
         @NotNull(message = "type is required")
         CostType costType,
 
-        @Schema(description = "observations about the cost", example = "Monthly subscription fee")
-        @NotBlank(message = "observations is required")
-        String observation,
+        @Schema(description = "description about the cost", example = "Monthly subscription fee")
+        @NotBlank(message = "description is required")
+        String description,
 
         @Schema(description = "value of the cost", example = "100.00")
         @NotNull(message = "value is required")

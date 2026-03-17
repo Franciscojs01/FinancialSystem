@@ -135,7 +135,7 @@ public class CostService extends UserLoggedService {
     public void ensureChanged(Cost oldCost, CostRequest newCostReq) {
         boolean unchanged =
                 oldCost.getCostType() ==(newCostReq.costType()) &&
-                        oldCost.getObservation().equals(newCostReq.observation()) &&
+                        oldCost.getDescription().equals(newCostReq.description()) &&
                         oldCost.getValue().compareTo(newCostReq.value()) == 0 &&
                         oldCost.getBaseCurrency() == newCostReq.baseCurrency() &&
                         oldCost.getDateFinancial().equals(newCostReq.dateFinancial());

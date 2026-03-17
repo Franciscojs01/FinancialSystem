@@ -19,11 +19,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 public class Login extends BaseEntity implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "login_id")
-    private UUID id;
-
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;

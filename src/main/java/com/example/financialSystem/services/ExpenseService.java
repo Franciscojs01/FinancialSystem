@@ -137,6 +137,7 @@ public class ExpenseService extends UserLoggedService {
                         && oldExpense.getDateFinancial().equals(newExpReq.dateFinancial())
                         && oldExpense.getValue().compareTo(newExpReq.value()) == 0
                         && oldExpense.getBaseCurrency() == newExpReq.baseCurrency()
+                        && oldExpense.getDescription().equals(newExpReq.description())
                         && oldExpense.getPaymentMethod().equals(newExpReq.paymentMethod())
                         && oldExpense.isFixed() == newExpReq.isFixed();
 

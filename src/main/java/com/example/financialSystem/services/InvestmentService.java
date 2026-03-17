@@ -250,6 +250,7 @@ public class InvestmentService extends UserLoggedService {
                         && oldInvestment.getActionQuantity() == newInvestmentReq.actionQuantity()
                         && oldInvestment.getDateFinancial().isEqual(newInvestmentReq.dateFinancial())
                         && oldInvestment.getValue().compareTo(newInvestmentReq.value()) == 0
+                        && oldInvestment.getDescription().equals(newInvestmentReq.description())
                         && oldInvestment.getBaseCurrency() == newInvestmentReq.baseCurrency()
                         && oldInvestment.getBrokerName().equals(newInvestmentReq.brokerName());
 

@@ -18,8 +18,8 @@ import java.time.LocalDate;
 public class CostPatchRequest {
     @Schema(description = "Name of the cost type", example = "FIXED, VARIABLE, OPERATIONAL, TAX, OTHER")
     private CostType costType;
-    @Schema(description = "observations about the cost", example = "Monthly subscription fee")
-    private String observation;
+    @Schema(description = "description about the cost", example = "Monthly subscription fee")
+    private String description;
     @Schema(description = "value of the cost", example = "100.00")
     private BigDecimal value;
     @Schema(description = "base currency for the cost", example = "USD, EUR, BRL")

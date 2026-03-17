@@ -25,6 +25,8 @@ public class InvestmentPatchRequest {
     private BenchMarkRate baseCurrency;
     @Schema(description = "date of the financial registry", example = "2024-06-01")
     private LocalDate dateFinancial;
+    @Schema(description = "description of investment", example = "Investment in technology stocks")
+    private String description;
     @Schema(description = "quantity of actions for the investment", example = "10")
     @Min(value = 1, message = "Action quantity must be greater than zero")
     private Integer actionQuantity;
