@@ -2,13 +2,11 @@ package com.example.financialSystem.configs.security;
 
 import com.example.financialSystem.services.UserService;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.RememberMeAuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -20,63 +18,21 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-
-import javax.sql.DataSource;
 
 @EnableWebSecurity
-@EnableMethodSecurity(securedEnabled = true)
+@EnableMethodSecurity
 @Configuration
 public class SecurityConfig {
 
     private final SecurityFilter securityFilter;
     private final UserService userService;
-    private final DataSource dataSource;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${app.rememberMe.key}")
-    private String rememberMeKey;
-
-    @Value("${app.rememberMe.cookieMaxAgeSeconds:2592000}")
-    private int rememberMeCookieMaxAge;
-
-    public SecurityConfig(SecurityFilter securityFilter,
-                          @Lazy UserService userService,
-                          DataSource dataSource,
+    public SecurityConfig(SecurityFilter securityFilter, @Lazy UserService userService,
                           PasswordEncoder passwordEncoder) {
         this.securityFilter = securityFilter;
         this.userService = userService;
-        this.dataSource = dataSource;
         this.passwordEncoder = passwordEncoder;
-    }
-
-    @Bean
-    public PersistentTokenRepository persistentTokenRepository() {
-        JdbcTokenRepositoryImpl repo = new JdbcTokenRepositoryImpl();
-        repo.setDataSource(dataSource);
-        return repo;
-    }
-
-    @Bean
-    public PersistentTokenBasedRememberMeServices rememberMeServices() {
-        PersistentTokenBasedRememberMeServices services =
-                new PersistentTokenBasedRememberMeServices(
-                        rememberMeKey,
-                        userService,
-                        persistentTokenRepository()
-                );
-        services.setAlwaysRemember(false);
-        services.setCookieName("remember-me");
-        services.setTokenValiditySeconds(rememberMeCookieMaxAge);
-        services.setParameter("rememberMe");
-        return services;
-    }
-
-    @Bean
-    public RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
-        return new RememberMeAuthenticationProvider(rememberMeKey);
     }
 
     @Bean
@@ -98,12 +54,9 @@ public class SecurityConfig {
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .rememberMe(remember -> remember
-                        .rememberMeServices(rememberMeServices())
-                )
+
                 .logout(logout -> logout
                         .logoutUrl("/auth/logout")
-                        .addLogoutHandler(rememberMeServices())
                         .logoutSuccessHandler((req, res, auth) ->
                                 res.setStatus(HttpServletResponse.SC_NO_CONTENT))
                         .permitAll()

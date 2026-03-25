@@ -16,12 +16,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,15 +36,15 @@ public class AuthController {
 
     public AuthController(AuthService authService,
                           RefreshTokenService refreshTokenService,
-                          TokenService tokenService,
-                          PersistentTokenBasedRememberMeServices rememberMeServices) {
+                          TokenService tokenService
+                          ) {
         this.authService = authService;
         this.refreshTokenService = refreshTokenService;
         this.tokenService = tokenService;
     }
 
     @PostMapping(value = "/login")
-    @Operation(summary = "User login", description = "Authenticates a user and returns a JWT. If rememberMe=true, sets an HTTP-Only persistent cookie.")
+    @Operation(summary = "User login", description = "Authenticates a user and returns JWT tokens for stateless authentication.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully authenticated",
                     content = @Content(schema = @Schema(implementation = LoginResponse.class))),
@@ -56,21 +54,10 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = ExceptionDetails.class)))
     })
     public ResponseEntity<LoginResponse> login(
-            @Valid @RequestBody LoginRequest loginRequest,
-            HttpServletRequest request,
-            HttpServletResponse response) {
+            @Valid @RequestBody LoginRequest loginRequest
+            ) {
 
-        LoginResponse loginResponse = authService.login(loginRequest, request, response);
-
-        if (loginRequest.rememberMe()) {
-            Cookie cookie = new Cookie("jwt", loginResponse.accessToken());
-            cookie.setHttpOnly(true);
-            cookie.setSecure(true);
-            cookie.setPath("/");
-            cookie.setMaxAge(2592000);
-            cookie.setAttribute("SameSite", "Lax");
-            response.addCookie(cookie);
-        }
+        LoginResponse loginResponse = authService.login(loginRequest);
 
         return ResponseEntity.ok(loginResponse);
     }
@@ -86,7 +73,7 @@ public class AuthController {
 
         User user = refreshToken.getUser();
         String newAccessToken = tokenService.generateToken(user.getLogin());
-        RefreshTokenResponse newRefreshToken = refreshTokenService.createRefreshToken(user.getId(), false);
+        RefreshTokenResponse newRefreshToken = refreshTokenService.createRefreshToken(user.getId());
 
         return ResponseEntity.ok(new RefreshTokenResponse(
                 newAccessToken,

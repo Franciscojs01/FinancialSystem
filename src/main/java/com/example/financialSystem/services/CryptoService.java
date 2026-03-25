@@ -1,6 +1,5 @@
 package com.example.financialSystem.services;
 
-import com.example.financialSystem.models.enums.SupportedCrypto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;

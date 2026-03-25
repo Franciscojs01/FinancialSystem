@@ -18,7 +18,7 @@ public class TokenService {
     private String tokenSecret;
 
     private static final String ISSUER = "auth-api";
-    private static final int EXPIRATION_TIME = 2;
+    private static final int EXPIRATION_TIME = 15;
     private static final ZoneOffset TIMEZONE_OFFSET = ZoneOffset.of("-03:00");
 
     public String generateToken(Login user) {

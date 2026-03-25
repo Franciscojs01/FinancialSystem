@@ -8,7 +8,6 @@ import com.example.financialSystem.repositories.RefreshTokenRepository;
 import com.example.financialSystem.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -18,9 +17,6 @@ import java.util.UUID;
 public class RefreshTokenService {
     @Value("${app.jwtRefreshExpirationMs}")
     private Long jwtRefreshExpirationMs;
-
-    @Value("${app.jwtRefreshRememberMeExpirationMs}")
-    private Long jwtRefreshRememberMeExpirationMs;
 
     private final RefreshTokenMapper refreshTokenMapper;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -32,36 +28,27 @@ public class RefreshTokenService {
         this.userRepository = userRepo;
     }
 
-    public RefreshTokenResponse createRefreshToken(UUID userId, boolean rememberMe) {
+    public RefreshTokenResponse createRefreshToken(UUID userId) {
         refreshTokenRepository.deleteByUserId(userId);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
-        long expiration = rememberMe ? jwtRefreshRememberMeExpirationMs : jwtRefreshExpirationMs;
-
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(user);
         refreshToken.setToken(UUID.randomUUID().toString());
-        refreshToken.setExpiryDate(Instant.now().plusMillis(expiration));
-        refreshToken.setRememberMe(rememberMe);
+        refreshToken.setExpiryDate(Instant.now().plusMillis(jwtRefreshExpirationMs));
 
         RefreshToken saved = refreshTokenRepository.save(refreshToken);
-
         return refreshTokenMapper.toRefreshToken(saved);
     }
 
     public void verifyExpiration(RefreshToken token) {
-        if (token.isRememberMe()) {
-            refreshTokenRepository.delete(token);
-            throw new RuntimeException("This user uses Remember Me cookie. Use the cookie-based flow instead.");
-        }
         if (isTokenExpired(token)) {
             refreshTokenRepository.delete(token);
             throw new RuntimeException("Refresh token was expired. Please make a new signin request");
         }
     }
-
 
     public Optional<RefreshToken> findByToken(String token) {
         return refreshTokenRepository.findByToken(token);
@@ -69,11 +56,6 @@ public class RefreshTokenService {
 
     public boolean isTokenExpired(RefreshToken token) {
         return token.getExpiryDate().isBefore(Instant.now());
-    }
-
-    @Transactional
-    public void deleteByUserId(UUID userId) {
-        userRepository.findById(userId).ifPresent(refreshTokenRepository::deleteByUser);
     }
 
 

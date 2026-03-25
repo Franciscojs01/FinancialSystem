@@ -1,7 +1,6 @@
 package com.example.financialSystem.repositories;
 
 import com.example.financialSystem.models.entity.RefreshToken;
-import com.example.financialSystem.models.entity.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -22,7 +21,5 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Inte
     @Transactional
     @Query("DELETE FROM RefreshToken rt WHERE rt.user.id = :userId")
     void deleteByUserId(@Param("userId") UUID userId);
-
-    void deleteByUser(User user);
 
 }
