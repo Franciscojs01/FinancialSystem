@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -18,12 +19,6 @@ import java.util.List;
 @Entity
 @Table(name="users")
 public class User extends BaseEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "user_id")
-    private int id;
-
     @Column(nullable = false)
     private String name;
 
@@ -40,12 +35,12 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
-    private LocalDate anniversaryDate;
+    private LocalDate birthDay;
 
     public User(String name, String email, LocalDate date) {
         this.name = name;
         this.email = email;
-        this.anniversaryDate = date;
+        this.birthDay = date;
     }
 
 

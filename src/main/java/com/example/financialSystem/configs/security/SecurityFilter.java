@@ -16,19 +16,21 @@ import java.util.List;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
+
     private final LoginRepository loginRepository;
     private final TokenService tokenService;
+
+    private static final List<String> PUBLIC_PATHS = List.of(
+            "/auth/login",
+            "/user/register",
+            "/user/admin/create",
+            "/auth/logout"
+    );
 
     public SecurityFilter(LoginRepository loginRepository, TokenService tokenService) {
         this.loginRepository = loginRepository;
         this.tokenService = tokenService;
     }
-
-    private static final List<String> PUBLIC_PATHS = List.of(
-            "/auth/login",
-            "/user/register",
-            "/user/admin/create"
-    );
 
     @Override
     protected void doFilterInternal(HttpServletRequest servletHttp, HttpServletResponse response, FilterChain filterChain)
@@ -63,12 +65,14 @@ public class SecurityFilter extends OncePerRequestFilter {
     private void authenticateUser(String token) {
         String email = tokenService.validateToken(token);
         if (email != null) {
-            loginRepository.findByUsername(email).ifPresent(usuario -> {
+            loginRepository.findByUsername(email).ifPresent(user -> {
+                if (!user.isEnabled()) {
+                    return;
+                }
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+                        new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             });
         }
     }
-
 }

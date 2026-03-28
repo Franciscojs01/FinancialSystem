@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/user")
@@ -91,7 +92,7 @@ public class UserController {
                             schema = @Schema(implementation = ExceptionDetails.class)
                     ))
     })
-    public ResponseEntity<UserResponse> editUser(@PathVariable int id, @RequestBody UserRequest request) {
+    public ResponseEntity<UserResponse> editUser(@PathVariable UUID id, @RequestBody UserRequest request) {
         return ResponseEntity.ok().body(userService.updateUser(id, request));
     }
 
@@ -111,7 +112,7 @@ public class UserController {
                             schema = @Schema(implementation = ExceptionDetails.class)
                     ))
     })
-    public ResponseEntity<UserResponse> patchUser(@PathVariable int id, @RequestBody UserPatchRequest request) {
+    public ResponseEntity<UserResponse> patchUser(@PathVariable UUID id, @RequestBody UserPatchRequest request) {
         return ResponseEntity.ok().body(userService.patchUser(id, request));
     }
 
@@ -165,7 +166,7 @@ public class UserController {
                             schema = @Schema(implementation = ExceptionDetails.class)
                     ))
     })
-    public ResponseEntity<UserResponse> getUser(@PathVariable int id) {
+    public ResponseEntity<UserResponse> getUser(@PathVariable UUID id) {
         return ResponseEntity.ok().body(userService.getUserById(id));
     }
 
@@ -178,7 +179,7 @@ public class UserController {
                             schema = @Schema(implementation = ExceptionDetails.class)
                     ))
     })
-    public ResponseEntity<Void> deactivateUser(@PathVariable int id) {
+    public ResponseEntity<Void> deactivateUser(@PathVariable UUID id) {
         userService.deactivateUser(id);
         return ResponseEntity.noContent().build();
     }
@@ -192,7 +193,7 @@ public class UserController {
                             schema = @Schema(implementation = ExceptionDetails.class)
                     ))
     })
-    public ResponseEntity<Void> activateUser(@PathVariable int id) {
+    public ResponseEntity<Void> activateUser(@PathVariable UUID id) {
         userService.activateUser(id);
         return ResponseEntity.noContent().build();
     }

@@ -6,10 +6,11 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface UserRepository extends BaseRepository<User, Integer> {
     @EntityGraph(attributePaths = {"login"})
-    Optional<User> findById(int id);
+    Optional<User> findById(UUID id);
 
     @EntityGraph(attributePaths = {"login"})
     @Query("SELECT e FROM #{#entityName} e WHERE e.deleted = false")

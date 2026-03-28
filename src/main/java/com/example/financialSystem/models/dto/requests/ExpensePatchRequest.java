@@ -23,6 +23,8 @@ public class ExpensePatchRequest {
     private BigDecimal value;
     @Schema(description = "date of the financial registry", example = "2024-06-01")
     private LocalDate dateFinancial;
+    @Schema(description = "description of the expense", example= "Dinner at restaurant")
+    private String description;
     @Schema(description = "base currency for the expense", example = "USD, EUR, BRL")
     private BenchMarkRate baseCurrency;
     @Schema(description = "payment method for the expense", example = "CREDIT_CARD, DEBIT_CARD, CASH, TRANSFER")

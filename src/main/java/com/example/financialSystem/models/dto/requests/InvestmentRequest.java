@@ -23,6 +23,10 @@ public record InvestmentRequest(
         @NotNull(message = "dateFinancial is required")
         LocalDate dateFinancial,
 
+        @Schema(description = "description of investment", example = "Investment in technology stocks")
+        @NotBlank(message = "description is required")
+        String description,
+
         @Schema(description = "base currency for the investment", example = "USD, EUR, BRL")
         @NotNull(message = "baseCurrency is required")
         BenchMarkRate baseCurrency,

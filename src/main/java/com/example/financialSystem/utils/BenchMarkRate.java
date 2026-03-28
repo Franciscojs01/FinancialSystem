@@ -4,15 +4,13 @@ import lombok.Getter;
 
 @Getter
 public enum BenchMarkRate {
-    BRL("CDI", 0.1365),
-    USD("Fedaral funds Rate", 0.0525),
-    EUR("Euribor",0.04);
+    BRL("CDI"),
+    USD("Fedaral funds Rate"),
+    EUR("Euribor");
 
     private final String name;
-    private final double annualRate;
 
-    BenchMarkRate(String name, double annualRate) {
+    BenchMarkRate(String name) {
         this.name = name;
-        this.annualRate = annualRate;
     }
 }

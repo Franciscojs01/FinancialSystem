@@ -1,8 +1,10 @@
 package com.example.financialSystem.configs.security;
 
 import com.example.financialSystem.services.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -13,31 +15,36 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
-@EnableMethodSecurity(securedEnabled = true)
+@EnableMethodSecurity
 @Configuration
 public class SecurityConfig {
-    private final SecurityFilter securityFilter;
 
-    public SecurityConfig(SecurityFilter securityFilter) {
+    private final SecurityFilter securityFilter;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
+
+    public SecurityConfig(SecurityFilter securityFilter, @Lazy UserService userService,
+                          PasswordEncoder passwordEncoder) {
         this.securityFilter = securityFilter;
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Bean
-    public SecurityFilterChain SecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-
-                        .requestMatchers("/auth/login","/user/register", "/user/admin/create").permitAll()
+                        .requestMatchers("/auth/login", "/user/register", "/user/admin/create", "/auth/logout")
+                        .permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/user/**").authenticated()
                         .requestMatchers(
@@ -46,6 +53,13 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
                         .anyRequest().authenticated()
+                )
+
+                .logout(logout -> logout
+                        .logoutUrl("/auth/logout")
+                        .logoutSuccessHandler((req, res, auth) ->
+                                res.setStatus(HttpServletResponse.SC_NO_CONTENT))
+                        .permitAll()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -58,15 +72,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationProvider authenticationProvider(UserService userService) {
+    public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userService);
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
-        
+        authenticationProvider.setPasswordEncoder(passwordEncoder);
         return authenticationProvider;
     }
 }

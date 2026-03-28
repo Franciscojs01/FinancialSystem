@@ -1,5 +1,6 @@
 package com.example.financialSystem.services;
 
+import com.example.financialSystem.exceptions.UserInactiveException;
 import com.example.financialSystem.exceptions.duplicates.UserDuplicateException;
 import com.example.financialSystem.exceptions.notFound.UserNotFoundException;
 import com.example.financialSystem.models.dto.requests.UserPatchRequest;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService extends UserLoggedService implements UserDetailsService {
@@ -49,7 +51,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
                 );
 
         if (login.getUser().getDeleted()) {
-            throw new UsernameNotFoundException("User is inactive");
+            throw new UserInactiveException("User is inactive");
         }
 
         return login;
@@ -66,7 +68,6 @@ public class UserService extends UserLoggedService implements UserDetailsService
         newUser.setUserRole(UserRole.ADMIN);
 
         Login login = new Login(
-                newUser.getId(),
                 newUser,
                 request.getEmail(),
                 passwordEncoder.encode(request.getPassword())
@@ -90,7 +91,6 @@ public class UserService extends UserLoggedService implements UserDetailsService
         newUser.setUserRole(UserRole.USER);
 
         Login login = new Login(
-                newUser.getId(),
                 newUser,
                 request.getEmail(),
                 passwordEncoder.encode(request.getPassword())
@@ -103,7 +103,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
     }
 
     @Transactional
-    public UserResponse updateUser(int id, UserRequest request) {
+    public UserResponse updateUser(UUID id, UserRequest request) {
         User user = userRepository.findById(id)
                         .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -116,7 +116,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
     }
 
     @Transactional
-    public UserResponse patchUser(int id, UserPatchRequest patchRequest) {
+    public UserResponse patchUser(UUID id, UserPatchRequest patchRequest) {
         User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -128,7 +128,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    public UserResponse getUserById(int id) {
+    public UserResponse getUserById(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -149,7 +149,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    public void deactivateUser(int id) {
+    public void deactivateUser(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 
@@ -162,7 +162,7 @@ public class UserService extends UserLoggedService implements UserDetailsService
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    public void activateUser(int id) {
+    public void activateUser(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
 

@@ -7,13 +7,14 @@ import org.springframework.data.jpa.repository.EntityGraph;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface InvestmentRepository extends BaseRepository<Investment, Integer> {
     @EntityGraph(attributePaths = {"user"})
     Optional<Investment> findByUserAndInvestmentTypeAndBrokerName(User user, InvestmentType investmentType, String brokerName);
 
     @EntityGraph(attributePaths = {"user"})
-    Optional<Investment> findById(int id);
+    Optional<Investment> findById(UUID id);
 
     @EntityGraph(attributePaths = {"user"})
     List<Investment> findByUserAndDeletedFalse(User user);

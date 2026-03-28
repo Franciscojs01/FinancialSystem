@@ -10,6 +10,7 @@ import com.example.financialSystem.models.entity.Investment;
 import com.example.financialSystem.models.entity.Login;
 import com.example.financialSystem.models.entity.User;
 import com.example.financialSystem.models.enums.InvestmentType;
+import com.example.financialSystem.models.enums.SupportedCrypto;
 import com.example.financialSystem.models.enums.UserRole;
 import com.example.financialSystem.models.mapper.InvestmentMapper;
 import com.example.financialSystem.repositories.InvestmentRepository;
@@ -24,18 +25,25 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class InvestmentService extends UserLoggedService {
     private final InvestmentRepository investmentRepository;
     private final InvestmentMapper investmentMapper;
+    private final CurrencyService currencyService;
+    private final CryptoService cryptoService;
 
     public InvestmentService(LoginRepository loginRepository,
                              InvestmentRepository investmentRepository,
-                             InvestmentMapper investmentMapper) {
+                             InvestmentMapper investmentMapper,
+                             CurrencyService currencyService,
+                             CryptoService cryptoService) {
         super(loginRepository);
         this.investmentRepository = investmentRepository;
         this.investmentMapper = investmentMapper;
+        this.currencyService = currencyService;
+        this.cryptoService = cryptoService;
     }
 
     @Transactional
@@ -61,7 +69,7 @@ public class InvestmentService extends UserLoggedService {
     }
 
     @Transactional
-    public InvestmentResponse updateInvestment(int id, InvestmentRequest request) {
+    public InvestmentResponse updateInvestment(UUID id, InvestmentRequest request) {
         Investment existingInvestment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException(id));
 
@@ -77,7 +85,7 @@ public class InvestmentService extends UserLoggedService {
     }
 
     @Transactional
-    public InvestmentResponse patchInvestment(int id, InvestmentPatchRequest patchRequest) {
+    public InvestmentResponse patchInvestment(UUID id, InvestmentPatchRequest patchRequest) {
         Investment existingInvestment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException(id));
 
@@ -90,7 +98,7 @@ public class InvestmentService extends UserLoggedService {
         return investmentMapper.toResponse(investmentRepository.save(existingInvestment));
     }
 
-    public InvestmentResponse getInvestmentById(int id) {
+    public InvestmentResponse getInvestmentById(UUID id) {
         Investment investment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException(id));
 
@@ -118,7 +126,7 @@ public class InvestmentService extends UserLoggedService {
     }
 
     @Transactional
-    public void activateInvestment(int id) {
+    public void activateInvestment(UUID id) {
         Investment investment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException(id));
 
@@ -133,7 +141,7 @@ public class InvestmentService extends UserLoggedService {
     }
 
     @Transactional
-    public void deleteInvestment(int id) {
+    public void deleteInvestment(UUID id) {
         Investment investment = investmentRepository.findById(id)
                 .orElseThrow(() -> new InvestmentNotFoundException(id));
 
@@ -147,7 +155,7 @@ public class InvestmentService extends UserLoggedService {
         investmentRepository.save(investment);
     }
 
-    public InvestmentResponse simulateInvestment(int id, int days) {
+    public InvestmentResponse simulateInvestment(UUID id, int days) {
         if (days <= 0) {
             throw new IllegalArgumentException("Days must be greater than zero");
         }
@@ -170,7 +178,6 @@ public class InvestmentService extends UserLoggedService {
     }
 
     private BigDecimal calculateFutureValue(BigDecimal initialValue, double annualRate, int days) {
-
         if (days < 0) days = 0;
 
         double dailyRate = Math.pow(1 + annualRate, 1.0 / 365) - 1;
@@ -182,6 +189,23 @@ public class InvestmentService extends UserLoggedService {
     }
 
     private BigDecimal calculateCurrentValue(Investment investment) {
+        InvestmentType type = investment.getInvestmentType();
+
+        if (type.isCrypto()) {
+            String coinGeckoId = type.getCoinGeckoId();
+            String fiatBase = investment.getBaseCurrency().name().toLowerCase();
+
+            Double cryptoPrice = cryptoService.getCryptoPrice(coinGeckoId, fiatBase);
+
+            if (cryptoPrice != null) {
+                BigDecimal price = BigDecimal.valueOf(cryptoPrice);
+                BigDecimal quantity = BigDecimal.valueOf(investment.getActionQuantity());
+
+                return price.multiply(quantity).setScale(4, RoundingMode.HALF_UP);
+            }
+
+            return investment.getValue();
+        }
 
         int days = Math.toIntExact(ChronoUnit.DAYS.between(
                 investment.getDateFinancial(),
@@ -194,9 +218,13 @@ public class InvestmentService extends UserLoggedService {
     }
 
     private double getAnnualRate(Investment investment) {
-        return (investment.getInvestmentType().getRate() != null)
-                ? investment.getInvestmentType().getRate()
-                : investment.getBaseCurrency().getAnnualRate();
+        if (investment.getInvestmentType().getRate() != null) {
+            return investment.getInvestmentType().getRate();
+        }
+
+        String currencyCode = investment.getBaseCurrency().name();
+
+        return currencyService.getLiveRates(currencyCode);
     }
 
     private void validateInvestmentDate(LocalDate date) {
@@ -222,6 +250,7 @@ public class InvestmentService extends UserLoggedService {
                         && oldInvestment.getActionQuantity() == newInvestmentReq.actionQuantity()
                         && oldInvestment.getDateFinancial().isEqual(newInvestmentReq.dateFinancial())
                         && oldInvestment.getValue().compareTo(newInvestmentReq.value()) == 0
+                        && oldInvestment.getDescription().equals(newInvestmentReq.description())
                         && oldInvestment.getBaseCurrency() == newInvestmentReq.baseCurrency()
                         && oldInvestment.getBrokerName().equals(newInvestmentReq.brokerName());
 

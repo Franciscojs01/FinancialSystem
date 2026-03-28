@@ -17,6 +17,4 @@ public class Cost extends Financial {
     @Enumerated(EnumType.STRING)
     private CostType costType;
 
-    private String observation;
-
 }

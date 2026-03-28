@@ -7,12 +7,14 @@ import com.example.financialSystem.utils.BenchMarkRate;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -23,11 +25,6 @@ import java.time.LocalDate;
 @EntityListeners(FinancialTypeListener.class)
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class Financial extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "financial_id")
-    private int id;
-
     @DecimalMin(value = "0.01", message = "Value must be greater than 0")
     private BigDecimal value;
 
@@ -39,6 +36,9 @@ public abstract class Financial extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private FinancialType financialType;
+
+    @NotBlank(message = "description is required")
+    private String description;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

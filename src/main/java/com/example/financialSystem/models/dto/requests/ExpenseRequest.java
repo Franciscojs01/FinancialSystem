@@ -23,6 +23,10 @@ public record ExpenseRequest(
         @NotNull(message = "dateFinancial is required")
         LocalDate dateFinancial,
 
+        @Schema(description = "description of the expense", example= "Dinner at restaurant")
+        @NotBlank(message = "description is required")
+        String description,
+
         @Schema(description = "base currency for the expense", example = "USD, EUR, BRL")
         @NotNull(message = "baseCurrency is required")
         BenchMarkRate baseCurrency,
